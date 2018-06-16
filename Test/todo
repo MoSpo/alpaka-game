@@ -1,0 +1,14 @@
+add network pipeline to vs AI
+add randomness to ties
+add mana system, complete with mana equation and using mana for attacks (need to make a new 'end resolution'?)
+display name and stats for actions
+add creatures from demo
+add switching and choice of creature
+add death
+add messages to message system such as attack message
+
++ add as many moves as you can to game per day
+...
+make game camera pan with mouse
+animate health bar
+toggle between 5 different camera angles

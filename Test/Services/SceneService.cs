@@ -17,7 +17,9 @@ namespace Alpaka.Services {
     static class SceneService {
         private static Scene currentScene;
         private static Overlay currentOverlay;
-        public static MainGame game;
+        //public static MainGame game; //Change back later
+		public static Game game;
+
         public static InputService input;
         private static BattleScene battleScene;
         private static MapScene mapScene;

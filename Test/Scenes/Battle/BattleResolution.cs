@@ -90,7 +90,9 @@ namespace Alpaka.Scenes.Battle {
 					Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ATTACKING, User));
 
 				} else {
-					Animations.Add(Action.Animation);
+					Animations.Add(new SceneAnimation(2, new double[] {
+				Battle.GetOpponent(User).playerNumber }, "#ATTACK ANIMATION#"));
+					//Animations.Add(Action.Animation); //TODO: DONT PASS AS ARGUMENT
 					User.amountOfAttacks = 1;
 				}
 

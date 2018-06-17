@@ -158,8 +158,8 @@ namespace Alpaka {
                 
             }
             if (st > 0) {
-                status.sourcex = (st - 1) % 3;
-                status.sourcey = (int)(Math.Floor((double)(st - 1) / 3));
+				status.sourcey = ((st - 1) % 4)*32;
+				status.sourcex = (int)(Math.Floor((double)(st)-1 / 4))*32;
                 status.Draw(288 + x, 18 + y, spriteBatch);
             }
 

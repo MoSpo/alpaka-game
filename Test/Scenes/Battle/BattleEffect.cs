@@ -7,7 +7,7 @@ namespace Alpaka.Scenes.Battle {
 		public byte Priority;
 
 		public byte Lifespan;
-		public bool IsInfinate;
+		public bool IsInfinate = false;
 
 		public CreatureElement Element; //TODO: ADD ELEMENTS
 		public List<byte> Placement;
@@ -21,8 +21,8 @@ namespace Alpaka.Scenes.Battle {
 
 		public byte CurrentLifespan;
 
-		public BattleEffect(short Priority, byte Lifespan, byte[] Placement, EffectScript[] Scripts) {
-			this.Priority = (byte)(Priority);
+		public BattleEffect(byte Priority, byte Lifespan, byte[] Placement, EffectScript[] Scripts) {
+			this.Priority = Priority;
 			this.Lifespan = Lifespan;
 			CurrentLifespan = Lifespan;
 			if (Placement == null) {
@@ -53,11 +53,14 @@ namespace Alpaka.Scenes.Battle {
 			return null;
 		}
 
-		public bool DecreaseLifespan() {
-			// if (!IsInfinate) {
+		public void DecreaseLifespan() {
+			if (!IsInfinate) {
 			CurrentLifespan--;
-			return CurrentLifespan == 0;
-			// }
+			}
+		}
+
+		public bool IsLifespanDepleted() {
+			return CurrentLifespan == 0; //TODO: BUG IF INITIALISED TO 0
 		}
 
 		public bool HasTrigger(EffectTrigger trigger) {

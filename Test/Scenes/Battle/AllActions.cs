@@ -65,7 +65,7 @@ namespace Alpaka.Scenes.Battle {
 				 ActionCategory.PHYSICAL,
 				60,          //SPEED
 				0,           //PRIORITY MODIFIER
-				60,          //POWER
+				5,//60,          //POWER
 				15,          //USAGE
 				0,           //MANA
 				new BattleEffect(
@@ -89,8 +89,8 @@ namespace Alpaka.Scenes.Battle {
 				8,          //USAGE
 				0,           //MANA
 				new BattleEffect(
-					10, //PRIORITY
-					1, //LIFESPAN
+					9, //PRIORITY
+					3, //LIFESPAN
 					new byte[1] { 0 }, //PLACEMENT
 					new EffectScript[2] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
 														   70, //SPEED
@@ -113,7 +113,7 @@ namespace Alpaka.Scenes.Battle {
 				10,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
-					1, //LIFESPAN
+					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   60, //SPEED
@@ -153,7 +153,7 @@ namespace Alpaka.Scenes.Battle {
 				50,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
-					1, //LIFESPAN
+					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   120, //SPEED
@@ -173,7 +173,7 @@ namespace Alpaka.Scenes.Battle {
 				20,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
-					1, //LIFESPAN
+					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   80, //SPEED
@@ -193,7 +193,7 @@ namespace Alpaka.Scenes.Battle {
 				20,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
-					1, //LIFESPAN
+					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   50, //SPEED
@@ -212,8 +212,8 @@ namespace Alpaka.Scenes.Battle {
 				5,          //USAGE
 				20,           //MANA
 				new BattleEffect(
-					10, //PRIORITY
-					1, //LIFESPAN
+					9, //PRIORITY
+					10, //LIFESPAN
 					new byte[3] { 3, 4, 5 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
 														   50, //SPEED
@@ -233,7 +233,7 @@ namespace Alpaka.Scenes.Battle {
 				20,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
-					1, //LIFESPAN
+					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   55, //SPEED

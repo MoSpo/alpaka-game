@@ -106,9 +106,11 @@ namespace Alpaka.Scenes.Battle {
 				} else {
 
 					if (pollIndex == 10) {
-						foreach (List<BattleEffect> Effects in SortedEffects[EffectTrigger.EACHTURN_UNTIL_EFFECT_END].Values) {
-							foreach (BattleEffect Effect in Effects) {
-								BattlePhases[Effect.Priority - 1].CurrentPhaseEffects.Add(Effect);
+						foreach (EffectTrigger type in Enum.GetValues(typeof(EffectTrigger))) {
+							foreach (List<BattleEffect> Effects in SortedEffects[type].Values) {
+								foreach (BattleEffect Effect in Effects) {
+									if(Effect.Priority != 10) BattlePhases[Effect.Priority - 1].CurrentPhaseEffects.Add(Effect);
+								}
 							}
 						}
 
@@ -281,6 +283,9 @@ namespace Alpaka.Scenes.Battle {
 
 					SortedEffects[Script.Trigger][Script.Speed].Remove(Effect);
 				}
+				if (Script.Trigger == EffectTrigger.ON_STAND_EXIT) {
+					Animations.AddRange(RunTriggerEffectType(EffectTrigger.ON_STAND_EXIT, null));
+				}
 			}
 			return Animations;
 		}
@@ -407,6 +412,7 @@ namespace Alpaka.Scenes.Battle {
 							Animations.AddRange(InterpretEffect(Effect.GetTriggeredEffect(Trigger), Effect.User, null, 0));
 						}
 					}
+					Effects.RemoveAll(Effect => Effect.IsLifespanDepleted());
 				}
 			}
 			return Animations;
@@ -520,6 +526,7 @@ namespace Alpaka.Scenes.Battle {
 						Animations.AddRange(InterpretEffect(Effect.GetTriggeredEffect(EffectTrigger.ON_NEW_TILE_HERE), Effect.User, null, Position));
 					}
 				}
+				Effects.RemoveAll(Effect => Effect.IsLifespanDepleted());
 			}
 			return Animations;
 		}
@@ -544,6 +551,7 @@ namespace Alpaka.Scenes.Battle {
 							Animations.AddRange(InterpretEffect(Effect.GetTriggeredEffect(Trigger), Effect.User, Player2, Effect.CurrentPlacement));
 						}
 					}
+					Effects.RemoveAll(Effect => Effect.IsLifespanDepleted());
 				}
 			} else if(!Target.IsKilled()){
 				foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
@@ -555,6 +563,7 @@ namespace Alpaka.Scenes.Battle {
 							Animations.AddRange(InterpretEffect(Effect.GetTriggeredEffect(Trigger), Effect.User, Target, Effect.CurrentPlacement));
 						}
 					}
+					Effects.RemoveAll(Effect => Effect.IsLifespanDepleted());
 				}
 			}
 			return Animations;

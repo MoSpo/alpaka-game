@@ -125,9 +125,12 @@ namespace Alpaka.Scenes.Battle {
 
 		void TRANSPORT_RIP() {
 			Trigger.HasActionDelay.SetFlag(255);
+			Animations.Add(new SceneAnimation(0, null, "Flag Set"));
+
 		}
 		void TRANSPORT_RIP2() {
 			Trigger.HasActionDelay.RemoveFlag();
+			Animations.Add(new SceneAnimation(0, null, "Flag Unset"));
 		}
 		void HOVER() {
 			User.NotEffectedByEarth.SetFlag(3);
@@ -142,7 +145,7 @@ namespace Alpaka.Scenes.Battle {
 			Animations.Add(new SceneAnimation(0,null, "All but Ice Effects have been removed from the Arena!"));
 		}
 		void SOLIDIFY() {
-			Opponent.newElement = CreatureElement.ICE;
+			Opponent.newElement = CreatureElement.ICE; //TODO: FUCKING HELL
 		}
 		void CEASEFIRE() {
 			User.CanBeAttacked.SetFlag(1);

@@ -198,7 +198,7 @@ namespace Alpaka {
                 engine.Player1.SelectAction((byte)(menu.chosenAction-1));
                 engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
                 engine.Player2.SelectAction(0);
-                engine.Player2.SelectMovement(MovementCategory.MOVE_RIGHT);
+				engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
                 for (int i = 0; i < 10; i++) {
                     List<SceneAnimation> a = engine.Poll();
                     if (a == null) {

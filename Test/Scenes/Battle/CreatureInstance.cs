@@ -34,7 +34,8 @@ namespace Alpaka.Scenes.Battle {
             CreatureType = temp.GetCreature(0);
             Nickname = CreatureType.Name;
             AllActions temp2 = new AllActions();
-            Actions[0] = temp2.GetAction(1);
+            Actions[0] = temp2.GetAction(2);
+			Actions[1] = temp2.GetAction(3);
 
 			for (byte i = 0; i < 6; i++) {
 				ActionAmountUsed[i] = 10;

@@ -26,13 +26,14 @@ namespace Alpaka.Scenes.Battle {
             //CurrentPhaseEffects.Sort(Comparer<BattleEffect>.Create((e1, e2) => e1.Speeds[(int)EffectTrigger.EACHTURN_UNTIL_EFFECT_END].CompareTo(e2.Speeds[(int)EffectTrigger.EACHTURN_UNTIL_EFFECT_END])));
 
 			foreach (BattleEffect Effect in CurrentPhaseEffects) {
-                if (Effect.HasTrigger(EffectTrigger.EACHTURN_UNTIL_EFFECT_END)) {
+				if (Effect.HasTrigger(EffectTrigger.EACHTURN_UNTIL_EFFECT_END)) {
 					if (Effect.EffectAnimation != null) {
 						Animations.Add(Effect.EffectAnimation);
 					}
 					Animations.AddRange(Battle.InterpretEffect(Effect.GetTriggeredEffect(EffectTrigger.EACHTURN_UNTIL_EFFECT_END), Effect.User, null, Effect.CurrentPlacement));
-                }
-				if (Effect.DecreaseLifespan()) {
+				}
+				Effect.DecreaseLifespan();
+				if (Effect.IsLifespanDepleted()) {
 					Animations.AddRange(Battle.RemoveEffect(Effect, true));
 				}
             }

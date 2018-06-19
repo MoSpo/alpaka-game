@@ -70,7 +70,7 @@ namespace Alpaka.Scenes.Battle {
 				Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ACTION, User));
 
 				if (Action.ActionEffect != null) {
-					Battle.AddEffect(Action.ActionEffect, User); //TODO???: PROPER ADDING OF ACTION EFFECTS TO CURRENT BATTLE STATE
+                    Animations.AddRange(Battle.AddEffect(Action.ActionEffect, User)); //TODO???: PROPER ADDING OF ACTION EFFECTS TO CURRENT BATTLE STATE
 				}
 
 				if (Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL) { //TODO: ADD ADAPTIVES AND DEFENSIVES

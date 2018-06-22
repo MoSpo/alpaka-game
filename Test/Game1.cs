@@ -36,7 +36,6 @@ namespace Alpaka {
 
         public bool nextAnim = false;
 
-
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 720;
@@ -47,7 +46,7 @@ namespace Alpaka {
 
         private void PrintAnim() {
             foreach (SceneAnimation an in anim) {
-                Console.Write(an.ID + ": ");
+	            Console.Write(an.ID + ": ");
                 if (an.values != null) {
                     foreach (int i in an.values) {
                         Console.Write(i + " ");
@@ -154,7 +153,6 @@ namespace Alpaka {
 
             background = Content.Load<Texture2D>("bkground2");
             shade = Content.Load<Texture2D>("shade");
-
         }
 
         protected override void UnloadContent() {
@@ -188,7 +186,7 @@ namespace Alpaka {
             MouseState state = Mouse.GetState();
             menu.Update(dt, state.LeftButton == ButtonState.Pressed, state.X, state.Y);
             phasecounter.Update(dt);
-            arena.UpdateArenaRot(dt, this);
+            arena.Rotate(dt, this);
             leftbar.Update(dt);
             rightbar.Update(dt);
 
@@ -234,6 +232,7 @@ namespace Alpaka {
             rightbar.Draw(spriteBatch, 720 - 336 - 7, 22);
             menu.Draw(spriteBatch);
             phasecounter.Draw(spriteBatch);
+
 
             if (builtmessage != null) {
                 spriteBatch.DrawString(font, builtmessage, new Vector2(250, 430), Color.White);

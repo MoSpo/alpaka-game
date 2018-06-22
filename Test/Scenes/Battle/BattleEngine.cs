@@ -456,10 +456,10 @@ namespace Alpaka.Scenes.Battle {
                 RunTriggerEffectType(EffectTrigger.ON_STAND_EXIT, null)
             );
 
-            Player1.Placement = (byte)((ArenaOrientation) % 8);
-            Player2.Placement = (byte)((ArenaOrientation + 4) % 8);
+            Player1.Placement = (byte)((ArenaOrientation + 8) % 8);
+            Player2.Placement = (byte)((ArenaOrientation + 4 + 8) % 8);
 
-            Animations.Add(new SceneAnimation(3, new double[] { RotationDelta }, "#MOVEMENT#"));
+            Animations.Add(new SceneAnimation(3, new double[] { RotationDelta }, "#MOVEMENT ANIMATION#"));
 
             Animations.AddRange(
                 RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, null)
@@ -515,8 +515,8 @@ namespace Alpaka.Scenes.Battle {
                 RunTriggerEffectType(EffectTrigger.ON_STAND_EXIT, null)
             );
 
-            Player1.Placement = (byte)((Player1.Placement + RotationDelta) % 8);
-            Player2.Placement = (byte)((Player1.Placement + RotationDelta) % 8);
+            Player1.Placement = (byte)((Player1.Placement + RotationDelta + 8) % 8);
+            Player2.Placement = (byte)((Player1.Placement + RotationDelta + 8) % 8);
 
             Animations.Add(new SceneAnimation(3, new double[] { RotationDelta }, "#MOVEMENT ANIMATION#"));
 

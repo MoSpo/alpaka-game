@@ -38,7 +38,7 @@ namespace Alpaka {
             timer = 0;
         }
 
-        public bool UpdateArenaRot(double dt, Game1 g)
+        public void Rotate(double dt, Game1 g)
         {
             if (rot != 0)
             {
@@ -76,7 +76,6 @@ namespace Alpaka {
                     angle -= dt * Math.PI / 4;
                 }
                 rotating = true;
-                return false;
             }
             else
             {
@@ -84,7 +83,6 @@ namespace Alpaka {
                     rotating = false;
                     g.nextAnim = true;
                 }
-                return true;
             }
         }
 

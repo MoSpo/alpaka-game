@@ -20,18 +20,30 @@ namespace Alpaka {
 				new ArenaEffect(Content),
 				new ArenaEffect(Content),
 				new ArenaEffect(Content),
-			};
-			poses = new Vector2[] {
-				new Vector2(0,0),
-				new Vector2(0,0),
-								new Vector2(0,0),
-								new Vector2(0,0),
-								new Vector2(0,0),
-								new Vector2(0,0),
-								new Vector2(0,0),
-								new Vector2(0,0),
-			};
-			timer = 0;
+                new ArenaEffect(Content),
+                new ArenaEffect(Content),
+                new ArenaEffect(Content),
+
+            };
+
+            poses = new Vector2[] {
+	    		new Vector2(145,350),
+    			new Vector2(205,315),
+				new Vector2(360,300),
+				new Vector2(515,315),
+				new Vector2(575,350),
+				new Vector2(515,405),
+                new Vector2(360,420),
+                new Vector2(205,405),
+            };
+
+            for (int i = 0; i < effects.Length; i++) {
+                effects[i].amt = (i % 3) +1;
+                effects[i].setPosition(poses[i]);
+                if (effects[i].y > 350) effects[i].InFocus = false;
+            }
+
+            timer = 0;
 		}
 
 		public void Update(double dt) {
@@ -64,18 +76,28 @@ namespace Alpaka {
 				}
 
 				if (rot > 0) {
-					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8]);
+					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8].X + (poses[(8 + i + 1 + pos) % 8].X - poses[(8 + i + pos) % 8].X) * timer, poses[(8 + i + pos) % 8].Y + (poses[(8 + i + 1 + pos) % 8].Y - poses[(8 + i + pos) % 8].Y) * timer);
 					//angle += dt * Math.PI / 4;
 				} else if (rot < 0) {
-					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8]);
-					//angle -= dt * Math.PI / 4;
-				}
+					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8].X + (poses[(8 + i - 1 + pos) % 8].X - poses[(8 + i + pos) % 8].X) * timer, poses[(8 + i + pos) % 8].Y + (poses[(8 + i - 1 + pos) % 8].Y - poses[(8 + i + pos) % 8].Y) * timer);
+                    //angle -= dt * Math.PI / 4;
+                }
 
-			}
+                for (int i = 0; i < effects.Length; i++) {
+                    if (!effects[i].useTimer) {
+                        if (effects[i].y > 350 && effects[i].InFocus) effects[i].Foreground();
+                        else if (effects[i].y < 405 && !effects[i].InFocus) effects[i].Background();
+                    }
+                }
+
+            }
 		}
 
-		public void Draw(SpriteBatch spriteBatch) {
-			foreach (ArenaEffect eff in effects) eff.Draw(spriteBatch);
+		public void DrawForeground(SpriteBatch spriteBatch) {
+			foreach (ArenaEffect eff in effects) if(!eff.InFocus) eff.Draw(spriteBatch);
 		}
-	}
+        public void DrawBackground(SpriteBatch spriteBatch) {
+            foreach (ArenaEffect eff in effects) if (eff.InFocus) eff.Draw(spriteBatch);
+        }
+    }
 }

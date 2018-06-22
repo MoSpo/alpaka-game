@@ -13,6 +13,7 @@ namespace Alpaka {
         BattleEngine engine;
 
         Arena arena;
+        ArenaEffects effects;
         Menu menu;
         Phase phasecounter;
 
@@ -93,6 +94,8 @@ namespace Alpaka {
                     break;
                     case 3: //Arena Animation
                     arena.rot = (int)an.values[0];
+                    effects.rot = (int)an.values[0];
+                    menu.rot = (int)an.values[0];
                     nextAnim = false;
                     break;
                     case 4: //Phase Animation
@@ -138,6 +141,7 @@ namespace Alpaka {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             arena = new Arena(Content);
+            effects = new ArenaEffects(Content);
             menu = new Menu(Content);
             menu.g = this;
             phasecounter = new Phase(Content);
@@ -187,6 +191,9 @@ namespace Alpaka {
             menu.Update(dt, state.LeftButton == ButtonState.Pressed, state.X, state.Y);
             phasecounter.Update(dt);
             arena.Rotate(dt, this);
+            menu.Rotate(dt);
+            effects.Rotate(dt);
+            effects.Update(dt);
             leftbar.Update(dt);
             rightbar.Update(dt);
 
@@ -225,8 +232,13 @@ namespace Alpaka {
             spriteBatch.Begin();
             spriteBatch.Draw(shade, Vector2.Zero);
 
+            effects.DrawBackground(spriteBatch);
+
             user.Draw(spriteBatch, 0);
             opponent.Draw(spriteBatch, 464);
+
+            effects.DrawForeground(spriteBatch);
+
 
             leftbar.Draw(spriteBatch, 7, 22);
             rightbar.Draw(spriteBatch, 720 - 336 - 7, 22);

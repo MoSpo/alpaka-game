@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework.Content;
 namespace Alpaka {
 	public class ArenaEffect {
 
-		bool InFocus = true;
-		bool useTimer = false;
-		double timer;
+		public bool InFocus = true;
+		public bool useTimer = false;
+		double timer = 0;
 
 		Texture2D block;
 
@@ -49,7 +49,12 @@ namespace Alpaka {
 			x = vec.X;
 			y = vec.Y;
 		}
-		public void blend(double ti, Color startColor, Color endColor) {
+        public void setPosition(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void blend(double ti, Color startColor, Color endColor) {
 			currentColor.R = (byte)(startColor.R + (endColor.R - startColor.R) * ti);
 			currentColor.B = (byte)(startColor.B + (endColor.B - startColor.B) * ti);
 			currentColor.G = (byte)(startColor.G + (endColor.G - startColor.G) * ti);
@@ -57,23 +62,23 @@ namespace Alpaka {
 		}
 
 		public void Draw(SpriteBatch spriteBatch) {
-			if (useTimer) {
-				if (!InFocus) {
-					blend(timer, normalColor, fadedColor);
-				} else {
-					blend(timer, fadedColor, normalColor);
-				}
-				for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int)y - 70 * i), currentColor);
+			if (useTimer && timer <= 0.6) {
+                if (InFocus) {
+                    blend(timer / 0.6, fadedColor, normalColor);
+                } else {
+                    blend(timer / 0.6, normalColor, fadedColor);
+                }
+                for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int)y - 60 - 70 * i), currentColor);
 
-				if (timer > 0.6) {
-					timer = 0;
-					useTimer = false;
-				}
 			} else {
-				if (InFocus) {
-					for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int )y - 70 * i), normalColor);
+                if (timer > 1) {
+                    timer = 0;
+                    useTimer = false;
+                }
+                if (InFocus) {
+					for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int )y - 60 -70 * i), normalColor);
 				} else {
-					for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int) y - 70 * i), fadedColor);			
+					for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int) y -60 - 70 * i), fadedColor);			
 				}
 			}
         }

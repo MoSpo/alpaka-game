@@ -44,8 +44,8 @@ namespace Alpaka.Scenes.Battle {
         private Random randomGen;
 
         public BattleEngine() {
-            Player1 = new Player();
-            Player2 = new Player();
+            Player1 = new Player(0);
+            Player2 = new Player(4);
 
             Interpreter = new EffectHardExecute(this);
             Network = new BattleNetwork(null, 0);
@@ -242,8 +242,9 @@ namespace Alpaka.Scenes.Battle {
                         Animations.AddRange(RunSameTilePlacedEffect((byte)((Placement + ArenaOrientation + 4) % 8)));
 
                     }
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_EFFECT, new double[] { Effect.CurrentPlacement }, Effect.Name));
                     Animations.AddRange(RunEffectType(EffectTrigger.ON_NEW_TILE_PLACED, null));
-                    Animations.AddRange(RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, null));
+                    Animations.AddRange(RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, User));
 
                 } else if (Placement == 8) {
                     //TODO: CENTRE EFFECTS
@@ -294,6 +295,7 @@ namespace Alpaka.Scenes.Battle {
 
                     SortedEffects[Script.Trigger][Script.Speed].Remove(Effect);
                 }
+				if (Effect.CurrentPlacement < 8) Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.REMOVE_EFFECT, new double[] { Effect.CurrentPlacement }, Effect.Name));
             }
             return Animations;
         }
@@ -363,7 +365,7 @@ namespace Alpaka.Scenes.Battle {
                 }
 
                 for (int i = 0; i < AmountOfAttacks; i++) {
-                    Animations.Add(new SceneAnimation(2, new double[] {
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ATTACK, new double[] {
                 GetOpponent(Target).playerNumber }, "#ATTACK ANIMATION#"));
                     //Animations.Add(AttackAnimation); //TODO: DONT PASS AS ARGUMENT
                     Animations.AddRange(Target.GiveDamage(Element, Catagory, BaseAmount, Target, GetOpponent(Target)));
@@ -374,9 +376,9 @@ namespace Alpaka.Scenes.Battle {
                 }
                 if (AmountOfAttacks > 1) {
                     if (AmountOfAttacks == 2) {
-                        Animations.Add(new SceneAnimation(0, null, "Damage landed twice!"));
+						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Damage landed twice!"));
                     } else {
-                        Animations.Add(new SceneAnimation(0, null, "Damage landed " + AmountOfAttacks + " times!"));
+                        Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Damage landed " + AmountOfAttacks + " times!"));
                     }
                 }
                 if (Target.IsKilled()) {
@@ -386,10 +388,10 @@ namespace Alpaka.Scenes.Battle {
                     );
                     Target.ActiveCreature.killed = true;
 
-                    Animations.Add(new SceneAnimation(5, new double[] {
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.DEATH, new double[] {
                 Target.playerNumber }, "#DEATH ANIMATION#"));
 
-                    Animations.Add(new SceneAnimation(0, null, Target.ActiveCreature.Nickname + " collapses!"));
+                    Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " collapses!"));
 
                     Animations.AddRange(
                         RunEffectType(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target))
@@ -409,6 +411,7 @@ namespace Alpaka.Scenes.Battle {
 
 
         public List<SceneAnimation> RunEffectType(EffectTrigger Trigger, Player TargetUser) {
+			//If TargetUser is parsed it will only run if they are not killed
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
 
@@ -459,7 +462,7 @@ namespace Alpaka.Scenes.Battle {
             Player1.Placement = (byte)((ArenaOrientation + 8) % 8);
             Player2.Placement = (byte)((ArenaOrientation + 4 + 8) % 8);
 
-            Animations.Add(new SceneAnimation(3, new double[] { RotationDelta }, "#MOVEMENT ANIMATION#"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ARENA, new double[] { RotationDelta }, "#MOVEMENT ANIMATION#"));
 
             Animations.AddRange(
                 RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, null)
@@ -516,9 +519,9 @@ namespace Alpaka.Scenes.Battle {
             );
 
             Player1.Placement = (byte)((Player1.Placement + RotationDelta + 8) % 8);
-            Player2.Placement = (byte)((Player1.Placement + RotationDelta + 8) % 8);
+            Player2.Placement = (byte)((Player2.Placement + RotationDelta + 8) % 8);
 
-            Animations.Add(new SceneAnimation(3, new double[] { RotationDelta }, "#MOVEMENT ANIMATION#"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ARENA, new double[] { RotationDelta }, "#MOVEMENT ANIMATION#"));
 
             Animations.AddRange(
                 RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, null)

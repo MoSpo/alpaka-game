@@ -15,7 +15,7 @@ namespace Alpaka.Scenes.Battle {
         public List<SceneAnimation> Run() {
 			
             List<SceneAnimation> Animations = new List<SceneAnimation>();
-			Animations.Add(new SceneAnimation(4, new double[] { PhaseNumber }, "#PHASE ANIMATION#"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.PHASE, new double[] { PhaseNumber }, "#PHASE ANIMATION#"));
 
 			foreach (BattleResolution Resolution in Resolutions) {
 					if (Resolution.GetUser() == null || !Resolution.GetUser().IsKilled()) { //TODO: STOP GET USER BEING NULL I.E. REDESIGN END RESOLUTION

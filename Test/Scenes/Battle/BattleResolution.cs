@@ -34,16 +34,16 @@ namespace Alpaka.Scenes.Battle {
 				Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_MOVEMENT, null));
 			
 				if (RotationDelta > 0) {
-					Animations.Add(new SceneAnimation(0, null, User.ActiveCreature.Nickname + " moves right..."));
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves right..."));
 				} else if (RotationDelta < 0) {
-					Animations.Add(new SceneAnimation(0, null, User.ActiveCreature.Nickname + " moves left..."));
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves left..."));
 				}
 				//Do Movement
 				Animations.AddRange(Battle.DeltaRotate(RotationDelta));
 
 				Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_MOVEMENT, null));
 			} else {
-				Animations.Add(new SceneAnimation(0, null, User.ActiveCreature.Nickname + " stays still..."));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " stays still..."));
 			}
 			return Animations;
 		}
@@ -63,7 +63,7 @@ namespace Alpaka.Scenes.Battle {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
-			Animations.Add(new SceneAnimation(0, null, User.ActiveCreature.Nickname + " " + Action.Style + " with " + Action.Name + "!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " " + Action.Style + " with " + Action.Name + "!"));
 
 			if (User.CanAttackThisTurn.Evaluate()) { //TODO: WHY IS THIS IN TWICE???
 
@@ -82,7 +82,7 @@ namespace Alpaka.Scenes.Battle {
 						//Do Attack
 						Animations.AddRange(Battle.Damage(Opponent, Action.Element, Action.Catagory, Action.Power, User.amountOfAttacks, Action.Animation, User.TriggersAttackFlags.Evaluate()));
 					} else {
-						Animations.Add(new SceneAnimation(0, null, "But the Action failed!"));
+						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But the Action failed!"));
 					}
 
 					User.amountOfAttacks = 1; //Needed for if any following effects inflict damage
@@ -90,7 +90,7 @@ namespace Alpaka.Scenes.Battle {
 					Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ATTACKING, User));
 
 				} else {
-					Animations.Add(new SceneAnimation(2, new double[] {
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ATTACK, new double[] {
 				Battle.GetOpponent(User).playerNumber }, "#ATTACK ANIMATION#"));
 					//Animations.Add(Action.Animation); //TODO: DONT PASS AS ARGUMENT
 					User.amountOfAttacks = 1;
@@ -99,7 +99,7 @@ namespace Alpaka.Scenes.Battle {
 				Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ACTION, User));
 			
 			} else {
-				Animations.Add(new SceneAnimation(0, null, "But the Action failed!"));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But the Action failed!"));
 			}
 
 			User.amountOfAttacks = 1; //Needed for if user can't attack this turn

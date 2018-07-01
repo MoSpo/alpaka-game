@@ -82,11 +82,12 @@ namespace Alpaka.Scenes.Battle {
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,1}  //LIGHT
 		};
 
-		public Player() {
+		public Player(byte Placement) {
 			for (int i = 0; i < 6; i++) {
 				Team[i] = new CreatureInstance();
 			}
 			ActiveCreature = Team[0];
+			this.Placement = Placement;
 			Ready = false;
 		}
 
@@ -110,7 +111,7 @@ namespace Alpaka.Scenes.Battle {
             int nh = ActiveCreature.Health - Damage;
             if (nh < 0) nh = 0;
 
-            Animations.Add(new SceneAnimation(1, new double[] {
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.DAMAGE_BAR, new double[] {
                 playerNumber,
 				ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
 				nh,
@@ -133,7 +134,7 @@ namespace Alpaka.Scenes.Battle {
 
         public SceneAnimation GiveCondition(byte Condition) {
             ActiveCreature.GiveCondition(Condition);
-            return new SceneAnimation(6, new double[] { playerNumber, Condition }, "#CONDITION ANIMATION#");
+			return new SceneAnimation(SceneAnimation.SceneAnimationType.CONDITION, new double[] { playerNumber, Condition }, "#CONDITION ANIMATION#");
         }
 
         public bool SelectAction(byte ActionNumber) {

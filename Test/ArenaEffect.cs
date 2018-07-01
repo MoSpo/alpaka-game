@@ -15,17 +15,22 @@ namespace Alpaka {
 		public double x;
 		public double y;
 
-		public int amt = 3;
+		public string[] text = { "EFFECT1", "EFFECT2", "EFFECT3" };
+
+		public SpriteFont font;
+
+		public int amt = 0;
 
 		Color normalColor = new Color(255, 0, 0, 255);
 		Color fadedColor = new Color(127, 0, 0, 127);
 
 		Color currentColor = new Color(0, 0, 0, 0);
 
-		public ArenaEffect(ContentManager Content) {
+		public ArenaEffect(ContentManager Content, SpriteFont font) {
 			//displays stuff in the arena
 			//arena stuffs all have different heights. Two  things of the same height fade in and out of each other.
 			//Things of larger height are drawn first and things of smaller height are drawn last.
+			this.font = font;
 			block = Content.Load<Texture2D>("block");
 		}
 
@@ -68,17 +73,25 @@ namespace Alpaka {
                 } else {
                     blend(timer / 0.6, normalColor, fadedColor);
                 }
-                for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int)y - 60 - 70 * i), currentColor);
-
+				for (int i = 0; i < amt; i++) {
+					spriteBatch.Draw(block, new Vector2((int)x - 64, (int)y - 60 - 70 * i), currentColor);
+					spriteBatch.DrawString(font, text[i], new Vector2((int)x - 64, (int)y - 60 - 70 * i), Color.White);
+				}
 			} else {
                 if (timer > 1) {
                     timer = 0;
                     useTimer = false;
                 }
-                if (InFocus) {
-					for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int )y - 60 -70 * i), normalColor);
+				if (InFocus) {
+					for (int i = 0; i < amt; i++) {
+						spriteBatch.Draw(block, new Vector2((int)x - 64, (int)y - 60 - 70 * i), normalColor);
+						spriteBatch.DrawString(font, text[i], new Vector2((int)x - 64, (int)y - 60 - 70 * i), Color.White);
+					}
 				} else {
-					for (int i = 0; i < amt; i++) spriteBatch.Draw(block, new Vector2((int)x - 64, (int) y -60 - 70 * i), fadedColor);			
+					for (int i = 0; i < amt; i++) {
+						spriteBatch.Draw(block, new Vector2((int)x - 64, (int)y - 60 - 70 * i), fadedColor);
+						spriteBatch.DrawString(font, text[i], new Vector2((int)x - 64, (int)y - 60 - 70 * i), Color.White);
+					}
 				}
 			}
         }

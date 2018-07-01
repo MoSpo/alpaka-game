@@ -13,16 +13,16 @@ namespace Alpaka {
 
 		Vector2[] poses;
 
-		public ArenaEffects(ContentManager Content) {
+		public ArenaEffects(ContentManager Content, SpriteFont font) {
 			effects = new ArenaEffect[] {
-				new ArenaEffect(Content),
-				new ArenaEffect(Content),
-				new ArenaEffect(Content),
-				new ArenaEffect(Content),
-				new ArenaEffect(Content),
-                new ArenaEffect(Content),
-                new ArenaEffect(Content),
-                new ArenaEffect(Content),
+				new ArenaEffect(Content, font),
+				new ArenaEffect(Content, font),
+				new ArenaEffect(Content, font),
+				new ArenaEffect(Content, font),
+				new ArenaEffect(Content, font),
+                new ArenaEffect(Content, font),
+                new ArenaEffect(Content, font),
+                new ArenaEffect(Content, font),
 
             };
 
@@ -37,8 +37,19 @@ namespace Alpaka {
                 new Vector2(205,405),
             };
 
+			poses = new Vector2[] {
+				new Vector2(145,350),
+				new Vector2(205,405),
+								new Vector2(360,420),
+								new Vector2(515,405),
+								new Vector2(575,350),
+								new Vector2(515,315),
+								new Vector2(360,300),
+								new Vector2(205,315),
+			};
+
             for (int i = 0; i < effects.Length; i++) {
-                effects[i].amt = (i % 3) +1;
+                //effects[i].amt = (i % 3) == 0 ? 1 : 0;
                 effects[i].setPosition(poses[i]);
                 if (effects[i].y > 350) effects[i].InFocus = false;
             }
@@ -50,6 +61,17 @@ namespace Alpaka {
 			foreach (ArenaEffect eff in effects) eff.Update(dt);
 		}
 
+		public void Add(int pos, string name) {
+			ArenaEffect eff = effects[pos];
+			eff.text[eff.amt] = name;
+			eff.amt++;
+		}
+
+		public void Remove(int pos, string name) {
+			ArenaEffect eff = effects[pos];
+			eff.amt--;
+		}
+
 		public void Rotate(double dt) {
 			if (rot != 0) {
 				timer += dt;
@@ -58,11 +80,11 @@ namespace Alpaka {
 					timer = 0;
 					if (rot > 0) {
 						rot--;
-						pos++;
+						pos--;
 
 					} else if (rot < 0) {
 						rot++;
-						pos--;
+						pos++;
 					}
 
 					if (pos == 255) {
@@ -76,10 +98,10 @@ namespace Alpaka {
 				}
 
 				if (rot > 0) {
-					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8].X + (poses[(8 + i + 1 + pos) % 8].X - poses[(8 + i + pos) % 8].X) * timer, poses[(8 + i + pos) % 8].Y + (poses[(8 + i + 1 + pos) % 8].Y - poses[(8 + i + pos) % 8].Y) * timer);
+					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8].X + (poses[(8 + i - 1 + pos) % 8].X - poses[(8 + i + pos) % 8].X) * timer, poses[(8 + i + pos) % 8].Y + (poses[(8 + i - 1 + pos) % 8].Y - poses[(8 + i + pos) % 8].Y) * timer);
 					//angle += dt * Math.PI / 4;
 				} else if (rot < 0) {
-					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8].X + (poses[(8 + i - 1 + pos) % 8].X - poses[(8 + i + pos) % 8].X) * timer, poses[(8 + i + pos) % 8].Y + (poses[(8 + i - 1 + pos) % 8].Y - poses[(8 + i + pos) % 8].Y) * timer);
+					for (int i = 0; i < effects.Length; i++) effects[i].setPosition(poses[(8 + i + pos) % 8].X + (poses[(8 + i + 1 + pos) % 8].X - poses[(8 + i + pos) % 8].X) * timer, poses[(8 + i + pos) % 8].Y + (poses[(8 + i + 1 + pos) % 8].Y - poses[(8 + i + pos) % 8].Y) * timer);
                     //angle -= dt * Math.PI / 4;
                 }
 

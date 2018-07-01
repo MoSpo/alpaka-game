@@ -115,22 +115,22 @@ namespace Alpaka.Scenes.Battle {
 
 		void SPEED_SLASH() {
             Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.CUT));
-			Animations.Add(new SceneAnimation(0,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Cut!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Cut!"));
 		}
 
 		void SLINGSHOT() {
             Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
-			Animations.Add(new SceneAnimation(0,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
 		}
 
 		void TRANSPORT_RIP() {
 			Trigger.HasActionDelay.SetFlag(255);
-			Animations.Add(new SceneAnimation(0, null, "Flag Set"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Flag Set"));
 
 		}
 		void TRANSPORT_RIP2() {
 			Trigger.HasActionDelay.RemoveFlag();
-			Animations.Add(new SceneAnimation(0, null, "Flag Unset"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Flag Unset"));
 		}
 		void HOVER() {
 			User.NotEffectedByEarth.SetFlag(3);
@@ -140,9 +140,9 @@ namespace Alpaka.Scenes.Battle {
 		}
 		void FLASH_FREEZE() {
             Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.FROZEN));
-			Animations.Add(new SceneAnimation(0,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Frozen!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Frozen!"));
 			Battle.RemoveAllEffectsExceptElement(CreatureElement.ICE);
-			Animations.Add(new SceneAnimation(0,null, "All but Ice Effects have been removed from the Arena!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, "All but Ice Effects have been removed from the Arena!"));
 		}
 		void SOLIDIFY() {
 			Opponent.newElement = CreatureElement.ICE; //TODO: FUCKING HELL
@@ -154,7 +154,7 @@ namespace Alpaka.Scenes.Battle {
 		void COLD_STORAGE() {
 			if (Trigger.JustSwitchedIn) {
                 Animations.Add(Trigger.GiveCondition((byte)CreatureCondition.FROZEN));
-				Animations.Add(new SceneAnimation(0,null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " is Frozen!"));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " is Frozen!"));
 			}
 		}
 		void HEALING_BELL() {

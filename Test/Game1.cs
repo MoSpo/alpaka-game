@@ -47,9 +47,9 @@ namespace Alpaka {
 
         private void PrintAnim() {
             foreach (SceneAnimation an in anim) {
-	            Console.Write(an.ID + ": ");
-                if (an.values != null) {
-                    foreach (int i in an.values) {
+				Console.Write(an.Type + ": ");
+                if (an.Values != null) {
+					foreach (int i in an.Values) {
                         Console.Write(i + " ");
                     }
                 }
@@ -70,56 +70,53 @@ namespace Alpaka {
                     return;
                 }
                 SceneAnimation an = anim[animPointer];
-                switch (an.ID) {
-                    case 0: //Add message
+                switch (an.Type) {
+					case SceneAnimation.SceneAnimationType.ADD_MESSAGE: //Add message
                     message = an.Message;
                     doTimer = true;
                     nextAnim = false;
                     break;
-                    case 1: //Damage Given Animation
-                    if (an.values[0] == 1) {
-                        leftbar.totalHealth = (int)an.values[1];
-                        leftbar.health = (int)an.values[2];
+					case SceneAnimation.SceneAnimationType.DAMAGE_BAR: //Damage Given Animation
+                    if (an.Values[0] == 1) {
+                        leftbar.totalHealth = (int)an.Values[1];
+                        leftbar.health = (int)an.Values[2];
                         leftbar.useTimer = true;
                     } else {
-                        rightbar.totalHealth = (int)an.values[1];
-                        rightbar.health = (int)an.values[2];
+                        rightbar.totalHealth = (int)an.Values[1];
+                        rightbar.health = (int)an.Values[2];
                         rightbar.useTimer = true;
 
                     }
                     nextAnim = false;
                     break;
-                    case 2: // Attack Animation
+					case SceneAnimation.SceneAnimationType.ATTACK: // Attack Animation
                     nextAnim = true;
                     break;
-                    case 3: //Arena Animation
-                    arena.rot = (int)an.values[0];
-                    effects.rot = (int)an.values[0];
-                    menu.rot = (int)an.values[0];
+					case SceneAnimation.SceneAnimationType.ARENA: //Arena Animation
+                    arena.rot = (int)an.Values[0];
+                    effects.rot = (int)an.Values[0];
+                    menu.rot = (int)an.Values[0];
                     nextAnim = false;
                     break;
-                    case 4: //Phase Animation
-                    phasecounter.SetPhase((byte)an.values[0], this);
+					case SceneAnimation.SceneAnimationType.PHASE: //Phase Animation
+                    phasecounter.SetPhase((byte)an.Values[0], this);
                     nextAnim = false;
                     break;
-                    case 5: //Death Animation
+					case SceneAnimation.SceneAnimationType.DEATH: //Death Animation
                     Console.WriteLine("Default case");
                     break;
-                    case 6: //Condition Animation
-                    if (an.values[0] == 1) {
-                        leftbar.st = (byte)(an.values[1] + 1);
+					case SceneAnimation.SceneAnimationType.CONDITION: //Condition Animation
+                    if (an.Values[0] == 1) {
+                        leftbar.st = (byte)(an.Values[1] + 1);
                     } else {
-                        rightbar.st = (byte)(an.values[1] + 1);
+                        rightbar.st = (byte)(an.Values[1] + 1);
                     }
                     break;
-                    case 7:
-                    Console.WriteLine("Default case");
+					case SceneAnimation.SceneAnimationType.ADD_EFFECT:
+						effects.Add((int)an.Values[0], an.Message);
                     break;
-                    case 8:
-                    Console.WriteLine("Default case");
-                    break;
-                    case 9:
-                    Console.WriteLine("Default case");
+					case SceneAnimation.SceneAnimationType.REMOVE_EFFECT:
+						effects.Remove((int)an.Values[0], an.Message);
                     break;
                 }
                 animPointer += 1;
@@ -140,8 +137,10 @@ namespace Alpaka {
         protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+			font = Content.Load<SpriteFont>("File");
+
             arena = new Arena(Content);
-            effects = new ArenaEffects(Content);
+            effects = new ArenaEffects(Content, font);
             menu = new Menu(Content);
             menu.g = this;
             phasecounter = new Phase(Content);
@@ -149,8 +148,6 @@ namespace Alpaka {
             leftbar.setMaxHealth(engine.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
             rightbar = new RightBar(Content, this);
             rightbar.setMaxHealth(engine.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
-
-            font = Content.Load<SpriteFont>("File");
 
             user = new Battler(Content, "user2");
             opponent = new Battler(Content, "opponent2");
@@ -202,7 +199,7 @@ namespace Alpaka {
                 Console.WriteLine(menu.chosenMovement);
                 engine.Player1.SelectAction((byte)(menu.chosenAction-1));
                 engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
-                engine.Player2.SelectAction(0);
+                engine.Player2.SelectAction(1);
 				engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
                 for (int i = 0; i < 10; i++) {
                     List<SceneAnimation> a = engine.Poll();

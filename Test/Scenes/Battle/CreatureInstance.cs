@@ -36,10 +36,12 @@ namespace Alpaka.Scenes.Battle {
             //AllCreatures temp = new AllCreatures(); CreatureType = temp.GetCreature(0);
             CreatureType = BaseCreature;
             Nickname = CreatureType.Name;
+
             //
             AllActions temp2 = new AllActions();
-            Actions[0] = temp2.GetAction(2);
-			Actions[1] = temp2.GetAction(3);
+            for (byte i = 0; i < 6; i++) {
+                Actions[i] = temp2.GetAction(i);
+            }
             //
 
 			for (byte i = 0; i < 6; i++) {

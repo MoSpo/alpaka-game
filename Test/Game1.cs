@@ -31,6 +31,8 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
+        double GameSpeed = 0.7;
+
         public bool chosen = false;
 
         String message;
@@ -49,7 +51,7 @@ namespace Alpaka {
             foreach (SceneAnimation an in anim) {
 				Console.Write(an.Type + ": ");
                 if (an.Values != null) {
-					foreach (int i in an.Values) {
+					foreach (double i in an.Values) {
                         Console.Write(i + " ");
                     }
                 }
@@ -71,41 +73,45 @@ namespace Alpaka {
                 }
                 SceneAnimation an = anim[animPointer];
                 switch (an.Type) {
-					case SceneAnimation.SceneAnimationType.ADD_MESSAGE: //Add message
+					case SceneAnimation.SceneAnimationType.ADD_MESSAGE:
                     message = an.Message;
                     doTimer = true;
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.DAMAGE_BAR: //Damage Given Animation
+					case SceneAnimation.SceneAnimationType.HEALTH_BAR:
                     if (an.Values[0] == 1) {
-                        leftbar.totalHealth = (int)an.Values[1];
-                        leftbar.health = (int)an.Values[2];
-                        leftbar.useTimer = true;
+                        leftbar.setHealth((int)an.Values[2]);
                     } else {
-                        rightbar.totalHealth = (int)an.Values[1];
-                        rightbar.health = (int)an.Values[2];
-                        rightbar.useTimer = true;
-
+                        rightbar.setHealth((int)an.Values[2]);
                     }
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.ATTACK: // Attack Animation
+                    case SceneAnimation.SceneAnimationType.KIN_BAR:
+                    if (an.Values[0] == 1) {
+                        leftbar.setKin((int)an.Values[2]);
+                    } else {
+                        rightbar.setKin((int)an.Values[2]);
+                    }
+                    nextAnim = false;
+                    break;
+
+                    case SceneAnimation.SceneAnimationType.ATTACK:
                     nextAnim = true;
                     break;
-					case SceneAnimation.SceneAnimationType.ARENA: //Arena Animation
+					case SceneAnimation.SceneAnimationType.ARENA:
                     arena.rot = (int)an.Values[0];
                     effects.rot = (int)an.Values[0];
                     menu.rot = (int)an.Values[0];
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.PHASE: //Phase Animation
+                    case SceneAnimation.SceneAnimationType.PHASE:
                     phasecounter.SetPhase((byte)an.Values[0], this);
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.DEATH: //Death Animation
+					case SceneAnimation.SceneAnimationType.DEATH:
                     Console.WriteLine("Default case");
                     break;
-					case SceneAnimation.SceneAnimationType.CONDITION: //Condition Animation
+					case SceneAnimation.SceneAnimationType.CONDITION:
                     if (an.Values[0] == 1) {
                         leftbar.st = (byte)(an.Values[1] + 1);
                     } else {
@@ -146,8 +152,14 @@ namespace Alpaka {
             phasecounter = new Phase(Content);
             leftbar = new LeftBar(Content, this);
             leftbar.setMaxHealth(engine.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
+            leftbar.setMaxKin(1000);
+            leftbar.setElements((byte)engine.Player1.ActiveCreature.CreatureType.Elements[0], (byte)engine.Player1.ActiveCreature.CreatureType.Elements[1], (byte)engine.Player1.ActiveCreature.CreatureType.Elements[2]);
+            leftbar.name = engine.Player1.ActiveCreature.Nickname;
             rightbar = new RightBar(Content, this);
-            rightbar.setMaxHealth(engine.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
+            rightbar.setMaxHealth(engine.Player2.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
+            rightbar.setMaxKin(1000);
+            rightbar.setElements((byte)engine.Player2.ActiveCreature.CreatureType.Elements[0], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[1], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[2]);
+            rightbar.name = engine.Player2.ActiveCreature.Nickname;
 
             user = new Battler(Content, "user2");
             opponent = new Battler(Content, "opponent2");
@@ -159,13 +171,20 @@ namespace Alpaka {
         protected override void UnloadContent() {
         }
 
+        double floattimer = 0;
+
         double timer = 0;
         bool doTimer = false;
         String builtmessage;
 
         protected override void Update(GameTime gameTime) {
    
-            double dt = gameTime.ElapsedGameTime.TotalSeconds;
+            double dt = gameTime.ElapsedGameTime.TotalSeconds/ GameSpeed;
+
+           /* floattimer += dt*5;
+            if (floattimer > Math.PI*2) {
+                floattimer = 0;
+            }*/
 
             if (doTimer) {
                 timer += dt;
@@ -237,8 +256,8 @@ namespace Alpaka {
             effects.DrawForeground(spriteBatch);
 
 
-            leftbar.Draw(spriteBatch, 7, 22);
-            rightbar.Draw(spriteBatch, 720 - 336 - 7, 22);
+            leftbar.Draw(spriteBatch, 7, 22 + (int)(Math.Sin(floattimer)*2));
+            rightbar.Draw(spriteBatch, 720 - 336 - 7, 22 + (int)(Math.Sin(floattimer) * 2));
             menu.Draw(spriteBatch);
             phasecounter.Draw(spriteBatch);
 

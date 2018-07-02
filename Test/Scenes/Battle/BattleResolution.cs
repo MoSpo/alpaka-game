@@ -80,7 +80,7 @@ namespace Alpaka.Scenes.Battle {
 
 					if (User.CanAttackThisTurn.Evaluate()) {
 						//Do Attack
-						Animations.AddRange(Battle.Damage(Opponent, Action.Element, Action.Catagory, Action.Power, User.amountOfAttacks, Action.Animation, User.TriggersAttackFlags.Evaluate()));
+						Animations.AddRange(Battle.Damage(Opponent, Action.Element, Action.Catagory, Action.Power, User.amountOfAttacks, Action.Animation, User.TriggersAttackFlags.Evaluate())); //BEOFRE_ATTACKED migrated into here
 					} else {
 						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But the Action failed!"));
 					}
@@ -119,19 +119,33 @@ namespace Alpaka.Scenes.Battle {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
-			if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) {
+			if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) { //TODO
 				Battle.Player1.ActiveCreature.Health += (short)Math.Floor(Battle.Player1.actionCombo * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 512);
 			} else {
-				Battle.Player1.ActiveCreature.Kin += (short)Math.Floor(Battle.Player1.actionCombo * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 512);
-			}
+                short Increase = (short)Math.Floor(Battle.Player1.actionCombo * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10);
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
+                1,
+                Battle.Player1.ActiveCreature.Kin,
+                Battle.Player1.ActiveCreature.Kin + Increase,
+                Increase,
+                }, "#END PHASE KIN#"));
+                Battle.Player1.ActiveCreature.Kin += Increase;
+            }
 
-			if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) {
+            if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) { //TODO
 				Battle.Player2.ActiveCreature.Health += (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 512);
 			} else {
-				Battle.Player2.ActiveCreature.Kin += (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 512);
-			}
+                short Increase = (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10);
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
+                2,
+                Battle.Player2.ActiveCreature.Kin,
+                Battle.Player2.ActiveCreature.Kin + Increase,
+                Increase,
+                }, "#END PHASE KIN#"));
+                Battle.Player2.ActiveCreature.Kin += Increase;
+            }
 
-			Battle.Player1.DecreaseFlags();
+            Battle.Player1.DecreaseFlags();
 			Battle.Player2.DecreaseFlags();
 
 			return Animations;

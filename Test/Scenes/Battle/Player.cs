@@ -61,7 +61,7 @@ namespace Alpaka.Scenes.Battle {
 		public Flag IsJumping = new Flag(false);
 		public Flag RestoreHealthInseadOfMana = new Flag(false);
 		//
-
+        /*
 		public byte[][] ElementEffectiveness = new byte[][] {
 			new byte[] {2,1,2,2,2,4,1,4,4,2,1,1,2,4,2,2,2},	//FIRE
 			new byte[] {4,2,1,2,2,1,4,1,2,4,2,2,2,2,1,2,2}, //WATER
@@ -81,25 +81,59 @@ namespace Alpaka.Scenes.Battle {
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,4}, //DARK
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,1}  //LIGHT
 		};
+        */
+        public byte[][] ElementEffectiveness = new byte[][] {
+            new byte[] {2,1,2,2,2,3,1,3,3,2,1,1,2,3,2,2,2},	//FIRE
+			new byte[] {3,2,1,2,2,1,3,1,2,3,2,2,2,2,1,2,2}, //WATER
+			new byte[] {2,3,2,1,3,2,3,2,2,2,1,2,2,2,2,2,2}, //EARTH
+			new byte[] {3,2,3,2,2,2,2,2,1,2,0,2,2,2,3,2,2}, //WIND
+			new byte[] {2,3,0,2,2,2,1,2,3,1,2,2,2,3,1,2,2}, //ELECTRIC
+			new byte[] {1,3,3,2,2,3,2,2,1,2,2,2,2,2,2,2,2}, //WOOD
+			new byte[] {3,2,1,2,2,2,1,3,1,2,3,2,2,2,1,2,2}, //ROCK
+			new byte[] {1,3,2,2,2,2,3,1,1,2,3,3,2,2,1,2,2}, //ICE
+			new byte[] {1,1,2,2,1,2,2,2,3,3,2,2,2,2,2,2,2}, //STEEL
+			new byte[] {2,2,3,3,2,3,3,3,3,2,1,2,1,2,1,2,2}, //NUCLEAR
+			new byte[] {3,2,2,3,2,2,2,1,2,3,2,3,1,2,3,2,2}, //COSMIC
+			new byte[] {2,2,2,2,2,1,2,2,2,3,2,2,3,1,2,2,2}, //VOID
+			new byte[] {2,2,2,2,2,1,2,2,1,3,2,3,2,3,2,2,2}, //ETHER
+			new byte[] {3,3,2,2,1,2,2,1,1,2,2,3,0,1,2,2,2}, //MAGIC
+			new byte[] {2,3,2,2,1,1,1,1,3,2,2,2,3,3,2,2,2}, //SOUND
+			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,3}, //DARK
+			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1}  //LIGHT
+		};
 
-		public Player(byte Placement) {
-			for (int i = 0; i < 6; i++) {
-				Team[i] = new CreatureInstance();
-			}
-			ActiveCreature = Team[0];
+        public Player(byte Placement) {
+
 			this.Placement = Placement;
 			Ready = false;
 		}
 
-		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseAmount, Player Attacked, Player Attacker) {
+
+        /// //////////////////
+
+        public void setStart(byte s) {  //STAND IN CODE
+            AllCreatures temp = new AllCreatures();
+            for (int i = 0; i < 6; i++) {
+                Team[i] = new CreatureInstance(temp.GetCreature(s));
+            }
+            ActiveCreature = Team[0];
+        }
+
+        /// //////////////////
+
+
+        public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseAmount, Player Attacked, Player Attacker) {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
 			int Damage = 0;
-			double Bonuses = Attacked.ActiveCreature.GetElementBonus(Element);
-			if (Attacker.ActiveCreature.HasElement(Element)) Bonuses *= 1.5;
+            double ElementBonus = 1.0;
+            for (int i = 0; i < 16; i++) if (Attacked.ActiveCreature.HasElement((CreatureElement)(i + 1))) ElementBonus *= (double)ElementEffectiveness[((int)Element) - 1][i] / 2;
+            double SameElementBonus = 1.0;
+            if (Attacker.ActiveCreature.HasElement(Element)) SameElementBonus *= 1.5;
+            double Bonuses = ElementBonus * SameElementBonus;
 
-			if (Category == ActionCategory.PHYSICAL) {
+            if (Category == ActionCategory.PHYSICAL) {
 				Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.STRENGTH) * BaseAmount * Bonuses /
 				                     Attacked.ActiveCreature.GetTotalStat(CreatureStats.ENDURANCE) + 2.0));
 
@@ -111,12 +145,13 @@ namespace Alpaka.Scenes.Battle {
             int nh = ActiveCreature.Health - Damage;
             if (nh < 0) nh = 0;
 
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.DAMAGE_BAR, new double[] {
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
                 playerNumber,
 				ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
 				nh,
-				Damage,
-				Bonuses}, "#DAMAGE GIVEN#"));
+				-1*Damage,
+                ElementBonus,
+                SameElementBonus}, "#DAMAGE GIVEN#"));
 
 
 			ActiveCreature.Health -= Damage;

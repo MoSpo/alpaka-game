@@ -35,9 +35,12 @@ namespace Alpaka {
         public int oldkin;
 		public bool isHealth = true;
 
-        byte ele1 = 14;
+        byte ele1 = 0;
         byte ele2 = 0;
         byte ele3 = 0;
+
+        public String name;
+
 
         Thing el1;
         Thing el2;
@@ -103,8 +106,8 @@ namespace Alpaka {
 
         public void setMaxKin(int sm) {
             totalKin = sm;
-            kin = sm;
-            oldkin = sm;
+            kin = 0;
+            oldkin = 0;
             m = 0;
         }
 
@@ -114,7 +117,16 @@ namespace Alpaka {
 			isHealth = false;
 		}
 
-		public void Draw(SpriteBatch spriteBatch, int x, int y) {
+        public void setElements(byte e1, byte e2, byte e3) {
+            ele1 = e1;
+            ele2 = e2;
+            ele3 = e3;
+            el1.sourcey = ele1 * 32;
+            el2.sourcey = ele2 * 32;
+            el3.sourcey = ele3 * 32;
+        }
+
+        public void Draw(SpriteBatch spriteBatch, int x, int y) {
             el1.Draw(136 + x, 34 + y, spriteBatch);
             el2.Draw(172 + x, 34 + y, spriteBatch);
             el3.Draw(208 + x, 34 + y, spriteBatch);
@@ -126,7 +138,11 @@ namespace Alpaka {
 					h = (int)((oldhealth + (health - oldhealth) * timer) * 250/totalHealth);
 					hbar.width = 59 + h;
 					hbar.Draw(x, y, spriteBatch);
-					if (timer > 1) {
+
+                    mbar.width = (int)(59 + (double)((double)kin / (double)totalKin) * 200);
+                    mbar.Draw(x, y + 25, spriteBatch);
+
+                    if (timer > 1) {
 						timer = 0;
 						oldhealth = health;
 						useTimer = false;
@@ -136,7 +152,11 @@ namespace Alpaka {
 					m = (int)((oldkin + (kin - oldkin) * timer) * 200 / totalKin);
 					mbar.width = 59 + m;
 					mbar.Draw(x, y + 25, spriteBatch);
-					if (timer > 1) {
+
+                    hbar.width = (int)(59 + (double)((double)health / (double)totalHealth) * 250);
+                    hbar.Draw(x, y, spriteBatch);
+
+                    if (timer > 1) {
 						timer = 0;
 						oldkin = kin;
 						useTimer = false;
@@ -159,6 +179,7 @@ namespace Alpaka {
             }
 
             spriteBatch.DrawString(g.font, ((int)((h) * (double)totalHealth / (double)250)).ToString(), new Vector2(x + 60 + 3, y + 6), Color.Black);
+            spriteBatch.DrawString(g.font, name, new Vector2(x + 40, y + 51), Color.Black);
         }
 
     }

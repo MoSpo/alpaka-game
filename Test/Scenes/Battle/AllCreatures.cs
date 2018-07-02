@@ -18,7 +18,7 @@ namespace Alpaka.Scenes.Battle {
                 "Space Insect",
                 new CreatureElement[] { CreatureElement.COSMIC },
                 CreatureType.INSECT,
-                60,  //HEALTH
+                60, //HEALTH
                 60, //KIN
                 80, //STRENGTH
                 90, //ENDURANCE
@@ -34,10 +34,10 @@ namespace Alpaka.Scenes.Battle {
                 60,  //HEALTH
                 100, //KIN
                 50, //STRENGTH
-                60, //ENDURANCE
+                70, //ENDURANCE
                 100, //INTELLIGENCE
                 100, //WISDOM
-                100, //PACE
+                90, //PACE
                 60  //AWE
                 ));
             c.Add(new Creature(
@@ -63,7 +63,7 @@ namespace Alpaka.Scenes.Battle {
                 100, //ENDURANCE
                 70, //INTELLIGENCE
                 80, //WISDOM
-                90, //PACE
+                100, //PACE
                 80  //AWE
                 ));
             c.Add(new Creature(

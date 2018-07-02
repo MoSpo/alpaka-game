@@ -28,7 +28,7 @@ namespace Alpaka.Scenes.Battle {
         public Player Player1;
         public Player Player2;
 
-        private bool IsPreviousMovementLeft;
+        private MovementCategory PreviousMovement;
         private byte OldArenaOrientation;
         private byte ArenaOrientation;
 
@@ -46,6 +46,8 @@ namespace Alpaka.Scenes.Battle {
         public BattleEngine() {
             Player1 = new Player(0);
             Player2 = new Player(4);
+            Player1.setStart(1);
+            Player2.setStart(3);
 
             Interpreter = new EffectHardExecute(this);
             Network = new BattleNetwork(null, 0);
@@ -69,7 +71,7 @@ namespace Alpaka.Scenes.Battle {
 
             pollIndex = 10;
 
-            IsPreviousMovementLeft = false;
+            PreviousMovement = MovementCategory.DO_NOTHING;
             OldArenaOrientation = 0;
             ArenaOrientation = 0;
 
@@ -143,18 +145,6 @@ namespace Alpaka.Scenes.Battle {
                     }
                     return BattlePhases[pollIndex - 1].Run();
                 }
-            } else {
-                //TODO: REMOVE ALL THIS HACKY CODE
-                KeyboardState state = Keyboard.GetState();
-                if (state.IsKeyDown(Keys.Up)) {
-                    Player1.SelectMovement(MovementCategory.DO_NOTHING);
-                } else if (state.IsKeyDown(Keys.Down)) {
-                    Player1.SelectMovement(MovementCategory.HOLD_GROUND);
-                } else if (state.IsKeyDown(Keys.Left)) {
-                    Player1.SelectMovement(MovementCategory.MOVE_LEFT);
-                } else if (state.IsKeyDown(Keys.Right)) {
-                    Player1.SelectMovement(MovementCategory.MOVE_RIGHT);
-                }
             }
             return null;
         }
@@ -200,11 +190,6 @@ namespace Alpaka.Scenes.Battle {
             }
         }
 
-        public bool CheckDeath() {
-            return (Player1.ActiveCreature.killed || Player2.ActiveCreature.killed);
-        }
-
-
 
         public List<SceneAnimation> AddEffect(BattleEffect OriginalEffect, Player User) {
 
@@ -214,20 +199,9 @@ namespace Alpaka.Scenes.Battle {
                 BattleEffect Effect = new BattleEffect(OriginalEffect, User);
 
                 foreach (EffectScript Script in Effect.Scripts) {
-                    List<BattleEffect> Effects;
-                    if (SortedEffects[Script.Trigger].ContainsKey(Script.Speed)) {
-                        Effects = SortedEffects[Script.Trigger][Script.Speed];
-                    } else {
-                        Effects = new List<BattleEffect>();
-                        SortedEffects[Script.Trigger].Add(Script.Speed, Effects);
-                    }
-                    Effects.Add(Effect);
-
                     if (Script.Trigger == EffectTrigger.ON_EFFECT_ENTER) {
                         Animations.AddRange(InterpretEffect(Script, User, null, Effect.CurrentPlacement));
                     }
-
-                    Animations.AddRange(RunEffectType(EffectTrigger.ON_OTHER_EFFECT_ENTER, null));
                 }
 
                 if (Placement < 8) {
@@ -244,24 +218,54 @@ namespace Alpaka.Scenes.Battle {
                     }
 					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_EFFECT, new double[] { Effect.CurrentPlacement }, Effect.Name));
                     Animations.AddRange(RunEffectType(EffectTrigger.ON_NEW_TILE_PLACED, null));
-                    Animations.AddRange(RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, User));
+                    foreach (EffectScript Script in Effect.Scripts) {
+                        if (Script.Trigger == EffectTrigger.ON_STAND_ENTER) {
+                            if (Effect.CurrentPlacement == Player1.Placement) {
+                                if (Effect.EffectAnimation != null) {
+                                    Animations.Add(Effect.EffectAnimation);
+                                }
+                                Animations.AddRange(InterpretEffect(Script, Effect.User, Player1, Effect.CurrentPlacement));
 
+                            } else if (Effect.CurrentPlacement == Player2.Placement) {
+                                if (Effect.EffectAnimation != null) {
+                                    Animations.Add(Effect.EffectAnimation);
+                                }
+                                Animations.AddRange(InterpretEffect(Script, Effect.User, Player2, Effect.CurrentPlacement));
+                            }
+                        }
+                    }
                 } else if (Placement == 8) {
                     //TODO: CENTRE EFFECTS
                 } else if (Placement == 9) {
                     if (Effect.User == Player1) {
                         AllEffects[9].AddEffect(Effect);
+                        Effect.CurrentPlacement = 9;
                     } else {
                         AllEffects[10].AddEffect(Effect);
+                        Effect.CurrentPlacement = 10;
                     }
                 } else {
                     if (Effect.User == Player1) {
                         AllEffects[10].AddEffect(Effect);
+                        Effect.CurrentPlacement = 10;
                     } else {
                         AllEffects[9].AddEffect(Effect);
+                        Effect.CurrentPlacement = 9;
                     }
                 }
 
+                Animations.AddRange(RunEffectType(EffectTrigger.ON_OTHER_EFFECT_ENTER, null));
+
+                foreach (EffectScript Script in Effect.Scripts) {
+                    List<BattleEffect> Effects;
+                    if (SortedEffects[Script.Trigger].ContainsKey(Script.Speed)) {
+                        Effects = SortedEffects[Script.Trigger][Script.Speed];
+                    } else {
+                        Effects = new List<BattleEffect>();
+                        SortedEffects[Script.Trigger].Add(Script.Speed, Effects);
+                    }
+                    Effects.Add(Effect);
+                }
             }
             return Animations;
         }
@@ -277,26 +281,52 @@ namespace Alpaka.Scenes.Battle {
                         Animations.AddRange(InterpretEffect(Script, Effect.User, null, Effect.CurrentPlacement));
                     }
 
-                    Animations.AddRange(RunEffectType(EffectTrigger.ON_OTHER_EFFECT_TIMEOUT, null));
                     if (Script.Trigger == EffectTrigger.ON_STAND_EXIT) {
-                        Animations.AddRange(RunTriggerEffectType(EffectTrigger.ON_STAND_EXIT, null));
+                        if (Effect.CurrentPlacement == Player1.Placement) {
+                            if (Effect.EffectAnimation != null) {
+                                Animations.Add(Effect.EffectAnimation);
+                            }
+                            Animations.AddRange(InterpretEffect(Script, Effect.User, Player1, Effect.CurrentPlacement));
+
+                        } else if (Effect.CurrentPlacement == Player2.Placement) {
+                            if (Effect.EffectAnimation != null) {
+                                Animations.Add(Effect.EffectAnimation);
+                            }
+                            Animations.AddRange(InterpretEffect(Script, Effect.User, Player2, Effect.CurrentPlacement));
+                        }
                     }
+
                     SortedEffects[Script.Trigger][Script.Speed].Remove(Effect);
+
+                    Animations.AddRange(RunEffectType(EffectTrigger.ON_OTHER_EFFECT_TIMEOUT, null));
 
                 } else {
                     if (Script.Trigger == EffectTrigger.ON_EFFECT_EXIT) {
                         Animations.AddRange(InterpretEffect(Script, Effect.User, null, Effect.CurrentPlacement));
                     }
 
-                    Animations.AddRange(RunEffectType(EffectTrigger.ON_OTHER_EFFECT_EXIT, null));
                     if (Script.Trigger == EffectTrigger.ON_STAND_EXIT) {
-                        Animations.AddRange(RunTriggerEffectType(EffectTrigger.ON_STAND_EXIT, null));
+                        if (Effect.CurrentPlacement == Player1.Placement) {
+                            if (Effect.EffectAnimation != null) {
+                                Animations.Add(Effect.EffectAnimation);
+                            }
+                            Animations.AddRange(InterpretEffect(Script, Effect.User, Player1, Effect.CurrentPlacement));
+
+                        } else if (Effect.CurrentPlacement == Player2.Placement) {
+                            if (Effect.EffectAnimation != null) {
+                                Animations.Add(Effect.EffectAnimation);
+                            }
+                            Animations.AddRange(InterpretEffect(Script, Effect.User, Player2, Effect.CurrentPlacement));
+                        }
                     }
 
                     SortedEffects[Script.Trigger][Script.Speed].Remove(Effect);
+
+                    Animations.AddRange(RunEffectType(EffectTrigger.ON_OTHER_EFFECT_EXIT, null));
                 }
-				if (Effect.CurrentPlacement < 8) Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.REMOVE_EFFECT, new double[] { Effect.CurrentPlacement }, Effect.Name));
             }
+            if (Effect.CurrentPlacement < 8) Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.REMOVE_EFFECT, new double[] { Effect.CurrentPlacement }, Effect.Name));
+
             return Animations;
         }
 
@@ -473,23 +503,19 @@ namespace Alpaka.Scenes.Battle {
 
         public short RotationFromMovement(MovementCategory Movement) {
             short RotationDelta = 0;
+            OldArenaOrientation = ArenaOrientation;
 
             if (Movement == MovementCategory.HOLD_GROUND) {
-                if (ArenaOrientation != OldArenaOrientation) {
-                    ArenaOrientation = OldArenaOrientation;
-                    if (IsPreviousMovementLeft) {
-                        IsPreviousMovementLeft = false;
-                        //1
-                        RotationDelta = 1;
-                    } else {
-                        IsPreviousMovementLeft = true;
-                        //-1
-                        RotationDelta = -1;
-                    }
-                } //else 0
-            } else if (Movement == MovementCategory.MOVE_LEFT) {
-                IsPreviousMovementLeft = true;
-                OldArenaOrientation = ArenaOrientation;
+                if (PreviousMovement == MovementCategory.MOVE_LEFT) {
+                    Movement = MovementCategory.MOVE_RIGHT;
+                } else if (PreviousMovement == MovementCategory.MOVE_RIGHT) {
+                    Movement = MovementCategory.MOVE_LEFT;
+                }
+            }
+
+            PreviousMovement = Movement;
+
+            if (Movement == MovementCategory.MOVE_LEFT) {
                 if (ArenaOrientation == 0) {
                     ArenaOrientation = 7;
                 } else {
@@ -498,7 +524,6 @@ namespace Alpaka.Scenes.Battle {
                 //-1
                 RotationDelta = -1;
             } else if (Movement == MovementCategory.MOVE_RIGHT) {
-                IsPreviousMovementLeft = false;
                 if (ArenaOrientation == 7) {
                     ArenaOrientation = 0;
                 } else {
@@ -506,7 +531,8 @@ namespace Alpaka.Scenes.Battle {
                 }
                 //1
                 RotationDelta = 1;
-            }//else 0
+            }
+
             return RotationDelta;
         }
 

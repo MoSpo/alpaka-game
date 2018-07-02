@@ -6,7 +6,8 @@ namespace Alpaka {
 
 		public enum SceneAnimationType {
 			ADD_MESSAGE,
-			DAMAGE_BAR,
+			HEALTH_BAR,
+            KIN_BAR,
 			ATTACK,
 			ARENA,
 			PHASE,

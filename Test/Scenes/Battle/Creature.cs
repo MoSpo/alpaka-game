@@ -100,12 +100,12 @@ namespace Alpaka.Scenes.Battle {
         ICE,
         STEEL,
         NUCLEAR,
-        MAGIC,
-        ETHER,
-        VOID,
         COSMIC,
+        VOID,
+        ETHER,
+        MAGIC,
         SOUND,
-        LIGHT,
-        DARK
+        DARK,
+        LIGHT
     }
 }

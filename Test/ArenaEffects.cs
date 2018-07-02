@@ -26,26 +26,15 @@ namespace Alpaka {
 
             };
 
-            poses = new Vector2[] {
-	    		new Vector2(145,350),
-    			new Vector2(205,315),
-				new Vector2(360,300),
-				new Vector2(515,315),
-				new Vector2(575,350),
-				new Vector2(515,405),
-                new Vector2(360,420),
-                new Vector2(205,405),
-            };
-
 			poses = new Vector2[] {
 				new Vector2(145,350),
 				new Vector2(205,405),
-								new Vector2(360,420),
-								new Vector2(515,405),
-								new Vector2(575,350),
-								new Vector2(515,315),
-								new Vector2(360,300),
-								new Vector2(205,315),
+				new Vector2(360,420),
+				new Vector2(515,405),
+				new Vector2(575,350),
+				new Vector2(515,315),
+				new Vector2(360,300),
+				new Vector2(205,315),
 			};
 
             for (int i = 0; i < effects.Length; i++) {

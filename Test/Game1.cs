@@ -28,6 +28,9 @@ namespace Alpaka {
 
         public SpriteFont font;
 
+        bool IsUserDeathTurn = false;
+        bool IsOpponentDeathTurn = false;
+
         List<SceneAnimation> anim;
         int animPointer = 0;
 
@@ -65,7 +68,14 @@ namespace Alpaka {
                     builtmessage = null;
                     animPointer = 0;
                     nextAnim = false;
-                    menu.newMode = Menu.MenuMode.ACTION;
+                    if (IsUserDeathTurn) {
+                        menu.newMode = Menu.MenuMode.CLOSED_CHOICE;
+                    } else if (IsOpponentDeathTurn) {
+                        chosen = true;
+                    } else {
+                        menu.newMode = Menu.MenuMode.ACTION;
+                    }
+
                     menu.useTimer = true;
                     anim.Clear();
                     phasecounter.SetPhase(0, null);
@@ -124,6 +134,32 @@ namespace Alpaka {
 					case SceneAnimation.SceneAnimationType.REMOVE_EFFECT:
 						effects.Remove((int)an.Values[0], an.Message);
                     break;
+                    case SceneAnimation.SceneAnimationType.USER_DEATH_SELECT:
+                    IsUserDeathTurn = true;
+                    break;
+                    case SceneAnimation.SceneAnimationType.OPPONENT_DEATH_SELECT:
+                    IsOpponentDeathTurn = true;
+                    break;
+                    case SceneAnimation.SceneAnimationType.SWITCH:
+                    if (an.Values[0] == 1) {
+                        leftbar.setMaxHealth((int)an.Values[3]);
+                        leftbar.setMaxKin(1000);
+                        leftbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
+                        leftbar.health = (int)an.Values[2];
+                        leftbar.kin = (int)an.Values[4];
+                        user.changeID((int)an.Values[1]);
+                        leftbar.name = an.Message;
+                    } else {
+                        rightbar.setMaxHealth((int)an.Values[3]);
+                        rightbar.setMaxKin(1000);
+                        rightbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
+                        rightbar.health = (int)an.Values[2];
+                        rightbar.kin = (int)an.Values[4];
+                        opponent.changeID((int)an.Values[1]);
+                        rightbar.name = an.Message;
+                    }
+
+                    break;
                 }
                 animPointer += 1;
             }
@@ -161,8 +197,8 @@ namespace Alpaka {
             rightbar.setElements((byte)engine.Player2.ActiveCreature.CreatureType.Elements[0], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[1], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[2]);
             rightbar.name = engine.Player2.ActiveCreature.Nickname;
 
-            user = new Battler(Content, "user2");
-            opponent = new Battler(Content, "opponent2");
+            user = new Battler(Content, engine.Player1.ActiveCreature.CreatureType.ID, "battlers");
+            opponent = new Battler(Content, engine.Player2.ActiveCreature.CreatureType.ID, "battlers");
 
             background = Content.Load<Texture2D>("bkground2");
             shade = Content.Load<Texture2D>("shade");
@@ -213,24 +249,45 @@ namespace Alpaka {
             leftbar.Update(dt);
             rightbar.Update(dt);
 
-            if (chosen) {
-                Console.WriteLine(menu.chosenAction);
-                Console.WriteLine(menu.chosenMovement);
-                engine.Player1.SelectAction((byte)(menu.chosenAction-1));
-                engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
-                engine.Player2.SelectAction(1);
-				engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
-                for (int i = 0; i < 10; i++) {
+            if (chosen) { //has finished with the menu selection
+                if (IsUserDeathTurn) {
+                    engine.Player1.SelectAction(0);
+                    engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
+                    engine.Player1.SelectCreature(menu.chosenCreature);
+                    engine.Player2.SelectAction(0);
+                    engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+                    engine.Player2.SelectCreature(0);
+
+                    IsUserDeathTurn = false;
                     List<SceneAnimation> a = engine.Poll();
-                    if (a == null) {
-                        Console.WriteLine("NULL");
-                    } else {
+                    anim.AddRange(a);
+                } else if (IsOpponentDeathTurn) {
+                    engine.Player1.SelectAction(0);
+                    engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
+                    engine.Player1.SelectCreature(0);
+                    engine.Player2.SelectAction(0);
+                    engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+                    engine.Player2.SelectCreature(1);
+
+                    IsOpponentDeathTurn = false;
+                    List<SceneAnimation> a = engine.Poll();
+                    anim.AddRange(a);
+                } else {
+                    Console.WriteLine(menu.chosenAction);
+                    Console.WriteLine(menu.chosenMovement);
+                    engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
+                    engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
+                    if (menu.chosenCreature != 0) engine.Player1.SelectCreature(menu.chosenCreature);
+                    engine.Player2.SelectAction(1);
+                    engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+                    for (int i = 0; i < 10; i++) {
+                        List<SceneAnimation> a = engine.Poll();
                         anim.AddRange(a);
                     }
                 }
-                PrintAnim();
-                chosen = false;
-                nextAnim = true;
+                    PrintAnim();
+                    chosen = false;
+                    nextAnim = true;
             }
             Animate();
             base.Update(gameTime);

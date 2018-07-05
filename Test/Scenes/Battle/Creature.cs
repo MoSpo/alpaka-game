@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Alpaka.Scenes.Battle {
     class Creature {
+
+        public int ID;
         public string Name;
         public CreatureType Type;
 
@@ -14,9 +16,10 @@ namespace Alpaka.Scenes.Battle {
 
 		public Dictionary<CreatureStats, byte> BaseStats = new Dictionary<CreatureStats, byte>();
         
-        public Creature(String name, CreatureElement[] elements, /*natures here*/CreatureType type, byte health, byte kin, byte strength, byte endurance, byte intelligence, byte wisdom, byte pace, byte awe) {
+        public Creature(int ID, String name, CreatureElement[] elements, /*natures here*/CreatureType type, byte health, byte kin, byte strength, byte endurance, byte intelligence, byte wisdom, byte pace, byte awe) {
             Name = name;
             Type = type;
+            this.ID = ID;
             for(int i = 0; i < 3; i++) {
                 if(i >= elements.Length) {
                     Elements[i] = CreatureElement.NULL;

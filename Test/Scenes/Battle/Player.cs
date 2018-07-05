@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Alpaka.Scenes.Battle {
 	class Player {
-		CreatureInstance[] Team = new CreatureInstance[6];
+		public CreatureInstance[] Team = new CreatureInstance[6];
 		public CreatureInstance ActiveCreature;
 		public bool Ready;
 
@@ -14,18 +14,18 @@ namespace Alpaka.Scenes.Battle {
 		public CreatureAction SelectedAction = null;
 		private CreatureAction OldAction = null;
 
-		public float actionCombo = 1;
+        public MovementCategory SelectedMovement = MovementCategory.NULL;
+        public byte Placement;
+
+        public byte SelectedCreature;
+        public bool JustSwitchedIn;
+
+        public float actionCombo = 1;
 
 		public byte amountOfAttacks = 1;
 
         public byte playerNumber;
         public byte playerServerNumber;
-
-		public MovementCategory SelectedMovement = MovementCategory.NULL;
-		public byte Placement;
-
-		public CreatureInstance SelectedSwitchCreature; //TODO: SWITCHING
-		public bool JustSwitchedIn;
 
 		public Dictionary<CreatureStats, byte> Statboosts = new Dictionary<CreatureStats, byte>();
 
@@ -39,6 +39,8 @@ namespace Alpaka.Scenes.Battle {
 		public List<CreatureElement> actionElementMaskTo;
 
 		public bool SentData = false;
+
+        public bool tempNotKilled = false; //used for switching only
 
 		//FLAGS
 		public Flag CanAttackThisTurn = new Flag(true);
@@ -102,9 +104,10 @@ namespace Alpaka.Scenes.Battle {
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1}  //LIGHT
 		};
 
-        public Player(byte Placement) {
+        public Player(byte Number, byte Placement) {
 
 			this.Placement = Placement;
+            playerNumber = Number;
 			Ready = false;
 		}
 
@@ -113,8 +116,22 @@ namespace Alpaka.Scenes.Battle {
 
         public void setStart(byte s) {  //STAND IN CODE
             AllCreatures temp = new AllCreatures();
-            for (int i = 0; i < 6; i++) {
-                Team[i] = new CreatureInstance(temp.GetCreature(s));
+            if(playerNumber == 1) {
+                Team[0] = new CreatureInstance(temp.GetCreature(1));
+                Team[1] = new CreatureInstance(temp.GetCreature(0));
+                Team[2] = new CreatureInstance(temp.GetCreature(2));
+                Team[3] = new CreatureInstance(temp.GetCreature(3));
+                Team[4] = new CreatureInstance(temp.GetCreature(5));
+                Team[5] = new CreatureInstance(temp.GetCreature(7));
+
+            } else {
+                Team[0] = new CreatureInstance(temp.GetCreature(8));
+                Team[1] = new CreatureInstance(temp.GetCreature(6));
+                Team[2] = new CreatureInstance(temp.GetCreature(4));
+                Team[3] = new CreatureInstance(temp.GetCreature(10));
+                Team[4] = new CreatureInstance(temp.GetCreature(9));
+                Team[5] = new CreatureInstance(temp.GetCreature(11));
+
             }
             ActiveCreature = Team[0];
         }
@@ -214,7 +231,11 @@ namespace Alpaka.Scenes.Battle {
 			}
 		}
 
-		public void Reset() {
+        public void SelectCreature(byte CreatureNumber) {
+            SelectedCreature = CreatureNumber;
+        }
+
+        public void Reset() {
 			CanAttackThisTurn.RemoveFlag();
 			TriggersAttackFlags.RemoveFlag();
 			CanBeMovedBackwards.RemoveFlag();
@@ -246,6 +267,8 @@ namespace Alpaka.Scenes.Battle {
 			SwitchedStats = new byte[8];
 			HasNewElement = false;
 
+            ActiveCreature.Kin = 0;
+
 			actionElementMaskFrom = new List<CreatureElement>();
 			actionElementMaskTo = new List<CreatureElement>();
 	}
@@ -273,7 +296,7 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		public bool IsKilled() {
-			return ActiveCreature.killed;
+			return ActiveCreature.killed || tempNotKilled;
 		}
 
 	}

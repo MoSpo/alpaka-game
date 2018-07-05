@@ -11,10 +11,14 @@ namespace Alpaka {
 			ATTACK,
 			ARENA,
 			PHASE,
+            SWITCH,
 			DEATH,
-			CONDITION,
+            USER_DEATH_SELECT,
+            OPPONENT_DEATH_SELECT,
+            CONDITION,
 			ADD_EFFECT,
 			REMOVE_EFFECT,
+            END_TURN,
 		}
 
 		public SceneAnimationType Type;

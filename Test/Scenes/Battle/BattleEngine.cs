@@ -32,6 +32,8 @@ namespace Alpaka.Scenes.Battle {
         private byte OldArenaOrientation;
         private byte ArenaOrientation;
 
+        public bool IsDeathTurn;
+
         public BattleTile[] AllEffects = new BattleTile[11]; //0-7 tileeffects, 8 centre effects, 9-10 creature effects
 
         private BattlePhase[] BattlePhases = new BattlePhase[9];
@@ -44,8 +46,8 @@ namespace Alpaka.Scenes.Battle {
         private Random randomGen;
 
         public BattleEngine() {
-            Player1 = new Player(0);
-            Player2 = new Player(4);
+            Player1 = new Player(1, 0);
+            Player2 = new Player(2, 4);
             Player1.setStart(1);
             Player2.setStart(3);
 
@@ -54,9 +56,6 @@ namespace Alpaka.Scenes.Battle {
             Network.StartOfflineClient();
 
             randomGen = new Random(0);
-
-            Player1.playerNumber = 1;
-            Player2.playerNumber = 2;
 
             Player1.playerServerNumber = 0;
             Player2.playerServerNumber = 1;
@@ -106,44 +105,73 @@ namespace Alpaka.Scenes.Battle {
                     Player2.SelectAction(tmp[0]);
                     Player2.SelectMovement(tmp[1]);
                 } else {
+                    if (IsDeathTurn) {
+                        List<SceneAnimation> DeathTurn = new List<SceneAnimation>();
 
-                    if (pollIndex == 10) {
-                        foreach (EffectTrigger type in Enum.GetValues(typeof(EffectTrigger))) {
-                            foreach (List<BattleEffect> Effects in SortedEffects[type].Values) {
-                                foreach (BattleEffect Effect in Effects) {
-                                    if (Effect.Priority != 10) BattlePhases[Effect.Priority - 1].CurrentPhaseEffects.Add(Effect);
+                        if (Player1.IsKilled()) {
+                            Player1.tempNotKilled = true;
+                            DeathTurn.AddRange(Switch(Player1));
+                            Player1.tempNotKilled = false;
+                        }
+                        if (Player2.IsKilled()) {
+                            Player1.tempNotKilled = true;
+                            DeathTurn.AddRange(Switch(Player2));
+                            Player1.tempNotKilled = false;
+                        }
+                        IsDeathTurn = false;
+                        DeathTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.END_TURN, null, "#END OF TURN#"));
+                        return DeathTurn;
+                    } else {
+                        if (pollIndex == 10) {
+                            foreach (EffectTrigger type in Enum.GetValues(typeof(EffectTrigger))) {
+                                foreach (List<BattleEffect> Effects in SortedEffects[type].Values) {
+                                    foreach (BattleEffect Effect in Effects) {
+                                        if (Effect.Priority != 10) BattlePhases[Effect.Priority - 1].CurrentPhaseEffects.Add(Effect);
+                                    }
                                 }
                             }
+
+                            int ran = randomGen.Next(0, 2);
+
+                            BattlePhases[CheckPace(Player1, Player2, ran) - 1 + Player1.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player1, Player2));
+                            BattlePhases[CheckPace(Player2, Player1, ran) - 1 + Player2.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player2, Player1));
+
+                            BattlePhases[CheckAwe(Player1, Player2, ran) - 1].Add(new MovementResolution(this, Player1, Player2));
+                            BattlePhases[CheckAwe(Player2, Player1, ran) - 1].Add(new MovementResolution(this, Player2, Player1));
+
+                            BattlePhases[8].Add(new EndResolution(this));
+
+                            pollIndex = 0;
                         }
+                        pollIndex++;
+                        if (pollIndex == 10) {
+                            Player1.Ready = false;
+                            Player1.SelectedAction = null;
+                            Player1.SelectedMovement = MovementCategory.NULL;
+                            Player2.Ready = false;
+                            Player2.SelectedAction = null;
+                            Player2.SelectedMovement = MovementCategory.NULL;
 
-                        int ran = randomGen.Next(0, 2);
+                            for (int i = 0; i < 9; i++) {
+                                BattlePhases[i] = new BattlePhase(this, (byte)(i + 1));
+                                //TODO: DON'T DESTROY BATTLEPHASES JUST RESET THEM DEAR GOD
+                            }
 
-                        BattlePhases[CheckPace(Player1, Player2, ran) - 1 + Player1.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player1, Player2));
-                        BattlePhases[CheckPace(Player2, Player1, ran) - 1 + Player2.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player2, Player1));
-
-                        BattlePhases[CheckAwe(Player1, Player2, ran) - 1].Add(new MovementResolution(this, Player1, Player2));
-                        BattlePhases[CheckAwe(Player2, Player1, ran) - 1].Add(new MovementResolution(this, Player2, Player1));
-
-                        BattlePhases[8].Add(new EndResolution(this));
-
-                        pollIndex = 0;
-                    }
-                    pollIndex++;
-                    if (pollIndex == 10) {
-                        Player1.Ready = false;
-                        Player1.SelectedAction = null;
-                        Player1.SelectedMovement = MovementCategory.NULL;
-                        Player2.Ready = false;
-                        Player2.SelectedAction = null;
-                        Player2.SelectedMovement = MovementCategory.NULL;
-
-                        for (int i = 0; i < 9; i++) {
-                            BattlePhases[i] = new BattlePhase(this, (byte)(i + 1));
-                            //TODO: DON'T DESTROY BATTLEPHASES JUST RESET THEM DEAR GOD
+                            List<SceneAnimation> FinishTurn = new List<SceneAnimation>();
+                            if (Player1.IsKilled()) {
+                                IsDeathTurn = true;
+                                FinishTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.USER_DEATH_SELECT, null, "#USER DEATH TURN ACTIVATED#"));
+                            }
+                            if (Player2.IsKilled()) {
+                                IsDeathTurn = true;
+                                List<SceneAnimation> death = new List<SceneAnimation>();
+                                FinishTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.OPPONENT_DEATH_SELECT, null, "#OPPONENT DEATH TURN ACTIVATED#"));
+                            }
+                            FinishTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.END_TURN, null, "#END OF TURN#"));
+                            return FinishTurn;
                         }
-                        return null;
+                        return BattlePhases[pollIndex - 1].Run();
                     }
-                    return BattlePhases[pollIndex - 1].Run();
                 }
             }
             return null;
@@ -367,9 +395,21 @@ namespace Alpaka.Scenes.Battle {
                 RunEffectType(EffectTrigger.ON_YOUR_SWITCH, Target)
             );
 
-            Target.ActiveCreature = Target.SelectedSwitchCreature;
+            Target.ActiveCreature = Target.Team[Target.SelectedCreature];
             Target.Reset();
             Target.JustSwitchedIn = true;
+
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH, new double[] {
+                Target.playerNumber,
+                Target.ActiveCreature.CreatureType.ID,
+                Target.ActiveCreature.Health,
+                Target.ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
+                Target.ActiveCreature.Kin,
+                (double)Target.ActiveCreature.CreatureType.Elements[0],
+                (double)Target.ActiveCreature.CreatureType.Elements[1],
+                (double)Target.ActiveCreature.CreatureType.Elements[2],
+            }, Target.ActiveCreature.Nickname));
+
             Animations.AddRange(
                 RunTriggerEffectType(EffectTrigger.ON_STAND_ENTER, Target)
             );
@@ -441,7 +481,7 @@ namespace Alpaka.Scenes.Battle {
 
 
         public List<SceneAnimation> RunEffectType(EffectTrigger Trigger, Player TargetUser) {
-			//If TargetUser is parsed it will only run if they are not killed
+			//If TargetUser is parsed it will only run if they are not killed and own the effect
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
 

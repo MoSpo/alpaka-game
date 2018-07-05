@@ -14,7 +14,8 @@ namespace Alpaka.Scenes.Battle {
 
         public AllCreatures() {
             List<Creature> c = new List<Creature>();
-            c.Add(new Creature(
+            int count = 1;
+            c.Add(new Creature(count,
                 "Space Insect",
                 new CreatureElement[] { CreatureElement.COSMIC },
                 CreatureType.INSECT,
@@ -27,7 +28,8 @@ namespace Alpaka.Scenes.Battle {
                 110, //PACE
                 70  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Ice Guy",
                 new CreatureElement[] { CreatureElement.ICE },
                 CreatureType.FAIRY,
@@ -40,7 +42,8 @@ namespace Alpaka.Scenes.Battle {
                 90, //PACE
                 60  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Rage",
                 new CreatureElement[] { CreatureElement.FIRE, CreatureElement.ETHER },
                 CreatureType.FIEND,
@@ -53,7 +56,8 @@ namespace Alpaka.Scenes.Battle {
                 60, //PACE
                 100  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Wingman",
                 new CreatureElement[] { CreatureElement.WIND },
                 CreatureType.FIEND,
@@ -66,7 +70,22 @@ namespace Alpaka.Scenes.Battle {
                 100, //PACE
                 80  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
+                "Not Present",
+                 new CreatureElement[] { CreatureElement.VOID },
+                 CreatureType.FAIRY,
+                 80,  //HEALTH
+                 100, //KIN
+                 100, //STRENGTH
+                 50, //ENDURANCE
+                 90, //INTELLIGENCE
+                 80, //WISDOM
+                 90, //PACE
+                 60  //AWE
+                 ));
+            count++;
+            c.Add(new Creature(count,
                 "Clown",
                 new CreatureElement[] { CreatureElement.DARK },
                 CreatureType.FIEND,
@@ -79,33 +98,8 @@ namespace Alpaka.Scenes.Battle {
                 70, //PACE
                 80  //AWE
                 ));
-            c.Add(new Creature(
-                "Quarantine",
-                new CreatureElement[] { CreatureElement.NUCLEAR, CreatureElement.STEEL },
-                CreatureType.CONSTRUCT,
-                100,  //HEALTH
-                80, //KIN
-                90, //STRENGTH
-                90, //ENDURANCE
-                90, //INTELLIGENCE
-                50, //WISDOM
-                70, //PACE
-                80  //AWE
-                ));
-            c.Add(new Creature(
-                "Not Present",
-                new CreatureElement[] { CreatureElement.VOID },
-                CreatureType.FAIRY,
-                80,  //HEALTH
-                100, //KIN
-                100, //STRENGTH
-                50, //ENDURANCE
-                90, //INTELLIGENCE
-                80, //WISDOM
-                90, //PACE
-                60  //AWE
-                ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Calesvol",
                 new CreatureElement[] { CreatureElement.ROCK },
                 CreatureType.CONSTRUCT,
@@ -118,7 +112,22 @@ namespace Alpaka.Scenes.Battle {
                 60, //PACE
                 100  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
+                "Quarantine",
+                new CreatureElement[] { CreatureElement.NUCLEAR, CreatureElement.STEEL },
+                CreatureType.CONSTRUCT,
+                100,  //HEALTH
+                80, //KIN
+                90, //STRENGTH
+                90, //ENDURANCE
+                90, //INTELLIGENCE
+                50, //WISDOM
+                70, //PACE
+                80  //AWE
+                ));
+            count++;
+            c.Add(new Creature(count,
                 "Garphene",
                 new CreatureElement[] { CreatureElement.ROCK, CreatureElement.STEEL },
                 CreatureType.BIRD,
@@ -131,7 +140,8 @@ namespace Alpaka.Scenes.Battle {
                 110, //PACE
                 100  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Aygon",
                 new CreatureElement[] { CreatureElement.COSMIC, CreatureElement.VOID },
                 CreatureType.FIEND,
@@ -144,7 +154,8 @@ namespace Alpaka.Scenes.Battle {
                 70, //PACE
                 90  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Yeboi",
                 new CreatureElement[] { CreatureElement.WATER },
                 CreatureType.REPTILE,
@@ -157,7 +168,8 @@ namespace Alpaka.Scenes.Battle {
                 50, //PACE
                 60  //AWE
                 ));
-            c.Add(new Creature(
+            count++;
+            c.Add(new Creature(count,
                 "Sandlurker",
                 new CreatureElement[] { CreatureElement.EARTH },
                 CreatureType.REPTILE,
@@ -170,6 +182,7 @@ namespace Alpaka.Scenes.Battle {
                 110, //PACE
                 90  //AWE
                 ));
+            count++;
 
             AllCreatureList = c;
         }

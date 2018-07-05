@@ -128,6 +128,13 @@ namespace Alpaka {
                         useTimer = true;
 
                     }
+                } else if (currentMode == MenuMode.CLOSED_CHOICE) {
+                    if (y > 430) {
+                        chosenCreature = (byte)(Math.Floor((double)x * 6 / 720));
+                        newMode = MenuMode.MESSAGE;
+                        useTimer = true;
+
+                    }
                 } else if (currentMode == MenuMode.ACTION_CHOICE) {
                     if (y > 430) {
                         chosenCreature = (byte)(Math.Floor((double)x * 6 / 720));
@@ -314,6 +321,20 @@ namespace Alpaka {
                         currentMode = MenuMode.ACTION_CHOICE;
                         useTimer = false;
                     }
+                } else if (newMode == MenuMode.CLOSED_CHOICE) {
+
+                    middle[0].Draw(248, 505, spriteBatch);
+                    middle[1].Draw(248, 475, spriteBatch);
+                    middle[2].Draw(249, 464, spriteBatch);
+
+                    middle[11].Draw(0, 540 - (int)(122 * Bezier(timer / 0.2)), spriteBatch);
+                    blend(middle[12], Bezier(timer / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
+                    middle[12].Draw(317, 510 - (int)(122 * Bezier(timer / 0.2)), spriteBatch);
+                    if (timer > 1 * 0.2) {
+                        timer = 0;
+                        currentMode = MenuMode.CLOSED_CHOICE;
+                        useTimer = false;
+                    }
                 } else if (newMode == MenuMode.MOVEMENT) {
                     if (currentMode == MenuMode.ACTION) {
                         middle[0].Draw(248, 368, spriteBatch);
@@ -397,6 +418,20 @@ namespace Alpaka {
                             currentMode = MenuMode.MESSAGE;
                             useTimer = false;
                         }
+                    } else if(currentMode == MenuMode.CLOSED_CHOICE) {
+                        middle[0].Draw(248, 505, spriteBatch);
+                        middle[1].Draw(248, 475, spriteBatch);
+                        middle[2].Draw(249, 464, spriteBatch);
+
+                        middle[11].Draw(0, 540 - (int)(122 * Bezier(1 - (timer / 0.2))), spriteBatch);
+                        blend(middle[12], Bezier(1 - (timer / 0.2)), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
+                        middle[12].Draw(317, 510 - (int)(122 * Bezier(1 - (timer / 0.2))), spriteBatch);
+                        if (timer > 1 * 0.2) {
+                            timer = 0;
+                            currentMode = MenuMode.MESSAGE;
+                            useTimer = false;
+                        }
+
                     }
                 }
             } else {
@@ -427,6 +462,14 @@ namespace Alpaka {
                     for (int i = 0; i < 13; i++) {
                         middle[i].Draw(spriteBatch);
                     }
+
+                } else if (currentMode == MenuMode.CLOSED_CHOICE) {
+                    middle[0].Draw(248, 505, spriteBatch);
+                    middle[1].Draw(248, 475, spriteBatch);
+                    middle[2].Draw(249, 464, spriteBatch);
+
+                    middle[11].Draw(spriteBatch);
+                    middle[12].Draw(spriteBatch);
 
                 } else if (currentMode == MenuMode.MOVEMENT) {
                     for (int i = 0; i < 3; i++) {

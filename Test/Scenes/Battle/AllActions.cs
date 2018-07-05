@@ -45,7 +45,7 @@ namespace Alpaka.Scenes.Battle {
 				 ActionCategory.PHYSICAL,
 				90,          //SPEED
 				-2,           //PRIORITY MODIFIER
-				60,          //POWER
+				250,//60,          //POWER
 				10,          //USAGE
 				10,           //MANA
 				new BattleEffect(

@@ -31,7 +31,15 @@ namespace Alpaka.Scenes.Battle {
 				this.Placement = Placement.ToList();
 			}
 			this.Scripts = Scripts.ToList();
+
 		}
+
+        public void SetElement(CreatureElement Element) {
+            this.Element = Element;
+            foreach (EffectScript Script in Scripts) {
+                Script.Element = Element;
+            }
+        }
 
 		public BattleEffect(BattleEffect Target, Player User) {
 			Name = Target.Name;
@@ -39,6 +47,7 @@ namespace Alpaka.Scenes.Battle {
 			Lifespan = Target.Lifespan;
 			CurrentLifespan = Target.Lifespan;
 			Placement = Target.Placement;
+            Element = Target.Element;
 			Scripts = new List<EffectScript>(Target.Scripts);
 			this.User = User;
 		}

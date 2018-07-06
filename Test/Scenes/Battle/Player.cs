@@ -33,17 +33,17 @@ namespace Alpaka.Scenes.Battle {
 
 		public byte[] SwitchedStats = new byte[8];
 		public bool HasNewElement = false;
-		public CreatureElement newElement;
+		private CreatureElement newElement;
 
-		public List<CreatureElement> actionElementMaskFrom;
-		public List<CreatureElement> actionElementMaskTo;
+        private List<CreatureElement> actionElementMaskFrom;
+        private List<CreatureElement> actionElementMaskTo;
 
 		public bool SentData = false;
 
         public bool tempNotKilled = false; //used for switching only
 
 		//FLAGS
-		public Flag CanAttackThisTurn = new Flag(true);
+		public Flag CanUseActionThisTurn = new Flag(true);
 		public Flag TriggersAttackFlags = new Flag(true);
 		public Flag CanBeMovedBackwards = new Flag(true);
 		public Flag CanBeMovedByEffects = new Flag(true);
@@ -63,7 +63,7 @@ namespace Alpaka.Scenes.Battle {
 		public Flag IsJumping = new Flag(false);
 		public Flag RestoreHealthInseadOfMana = new Flag(false);
 		//
-        /*
+        
 		public byte[][] ElementEffectiveness = new byte[][] {
 			new byte[] {2,1,2,2,2,4,1,4,4,2,1,1,2,4,2,2,2},	//FIRE
 			new byte[] {4,2,1,2,2,1,4,1,2,4,2,2,2,2,1,2,2}, //WATER
@@ -83,8 +83,8 @@ namespace Alpaka.Scenes.Battle {
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,4}, //DARK
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,1}  //LIGHT
 		};
-        */
-        public byte[][] ElementEffectiveness = new byte[][] {
+        
+        /*public byte[][] ElementEffectiveness = new byte[][] {
             new byte[] {2,1,2,2,2,3,1,3,3,2,1,1,2,3,2,2,2},	//FIRE
 			new byte[] {3,2,1,2,2,1,3,1,2,3,2,2,2,2,1,2,2}, //WATER
 			new byte[] {2,3,2,1,3,2,3,2,2,2,1,2,2,2,2,2,2}, //EARTH
@@ -102,7 +102,7 @@ namespace Alpaka.Scenes.Battle {
 			new byte[] {2,3,2,2,1,1,1,1,3,2,2,2,3,3,2,2,2}, //SOUND
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,3}, //DARK
 			new byte[] {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1}  //LIGHT
-		};
+		};*/
 
         public Player(byte Number, byte Placement) {
 
@@ -145,44 +145,59 @@ namespace Alpaka.Scenes.Battle {
 
 			int Damage = 0;
             double ElementBonus = 1.0;
-            for (int i = 0; i < 16; i++) if (Attacked.ActiveCreature.HasElement((CreatureElement)(i + 1))) ElementBonus *= (double)ElementEffectiveness[((int)Element) - 1][i] / 2;
+            for (int i = 0; i < 16; i++) if (Attacked.HasElement((CreatureElement)(i + 1))) ElementBonus *= (double)ElementEffectiveness[((int)Element) - 1][i] / 2;
             double SameElementBonus = 1.0;
-            if (Attacker.ActiveCreature.HasElement(Element)) SameElementBonus *= 1.5;
+            if (Attacker.HasElement(Element)) SameElementBonus *= 1.5;
             double Bonuses = ElementBonus * SameElementBonus;
 
-            if (Category == ActionCategory.PHYSICAL) {
-				Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.STRENGTH) * BaseAmount * Bonuses /
-				                     Attacked.ActiveCreature.GetTotalStat(CreatureStats.ENDURANCE) + 2.0));
+            if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
+                if (Category == ActionCategory.PHYSICAL) {
+                    Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.STRENGTH) * BaseAmount * Bonuses /
+                                         Attacked.ActiveCreature.GetTotalStat(CreatureStats.ENDURANCE) + 2.0));
 
-			} else if (Category == ActionCategory.MYSTICAL) {
-				Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.INTELLIGENCE) * BaseAmount * Bonuses /
-				                            Attacked.ActiveCreature.GetTotalStat(CreatureStats.WISDOM) + 2.0));
-			}
+                } else if (Category == ActionCategory.MYSTICAL) {
+                    Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.INTELLIGENCE) * BaseAmount * Bonuses /
+                                                Attacked.ActiveCreature.GetTotalStat(CreatureStats.WISDOM) + 2.0));
+                }
 
-            int nh = ActiveCreature.Health - Damage;
-            if (nh < 0) nh = 0;
+                int nh = ActiveCreature.Health - Damage;
+                if (nh < 0) nh = 0;
 
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
                 playerNumber,
-				ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
-				nh,
-				-1*Damage,
+                ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
+                nh,
+                -1*Damage,
                 ElementBonus,
                 SameElementBonus}, "#DAMAGE GIVEN#"));
 
 
-			ActiveCreature.Health -= Damage;
+                ActiveCreature.Health -= Damage;
 
-			if (ActiveCreature.Health <= 0) {
-				ActiveCreature.Health = 0;
-				ActiveCreature.killed = true;
-			}
-			return Animations;
+                if (ActiveCreature.Health <= 0) {
+                    ActiveCreature.Health = 0;
+                    ActiveCreature.killed = true;
+                }
+            } else {
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, ActiveCreature.Nickname + " was unaffected by the damage!"));
+            }
+            return Animations;
 		}
 
 		public void GainKin() {
 			//TODO GAIN KIN
 		}
+
+        public SceneAnimation SetNewElement(CreatureElement Element) {
+            newElement = Element;
+            return new SceneAnimation(SceneAnimation.SceneAnimationType.ELEMENT_CHANGE, new double[] { playerNumber,(double)Element, 0, 0 } , "#SET NEW ELEMENT#");
+        }
+
+        public bool HasElement(CreatureElement Element) {
+            if(newElement == CreatureElement.NULL) return ActiveCreature.HasElement(Element);
+            return newElement == Element;
+
+        }
 
         public SceneAnimation GiveCondition(byte Condition) {
             ActiveCreature.GiveCondition(Condition);
@@ -236,7 +251,7 @@ namespace Alpaka.Scenes.Battle {
         }
 
         public void Reset() {
-			CanAttackThisTurn.RemoveFlag();
+			CanUseActionThisTurn.RemoveFlag();
 			TriggersAttackFlags.RemoveFlag();
 			CanBeMovedBackwards.RemoveFlag();
 			CanBeMovedByEffects.RemoveFlag();
@@ -274,7 +289,7 @@ namespace Alpaka.Scenes.Battle {
 	}
 
 		public void DecreaseFlags() {
-			CanAttackThisTurn.DecreaseLifespan();
+			CanUseActionThisTurn.DecreaseLifespan();
 			TriggersAttackFlags.DecreaseLifespan();
 			CanBeMovedBackwards.DecreaseLifespan();
 			CanBeMovedByEffects.DecreaseLifespan();
@@ -296,7 +311,8 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		public bool IsKilled() {
-			return ActiveCreature.killed || tempNotKilled;
+            
+			return ActiveCreature.killed && !tempNotKilled;
 		}
 
 	}

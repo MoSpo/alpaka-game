@@ -65,30 +65,28 @@ namespace Alpaka.Scenes.Battle {
 
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " " + Action.Style + " with " + Action.Name + "!"));
 
-            if (User.CanAttackThisTurn.Evaluate()) { //TODO: WHY IS THIS IN TWICE???
+            if (User.CanUseActionThisTurn.Evaluate()) {
 
                 Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ACTION, User));
 
-                if (Action.ActionEffect != null) {
+                if (Action.ActionEffect != null && Opponent.CanBeAttacked.Evaluate()) {
                     Animations.AddRange(Battle.AddEffect(Action.ActionEffect, User)); //TODO???: PROPER ADDING OF ACTION EFFECTS TO CURRENT BATTLE STATE
                 }
 
-                if (Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL) { //TODO: ADD ADAPTIVES AND DEFENSIVES
+                if ((Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL)) { //TODO: ADD ADAPTIVES AND DEFENSIVES
 
-                    Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ATTACKING, User));
+                    if (Opponent.CanBeAttacked.Evaluate()) {
+                        Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ATTACKING, User));
 
-
-                    if (User.CanAttackThisTurn.Evaluate()) {
                         //Do Attack
                         Animations.AddRange(Battle.Damage(Opponent, Action.Element, Action.Catagory, Action.Power, User.amountOfAttacks, Action.Animation, User.TriggersAttackFlags.Evaluate())); //BEOFRE_ATTACKED migrated into here
+
+                        User.amountOfAttacks = 1; //Needed for if any following effects inflict damage
+
+                        Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ATTACKING, User));
                     } else {
-                        Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But the Action failed!"));
+                        Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Opponent.ActiveCreature.Nickname + " cannot be attacked!"));
                     }
-
-                    User.amountOfAttacks = 1; //Needed for if any following effects inflict damage
-
-                    Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ATTACKING, User));
-
                 } else {
                     Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ATTACK, new double[] {
                 Battle.GetOpponent(User).playerNumber }, "#ATTACK ANIMATION#"));
@@ -120,25 +118,39 @@ namespace Alpaka.Scenes.Battle {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
 
             if (!Battle.Player1.IsKilled()) {
-                if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) { //TODO
-                    Battle.Player1.ActiveCreature.Health += (short)Math.Floor(Battle.Player1.actionCombo * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 512);
-                } else {
+                if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) {
                     short Increase = (short)Math.Floor(Battle.Player1.actionCombo * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10);
+                    Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
+                        1,
+                        Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
+                        Battle.Player1.ActiveCreature.Health + Increase,
+                        Increase,
+                        1,1}, "#END PHASE KIN [ADDED TO HEALTH]#"));
+                    Battle.Player1.ActiveCreature.Health += Increase;
+                } else {
+                    short Increase = (short)Math.Floor(Battle.Player1.actionCombo * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 5);
                     Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
-                1,
-                Battle.Player1.ActiveCreature.Kin,
-                Battle.Player1.ActiveCreature.Kin + Increase,
-                Increase,
-                }, "#END PHASE KIN#"));
+                        1,
+                        Battle.Player1.ActiveCreature.Kin,
+                        Battle.Player1.ActiveCreature.Kin + Increase,
+                        Increase,
+                        }, "#END PHASE KIN#"));
                     Battle.Player1.ActiveCreature.Kin += Increase;
                 }
                 Battle.Player1.DecreaseFlags();
             }
             if (!Battle.Player2.IsKilled()) {
-                if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) { //TODO
-                    Battle.Player2.ActiveCreature.Health += (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 512);
-                } else {
+                if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) {
                     short Increase = (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10);
+                    Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
+                        2,
+                        Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
+                        Battle.Player2.ActiveCreature.Health + Increase,
+                        Increase,
+                        1,1}, "#END PHASE KIN [ADDED TO HEALTH]#"));
+                    Battle.Player2.ActiveCreature.Health += Increase;
+                } else {
+                    short Increase = (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 5);
                     Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
                 2,
                 Battle.Player2.ActiveCreature.Kin,

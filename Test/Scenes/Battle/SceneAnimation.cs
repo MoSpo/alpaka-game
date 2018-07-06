@@ -19,6 +19,7 @@ namespace Alpaka {
 			ADD_EFFECT,
 			REMOVE_EFFECT,
             END_TURN,
+            ELEMENT_CHANGE,
 		}
 
 		public SceneAnimationType Type;

@@ -32,6 +32,7 @@ namespace Alpaka.Scenes.Battle {
             this.ActionEffect = ActionEffect;
 			if (ActionEffect != null) {
 				ActionEffect.Name = Name;
+                ActionEffect.SetElement(Element);
 			}
 
 			Style = "attacked";

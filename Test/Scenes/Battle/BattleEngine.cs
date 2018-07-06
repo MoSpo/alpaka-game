@@ -114,9 +114,9 @@ namespace Alpaka.Scenes.Battle {
                             Player1.tempNotKilled = false;
                         }
                         if (Player2.IsKilled()) {
-                            Player1.tempNotKilled = true;
+                            Player2.tempNotKilled = true;
                             DeathTurn.AddRange(Switch(Player2));
-                            Player1.tempNotKilled = false;
+                            Player2.tempNotKilled = false;
                         }
                         IsDeathTurn = false;
                         DeathTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.END_TURN, null, "#END OF TURN#"));
@@ -133,9 +133,12 @@ namespace Alpaka.Scenes.Battle {
 
                             int ran = randomGen.Next(0, 2);
 
-                            BattlePhases[CheckPace(Player1, Player2, ran) - 1 + Player1.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player1, Player2));
-                            BattlePhases[CheckPace(Player2, Player1, ran) - 1 + Player2.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player2, Player1));
-
+                           // if (!Player1.HasActionDelay.Evaluate()) {
+                                BattlePhases[CheckPace(Player1, Player2, ran) - 1 + Player1.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player1, Player2));
+                           // }
+                           // if (!Player2.HasActionDelay.Evaluate()) {
+                                BattlePhases[CheckPace(Player2, Player1, ran) - 1 + Player2.SelectedAction.Priority - 4].Add(new ActionResolution(this, Player2, Player1));
+                          //  }
                             BattlePhases[CheckAwe(Player1, Player2, ran) - 1].Add(new MovementResolution(this, Player1, Player2));
                             BattlePhases[CheckAwe(Player2, Player1, ran) - 1].Add(new MovementResolution(this, Player2, Player1));
 
@@ -364,7 +367,7 @@ namespace Alpaka.Scenes.Battle {
 
             for (int i = 0; i < 8; i++) {
                 foreach (BattleEffect Effect in AllEffects[i].effects) {
-                    if (Effect.Element == Element) {
+                    if (Effect != null && Effect.Element == Element) {
                         Animations.AddRange(RemoveEffect(Effect, false));
                     }
                 }
@@ -377,9 +380,9 @@ namespace Alpaka.Scenes.Battle {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
 
             for (int i = 0; i < 8; i++) {
-                foreach (BattleEffect Effect in AllEffects[i].effects) {
-                    if (Effect.Element != Element) {
-                        Animations.AddRange(RemoveEffect(Effect, false));
+                for (int j = 0; j < 3; j++) {
+                    if (AllEffects[i].effects[j] != null && AllEffects[i].effects[j].Element != Element) {
+                        Animations.AddRange(RemoveEffect(AllEffects[i].effects[j], false));
                     }
                 }
             }
@@ -407,7 +410,7 @@ namespace Alpaka.Scenes.Battle {
                 Target.ActiveCreature.Kin,
                 (double)Target.ActiveCreature.CreatureType.Elements[0],
                 (double)Target.ActiveCreature.CreatureType.Elements[1],
-                (double)Target.ActiveCreature.CreatureType.Elements[2],
+                (double)Target.ActiveCreature.CreatureType.Elements[2], //TODO: ADD STATUS
             }, Target.ActiveCreature.Nickname));
 
             Animations.AddRange(
@@ -426,8 +429,6 @@ namespace Alpaka.Scenes.Battle {
 
             List<SceneAnimation> Animations = new List<SceneAnimation>();
 
-            if (Target.CanBeAttacked.Evaluate()) {
-
                 if (TriggersAttackFlags) {
                     Animations.AddRange(
                         RunEffectType(EffectTrigger.BEFORE_ATTACKED, Target)
@@ -438,6 +439,7 @@ namespace Alpaka.Scenes.Battle {
 					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ATTACK, new double[] {
                 GetOpponent(Target).playerNumber }, "#ATTACK ANIMATION#"));
                     //Animations.Add(AttackAnimation); //TODO: DONT PASS AS ARGUMENT
+
                     Animations.AddRange(Target.GiveDamage(Element, Catagory, BaseAmount, Target, GetOpponent(Target)));
                     if (Target.IsKilled()) {
                         AmountOfAttacks = (byte)(i + 1);
@@ -473,9 +475,6 @@ namespace Alpaka.Scenes.Battle {
                         );
                     }
                 }
-            } else {
-                //TODO: OPPONENT CANNOT BE ATTACKED - THE ATTACK FAILED
-            }
             return Animations;
         }
 
@@ -509,7 +508,7 @@ namespace Alpaka.Scenes.Battle {
 
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
-
+            Interpreter.SetElement(EffectScripts.Element);
             Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
             return Animations; //TODO: GET ANIMATIONS FROM SCRIPT

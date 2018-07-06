@@ -14,9 +14,12 @@ namespace Alpaka.Scenes.Battle {
 
 		public abstract void SetTargets(Player User, Player Opponent, Player Trigger, byte TriggerPosition);
 
-	}
+        public abstract void SetElement(CreatureElement Element);
 
-	class EffectHardExecute : EffectExecute {
+
+    }
+
+    class EffectHardExecute : EffectExecute {
 
 		BattleEngine Battle;
 		Player User;
@@ -24,6 +27,8 @@ namespace Alpaka.Scenes.Battle {
 		Player Trigger;
 		byte TriggerPosition;
 		byte PlayersEffected;
+
+        CreatureElement Element;
 
 		OP_[] OP_Decode;
 
@@ -46,8 +51,11 @@ namespace Alpaka.Scenes.Battle {
 			this.TriggerPosition = TriggerPosition;
 		}
 
-		private string OpponentText(Player Target) {
-			Console.WriteLine(Battle.Player2 == Target);
+        public override void SetElement(CreatureElement Element) {
+            this.Element = Element;
+        }
+
+        private string OpponentText(Player Target) {
 			if (Battle.Player2 == Target) {
 				return "The Opponent's ";
 			} else {
@@ -114,8 +122,10 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		void SPEED_SLASH() {
-            Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.CUT));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Cut!"));
+            if (!(Element == CreatureElement.EARTH && Opponent.NotEffectedByEarth.Evaluate())) {
+                Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.CUT));
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Cut!"));
+            }
 		}
 
 		void SLINGSHOT() {
@@ -141,15 +151,16 @@ namespace Alpaka.Scenes.Battle {
 		void FLASH_FREEZE() {
             Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.FROZEN));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Frozen!"));
-			Battle.RemoveAllEffectsExceptElement(CreatureElement.ICE);
+            Animations.AddRange(Battle.RemoveAllEffectsExceptElement(CreatureElement.ICE));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, "All but Ice Effects have been removed from the Arena!"));
 		}
 		void SOLIDIFY() {
-			Opponent.newElement = CreatureElement.ICE; //TODO: FUCKING HELL
-		}
-		void CEASEFIRE() {
-			User.CanBeAttacked.SetFlag(1);
-			Opponent.CanBeAttacked.SetFlag(1);
+            Animations.Add(Opponent.SetNewElement(CreatureElement.ICE));
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " has been changed to Ice!"));
+        }
+        void CEASEFIRE() {
+			User.CanBeAttacked.SetFlag(2);
+			Opponent.CanBeAttacked.SetFlag(2);
 		}
 		void COLD_STORAGE() {
 			if (Trigger.JustSwitchedIn) {

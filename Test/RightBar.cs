@@ -167,7 +167,8 @@ namespace Alpaka {
 
                     }
                 }
-			} else {
+                spriteBatch.DrawString(g.font, ((int)((250 - h) * (double)totalHealth / (double)250)).ToString(), new Vector2(x + 250 - 3, y + 6), Color.Black);
+            } else {
 				hbar.sourcex = (int)(27 +  250 - (double)((double)health / (double)totalHealth) * 250);
 				mbar.sourcex = (int)(77 + 200 - (double)((double)kin / (double)totalKin) * 200);
 
@@ -184,7 +185,7 @@ namespace Alpaka {
                 status.Draw(288 + x, 18 + y, spriteBatch);
             }
 
-            spriteBatch.DrawString(g.font, ((int)((250 -h)*(double)totalHealth/(double)250)).ToString(), new Vector2(x + 250 - 3, y + 6), Color.Black);
+            spriteBatch.DrawString(g.font, health.ToString(), new Vector2(x + 250 - 3, y + 6), Color.Black);
             spriteBatch.DrawString(g.font, name, new Vector2(x + 215, y + 51), Color.Black);
 
         }

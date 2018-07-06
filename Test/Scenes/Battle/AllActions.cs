@@ -41,13 +41,13 @@ namespace Alpaka.Scenes.Battle {
 
 			c.Add(new CreatureAction(
 				"Speed Slash", //NAME
-				CreatureElement.WIND,
+				CreatureElement.EARTH,
 				 ActionCategory.PHYSICAL,
 				90,          //SPEED
 				-2,           //PRIORITY MODIFIER
-				250,//60,          //POWER
+				60,          //POWER
 				10,          //USAGE
-				10,           //MANA
+				1,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
@@ -81,7 +81,7 @@ namespace Alpaka.Scenes.Battle {
 
 			c.Add(new CreatureAction(
 				"Transport Rip", //NAME
-				CreatureElement.COSMIC,
+				CreatureElement.ICE,
 				ActionCategory.ADAPTIVE,
 				50,          //SPEED
 				0,           //PRIORITY MODIFIER
@@ -110,12 +110,12 @@ namespace Alpaka.Scenes.Battle {
 				0,           //PRIORITY MODIFIER
 				0,          //POWER
 				5,          //USAGE
-				10,           //MANA
+				1,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
 														   60, //SPEED
 					                                       new byte[1] { 0x04 }) }
 					)
@@ -148,9 +148,9 @@ namespace Alpaka.Scenes.Battle {
 				ActionCategory.MYSTICAL,
 				110,          //SPEED
 				0,           //PRIORITY MODIFIER
-				120,          //POWER
+				240,          //POWER
 				2,          //USAGE
-				50,           //MANA
+				5,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
@@ -168,9 +168,9 @@ namespace Alpaka.Scenes.Battle {
 				ActionCategory.MYSTICAL,
 				80,          //SPEED
 				0,           //PRIORITY MODIFIER
-				70,          //POWER
+				250,//70,          //POWER
 				6,          //USAGE
-				20,           //MANA
+				2,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
@@ -187,15 +187,15 @@ namespace Alpaka.Scenes.Battle {
 				CreatureElement.ETHER,
 				ActionCategory.DEFENSIVE,
 				50,          //SPEED
-				0,           //PRIORITY MODIFIER
+				3,           //PRIORITY MODIFIER
 				0,          //POWER
 				10,          //USAGE
-				20,           //MANA
+				2,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
 														   50, //SPEED
 					                                       new byte[1] { 0x08 }) }
 					)
@@ -210,7 +210,7 @@ namespace Alpaka.Scenes.Battle {
 				0,           //PRIORITY MODIFIER
 				0,          //POWER
 				5,          //USAGE
-				20,           //MANA
+				2,           //MANA
 				new BattleEffect(
 					9, //PRIORITY
 					10, //LIFESPAN
@@ -230,14 +230,14 @@ namespace Alpaka.Scenes.Battle {
 				0,           //PRIORITY MODIFIER
 				0,          //POWER
 				5,          //USAGE
-				20,           //MANA
+				2,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
                     new byte[1] { 9 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
 														   55, //SPEED
-					                                       new byte[1] { 0x1A }) }
+					                                       new byte[1] { 0x0A }) }
 					)
 				)
 			);

@@ -10,7 +10,7 @@ namespace Alpaka {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        BattleEngine engine;
+       BattleEngine engine;
 
         Arena arena;
         ArenaEffects effects;
@@ -61,6 +61,13 @@ namespace Alpaka {
                 Console.WriteLine("[" + an.Message + "]");
             }
         }
+
+		public string getTeam(byte i) {
+			return engine.Player1.Team[i].Nickname;
+		}
+		public string getMove(byte i) {
+			return engine.Player1.ActiveCreature.GetAction(i).Name;
+		}
 
         private void Animate() {
             if (nextAnim) {

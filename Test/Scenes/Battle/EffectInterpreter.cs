@@ -35,12 +35,13 @@ namespace Alpaka.Scenes.Battle {
 		public override List<SceneAnimation> ExecuteEffect(EffectScript Script) {
 
 			Animations = new List<SceneAnimation>();
+			if (!(Element == CreatureElement.EARTH && Opponent.NotEffectedByEarth.Evaluate())) {
 
-			List<byte> Memory = Script.Script;
-			for (int i = 0; i < Memory.Count; i++) {
-				OP_Decode[Memory[i] >> 4]((byte)(Memory[i] & 0x0F))();
+				List<byte> Memory = Script.Script;
+				for (int i = 0; i < Memory.Count; i++) {
+					OP_Decode[Memory[i] >> 4]((byte)(Memory[i] & 0x0F))();
+				}
 			}
-
 			return Animations;
 		}
 
@@ -76,19 +77,17 @@ namespace Alpaka.Scenes.Battle {
 		Action OP_0_(byte OP) {
 			Action[] OP_ = {
 				new Action(COSMIC_STING), new Action(SPEED_SLASH), new Action(SLINGSHOT), new Action(TRANSPORT_RIP), new Action(HOVER), new Action(BEND_PRESENCE), new Action(FLASH_FREEZE), new Action(SOLIDIFY),
-				new Action(CEASEFIRE), new Action(COLD_STORAGE), new Action(HEALING_BELL), new Action(TRANSPORT_RIP2), new Action(OP_0C), new Action(OP_0D), new Action(OP_0E), new Action(OP_0F)
+				new Action(CEASEFIRE), new Action(COLD_STORAGE), new Action(HEALING_BELL), new Action(TRANSPORT_RIP2), new Action(SMOULDER_SMASH), new Action(CLOBBER), new Action(ANCIENT_ROAR), new Action(SCORCHED_EARTH)
 			};
 			return OP_[OP];
 		}
 
 		Action OP_1_(byte OP) {
-			/*
 			Action[] OP_ = {
-				new Action(OP_10), new Action(OP_11), new Action(OP_12), new Action(OP_13), new Action(OP_14), new Action(OP_15), new Action(OP_16), new Action(OP_17),
+				new Action(KINDLE), new Action(DETER), new Action(MACH_SPEED), new Action(WINDTUNNEL), new Action(PRESSURISE), new Action(OP_15), new Action(OP_16), new Action(OP_17),
 				new Action(OP_18), new Action(OP_19), new Action(OP_1A), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
 			};
-			return OP_[OP]; */
-			return null;
+			return OP_[OP];
 		}
 		Action OP_2_(byte OP) {
 			/*
@@ -122,15 +121,14 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		void SPEED_SLASH() {
-            if (!(Element == CreatureElement.EARTH && Opponent.NotEffectedByEarth.Evaluate())) {
                 Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.CUT));
                 Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Cut!"));
-            }
 		}
 
 		void SLINGSHOT() {
-            Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
+				Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
+
 		}
 
 		void TRANSPORT_RIP() {
@@ -171,25 +169,103 @@ namespace Alpaka.Scenes.Battle {
 		void HEALING_BELL() {
 			User.RestoreHealthInseadOfMana.SetFlag(4);
 		}
-		void OP_0C() {
-			//remove [POS/NEG] [NUMBER] pp from [USR/PNT/ALL] last move
-
+		void SMOULDER_SMASH() {
+			Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
 		}
 
-		void OP_0D() {
-			//remove [POS/NEG] [NUMBER] pp from [USR/PNT/ALL] moves
-
+		void CLOBBER() {
+			Animations.Add(Opponent.GiveStatBoost(CreatureStats.ENDURANCE, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " Endurance is lowered!"));
 		}
 
-		void OP_0E() {
+		void ANCIENT_ROAR() {
 			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] health from damage
 
 		}
 
-		void OP_0F() {
+		void SCORCHED_EARTH() {
 			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] health
 
 		}
+
+		void KINDLE() {
+			//gain [POS/NEG] [NUMBER] of [USR/PNT/ALL] health
+
+		}
+
+		void DETER() {
+			//heal [POS/NEG] [NUMBER] % of[USR / PNT / ALL] kin
+
+		}
+		void MACH_SPEED() {
+			//gain [POS/NEG] [NUMBER] of [USR/PNT/ALL] kin
+
+		}
+		void WINDTUNNEL() {
+			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] kin from damage
+
+		}
+
+		void PRESSURISE() {
+			//change all elements to singular element
+			//[ALL/USR/PNT/TGR] [ELEMENT]
+		}
+
+		void OP_15() {
+			//reset [USR/PNT/ALL] elements
+			//[ALL/USR/PNT/TGR]
+		}
+
+		void OP_16() {
+			//replace [USR/PNT/ALL] [ELEMENT] with [ELEMENT]
+			//[ALL/USR/PNT/TGR] [ELEMENT] [ELEMENT]
+		}
+
+		void OP_17() {
+			//add [ELEMENT] to [USR/PNT/ALL]
+
+		}
+
+		void OP_18() {
+			//give [ELEMENT] [POS/NEG] buff to [USR/PNT/ALL]
+			//[ALL/USR/PNT/TGR] [ELEMENT] [POS/NEG] [NUMBER]
+		}
+
+		void OP_19() {
+			//remove all buffs [USR/PNT/ALL]
+
+		}
+
+		void OP_1A() {
+			//give [ELEMENT] [NUMBER] [POS/NEG] priority to [USR/PNT/ALL]
+
+		}
+
+		void OP_1B() {
+			//give [NUMBER] [POS/NEG] priority to [USR/PNT/ALL]
+
+		}
+
+		void OP_1C() {
+			//increase mana cost of [USR/PNT/ALL] [ELEMENT] moves by [NUMBER]
+		}
+
+		void OP_1D() {
+			//change [USR/PNT/ALL] move elements all to [ELEMENT]
+
+		}
+
+		void OP_1E() {
+			//replace [USR/PNT/ALL] [ELEMENT] move elements with [ELEMENT]
+
+		}
+
+		void OP_1F() {
+			//reset last move element changes
+
+		}
+
 	}
 	/*
 	class EffectInterpreter : EffectExecute {

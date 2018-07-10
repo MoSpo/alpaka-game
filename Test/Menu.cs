@@ -457,11 +457,23 @@ namespace Alpaka {
                     for (int i = 0; i < 11; i++) {
                         middle[i].Draw(spriteBatch);
                     }
+					spriteBatch.DrawString(g.font, g.getMove(0), new Vector2(130, 367), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getMove(1), new Vector2(150, 426), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getMove(2), new Vector2(170, 485), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getMove(3), new Vector2(514, 367), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getMove(4), new Vector2(494, 426), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getMove(5), new Vector2(474, 485), Color.Fuchsia);
 
                 } else if (currentMode == MenuMode.ACTION_CHOICE) {
                     for (int i = 0; i < 13; i++) {
                         middle[i].Draw(spriteBatch);
                     }
+					spriteBatch.DrawString(g.font, g.getTeam(0), new Vector2(10, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(1), new Vector2(130, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(2), new Vector2(250, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(3), new Vector2(370, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(4), new Vector2(490, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(5), new Vector2(610, 500), Color.Black);
 
                 } else if (currentMode == MenuMode.CLOSED_CHOICE) {
                     middle[0].Draw(248, 505, spriteBatch);
@@ -470,6 +482,13 @@ namespace Alpaka {
 
                     middle[11].Draw(spriteBatch);
                     middle[12].Draw(spriteBatch);
+
+					spriteBatch.DrawString(g.font, g.getTeam(0), new Vector2(10, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(1), new Vector2(130, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(2), new Vector2(250, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(3), new Vector2(370, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(4), new Vector2(490, 500), Color.Black);
+					spriteBatch.DrawString(g.font, g.getTeam(5), new Vector2(610, 500), Color.Black);
 
                 } else if (currentMode == MenuMode.MOVEMENT) {
                     for (int i = 0; i < 3; i++) {

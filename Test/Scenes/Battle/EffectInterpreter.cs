@@ -16,7 +16,9 @@ namespace Alpaka.Scenes.Battle {
 
         public abstract void SetElement(CreatureElement Element);
 
+		public abstract void SetPrevElement(CreatureElement Element);
 
+		public abstract void SetBaseAttacks(int BasePhysical, int BaseMystical);
     }
 
     class EffectHardExecute : EffectExecute {
@@ -28,7 +30,11 @@ namespace Alpaka.Scenes.Battle {
 		byte TriggerPosition;
 		byte PlayersEffected;
 
-        CreatureElement Element;
+		public int BasePhysical;
+		public int BaseMystical;
+
+		CreatureElement PrevElement;
+		CreatureElement Element;
 
 		OP_[] OP_Decode;
 
@@ -56,7 +62,16 @@ namespace Alpaka.Scenes.Battle {
             this.Element = Element;
         }
 
-        private string OpponentText(Player Target) {
+		public override void SetPrevElement(CreatureElement Element) {
+			PrevElement = Element;
+		}
+
+		public override void SetBaseAttacks(int BasePhysical, int BaseMystical) {
+			this.BasePhysical = BasePhysical;
+			this.BaseMystical = BaseMystical;
+		}
+
+		private string OpponentText(Player Target) {
 			if (Battle.Player2 == Target) {
 				return "The Opponent's ";
 			} else {
@@ -84,7 +99,7 @@ namespace Alpaka.Scenes.Battle {
 
 		Action OP_1_(byte OP) {
 			Action[] OP_ = {
-				new Action(KINDLE), new Action(DETER), new Action(MACH_SPEED), new Action(WINDTUNNEL), new Action(PRESSURISE), new Action(OP_15), new Action(OP_16), new Action(OP_17),
+				new Action(KINDLE), new Action(DETER), new Action(MACH_SPEED), new Action(WINDTUNNEL), new Action(PRESSURISE), new Action(METAMORPH), new Action(ASTEROIDS), new Action(COMET_LAUNCHER),
 				new Action(OP_18), new Action(OP_19), new Action(OP_1A), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
 			};
 			return OP_[OP];
@@ -212,19 +227,21 @@ namespace Alpaka.Scenes.Battle {
 			//[ALL/USR/PNT/TGR] [ELEMENT]
 		}
 
-		void OP_15() {
-			//reset [USR/PNT/ALL] elements
-			//[ALL/USR/PNT/TGR]
+		void METAMORPH() {
+			Animations.Add(User.GiveStatBoost(CreatureStats.STRENGTH, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " has its Strength increased!"));
 		}
 
-		void OP_16() {
-			//replace [USR/PNT/ALL] [ELEMENT] with [ELEMENT]
-			//[ALL/USR/PNT/TGR] [ELEMENT] [ELEMENT]
+		void ASTEROIDS() {
+			Animations.AddRange(Trigger.GiveDamage(CreatureElement.ROCK, ActionCategory.PHYSICAL, 60, BasePhysical, BaseMystical, Trigger.GetTotalStat(CreatureStats.ENDURANCE), Trigger.GetTotalStat(CreatureStats.WISDOM), 1, Trigger.GetElementEffectiveness(Element)));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + Opponent.ActiveCreature.Nickname + " takes damage from Asteroids!"));
 		}
 
-		void OP_17() {
-			//add [ELEMENT] to [USR/PNT/ALL]
-
+		void COMET_LAUNCHER() {
+			if (PrevElement == CreatureElement.COSMIC) {
+				Animations.AddRange(Opponent.GiveDamage(CreatureElement.ICE, ActionCategory.PHYSICAL, 60, BasePhysical, BaseMystical, Opponent.GetTotalStat(CreatureStats.ENDURANCE), Opponent.GetTotalStat(CreatureStats.WISDOM), 1, Opponent.GetElementEffectiveness(Element)));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + Opponent.ActiveCreature.Nickname + " takes damage from Comet Launcher!"));
+			}
 		}
 
 		void OP_18() {

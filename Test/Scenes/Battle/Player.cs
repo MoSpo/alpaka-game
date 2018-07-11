@@ -121,8 +121,8 @@ namespace Alpaka.Scenes.Battle {
 		public void setStart(byte s) {  //STAND IN CODE
 			AllCreatures temp = new AllCreatures();
 			if (playerNumber == 1) {
-				Team[0] = new CreatureInstance(temp.GetCreature(1));
-				Team[1] = new CreatureInstance(temp.GetCreature(0));
+				Team[0] = new CreatureInstance(temp.GetCreature(0));
+				Team[1] = new CreatureInstance(temp.GetCreature(1));
 				Team[2] = new CreatureInstance(temp.GetCreature(2));
 				Team[3] = new CreatureInstance(temp.GetCreature(3));
 				Team[4] = new CreatureInstance(temp.GetCreature(5));
@@ -143,26 +143,22 @@ namespace Alpaka.Scenes.Battle {
 		/// //////////////////
 
 
-		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseAmount, Player Attacked, Player Attacker) {
+		public double GetElementEffectiveness(CreatureElement Element) {
+			double ElementBonus = 1.0;
+			for (int i = 0; i < 16; i++) if (HasElement((CreatureElement)(i + 1))) ElementBonus *= (double)ElementEffectiveness[((int)Element) - 1][i] / 2;
+			return ElementBonus;
+		}
+
+		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, int AttackerStrength, int AttackerIntelligence, int AttackedEndurance, int AttackedWisdom, double ElementBoost, double ElementEffectiveness) {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
 			int Damage = 0;
-			double ElementBonus = 1.0;
-			for (int i = 0; i < 16; i++) if (Attacked.HasElement((CreatureElement)(i + 1))) ElementBonus *= (double)ElementEffectiveness[((int)Element) - 1][i] / 2;
-			double SameElementBonus = 1.0;
-			if (Attacker.HasElement(Element)) SameElementBonus *= 1.5;
-			double Bonuses = ElementBonus * SameElementBonus;
+			double Bonuses = ElementEffectiveness * ElementBoost;
 
 			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
-				if (Category == ActionCategory.PHYSICAL) {
-					Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.STRENGTH) * BaseAmount * Bonuses /
-										 Attacked.ActiveCreature.GetTotalStat(CreatureStats.ENDURANCE) + 2.0));
-
-				} else if (Category == ActionCategory.MYSTICAL) {
-					Damage = (int)Math.Floor((Attacker.ActiveCreature.GetTotalStat(CreatureStats.INTELLIGENCE) * BaseAmount * Bonuses /
-												Attacked.ActiveCreature.GetTotalStat(CreatureStats.WISDOM) + 2.0));
-				}
+				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((AttackerStrength * BaseActionPower * Bonuses / AttackedEndurance) +2.0);
+				else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor((AttackerIntelligence * BaseActionPower * Bonuses / AttackedWisdom) + 2.0);
 
 				int nh = ActiveCreature.Health - Damage;
 				if (nh < 0) nh = 0;
@@ -172,8 +168,8 @@ namespace Alpaka.Scenes.Battle {
 				ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
 				nh,
 				-1*Damage,
-				ElementBonus,
-				SameElementBonus}, "#DAMAGE GIVEN#"));
+				ElementEffectiveness,
+				ElementBoost}, "#DAMAGE GIVEN#"));
 
 
 				ActiveCreature.Health -= Damage;
@@ -196,9 +192,9 @@ namespace Alpaka.Scenes.Battle {
 			int s = Statboosts[Stat] - 5;
 			double boost = 1;
 			if (s > 0) {
-				boost = (s + 2) / 2;
+				boost = ((double)s + 3) / 3;
 			} else {
-				boost = 2 / (2 - s);
+				boost = 3 / (3 - (double)s);
 			}
 			return (int)(boost * ActiveCreature.GetTotalStat(Stat)); //TODO: THIS IS USED WAYYY TOO MUCH PLEASE FIX
 		}
@@ -243,16 +239,26 @@ namespace Alpaka.Scenes.Battle {
 			return new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "");
 		}
 
+
+		public bool CanSelectAction(byte ActionNumber) {
+			return ActionNumber >= 6 || (ActiveCreature.GetActionUsage(ActionNumber) > 0 && ActiveCreature.GetKin(ActionNumber)*100 <= ActiveCreature.Kin);
+		}
+		public bool CanSelectMovement(byte MovementNumber) {
+			return true;
+		}
+
+		public bool CanSelectCreature(byte CreatureNumber) {
+			return !Team[CreatureNumber].killed;
+		}
+
 		public bool SelectAction(byte ActionNumber) {
 			if (ActionNumber < 6) {
-				if (ActiveCreature.GetActionUsage(ActionNumber) == 0) {
+				if (ActiveCreature.GetActionUsage(ActionNumber) == 0 || ActiveCreature.GetKin(ActionNumber) > ActiveCreature.Kin) {
 					return false;
 				}
+			}
 				SelectedActionNumber = ActionNumber;
 				SelectedAction = ActiveCreature.GetAction(ActionNumber);
-			} else {
-				//TODO: BASIC ACTIONS HERE
-			}
 			if (OldAction == null) {
 				actionCombo = 1;
 			} else {
@@ -316,7 +322,9 @@ namespace Alpaka.Scenes.Battle {
 
 			amountOfAttacks = 1;
 
-			Statboosts = new Dictionary<CreatureStats, byte>();
+			foreach (CreatureStats Stat in Enum.GetValues(typeof(CreatureStats))) {
+				Statboosts[Stat] = 5;
+			}
 
 			ElementBoosts = new byte[Enum.GetNames(typeof(CreatureElement)).Length];
 

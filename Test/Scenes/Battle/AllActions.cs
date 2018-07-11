@@ -25,9 +25,9 @@ namespace Alpaka.Scenes.Battle {
 				 ActionCategory.PHYSICAL,
 				50,          //SPEED
 				0,           //PRIORITY MODIFIER
-				20,          //POWER
-				3,          //USAGE
-				0,           //MANA
+				35,          //POWER
+				4,          //USAGE
+				2,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
@@ -45,9 +45,9 @@ namespace Alpaka.Scenes.Battle {
 				 ActionCategory.PHYSICAL,
 				90,          //SPEED
 				-2,           //PRIORITY MODIFIER
-				60,          //POWER
-				10,          //USAGE
-				1,           //MANA
+				70,          //POWER
+				5,          //USAGE
+				2,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
@@ -65,9 +65,9 @@ namespace Alpaka.Scenes.Battle {
 				 ActionCategory.PHYSICAL,
 				60,          //SPEED
 				0,           //PRIORITY MODIFIER
-				60,          //POWER
-				15,          //USAGE
-				0,           //MANA
+				50,          //POWER
+				3,          //USAGE
+				2,           //MANA
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
@@ -75,6 +75,68 @@ namespace Alpaka.Scenes.Battle {
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   100, //SPEED
 					                                       new byte[1] { 0x02 }) }
+					)
+				)
+			);
+
+
+			c.Add(new CreatureAction(
+				"Metamorph", //NAME
+				CreatureElement.WOOD,
+				ActionCategory.DEFENSIVE,
+				50,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				8,          //USAGE
+				0,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   70, //SPEED
+					                                       new byte[1] { 0x15 })}
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Asteroids", //NAME
+				CreatureElement.COSMIC,
+				ActionCategory.ADAPTIVE,
+				50,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				3,           //MANA
+				new BattleEffect(
+					9, //PRIORITY
+					5, //LIFESPAN
+					new byte[2] { 2,5 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
+														   70, //SPEED
+					                                       new byte[1] { 0x16 })}
+					)
+				)
+			);
+
+
+			c.Add(new CreatureAction(
+				"Comet Launcher", //NAME
+				CreatureElement.COSMIC,
+				ActionCategory.ADAPTIVE,
+				50,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				3,          //USAGE
+				2,           //MANA
+				new BattleEffect(
+					9, //PRIORITY
+					8, //LIFESPAN
+					new byte[1] { 0 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.ON_OTHER_EFFECT_TIMEOUT,
+														   70, //SPEED
+					                                       new byte[1] { 0x17 })}
 					)
 				)
 			);
@@ -168,7 +230,7 @@ namespace Alpaka.Scenes.Battle {
 				ActionCategory.MYSTICAL,
 				80,          //SPEED
 				0,           //PRIORITY MODIFIER
-				70,          //POWER
+				120,          //POWER
 				6,          //USAGE
 				2,           //MANA
 				new BattleEffect(

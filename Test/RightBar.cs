@@ -108,9 +108,9 @@ namespace Alpaka {
         }
 
         public void setMaxKin(int sm) {
-            totalKin = sm;
-            kin = 0;
-            oldkin = 0;
+            totalKin = 1000;
+            kin = sm;
+            oldkin = sm;
             m = 0;
         }
 

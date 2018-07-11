@@ -114,7 +114,11 @@ namespace Alpaka {
                     for (int i = 3; i < 11; i++) {
                         if (middle[i].x + middle[i].width - 15 >= x && middle[i].y + middle[i].height - 6 >= y && middle[i].x + 15 <= x && middle[i].y + 6 <= y) {
                             middle[i].texture = actionselect;
-                            chosenAction = (byte)(i - 2);
+							if (g.getCanUse((byte)(i - 3))) {
+								chosenAction = (byte)(i - 2);
+							} else {
+								chosenAction = 0;
+							}
                         } else {
                             middle[i].texture = actions;
                         }
@@ -454,15 +458,34 @@ namespace Alpaka {
                     for (int i = 3; i < 11; i++) {
                         middle[i].color = new Color(255, 255, 255, 255);
                     }
-                    for (int i = 0; i < 11; i++) {
+
+					for (int i = 3; i < 9; i++) {
+						if (!g.getCanUse((byte)(i-3))) {
+							middle[i].texture = actionselect;
+						} else {
+							middle[i].texture = actions;
+						}
+					}
+					for (int i = 0; i < 11; i++) {
                         middle[i].Draw(spriteBatch);
                     }
-					spriteBatch.DrawString(g.font, g.getMove(0), new Vector2(130, 367), Color.Fuchsia);
-					spriteBatch.DrawString(g.font, g.getMove(1), new Vector2(150, 426), Color.Fuchsia);
-					spriteBatch.DrawString(g.font, g.getMove(2), new Vector2(170, 485), Color.Fuchsia);
-					spriteBatch.DrawString(g.font, g.getMove(3), new Vector2(514, 367), Color.Fuchsia);
-					spriteBatch.DrawString(g.font, g.getMove(4), new Vector2(494, 426), Color.Fuchsia);
-					spriteBatch.DrawString(g.font, g.getMove(5), new Vector2(474, 485), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getAction(0), new Vector2(100, 367), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getAction(1), new Vector2(120, 426), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getAction(2), new Vector2(140, 485), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getAction(3), new Vector2(504, 367), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getAction(4), new Vector2(484, 426), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, g.getAction(5), new Vector2(464, 485), Color.Fuchsia);
+
+					spriteBatch.DrawString(g.font, "Attack", new Vector2(30, 485), Color.Fuchsia);
+					spriteBatch.DrawString(g.font, "Switch", new Vector2(624, 485), Color.Fuchsia);
+
+					spriteBatch.DrawString(g.font, g.getCanUseAction(0), new Vector2(203, 381), Color.Blue);
+					spriteBatch.DrawString(g.font, g.getCanUseAction(1), new Vector2(223, 440), Color.Blue);
+					spriteBatch.DrawString(g.font, g.getCanUseAction(2), new Vector2(243, 499), Color.Blue);
+					spriteBatch.DrawString(g.font, g.getCanUseAction(3), new Vector2(502, 381), Color.Blue);
+					spriteBatch.DrawString(g.font, g.getCanUseAction(4), new Vector2(482, 440), Color.Blue);
+					spriteBatch.DrawString(g.font, g.getCanUseAction(5), new Vector2(462, 499), Color.Blue);
+
 
                 } else if (currentMode == MenuMode.ACTION_CHOICE) {
                     for (int i = 0; i < 13; i++) {

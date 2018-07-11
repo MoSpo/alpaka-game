@@ -15,6 +15,9 @@ namespace Alpaka.Scenes.Battle {
 
 		public byte CurrentPlacement;
 
+		public int BasePhysical;
+		public int BaseMystical;
+
 		public SceneAnimation EffectAnimation; //TODO: ASSIGN DEFAULT
 
 		public Player User;
@@ -36,10 +39,12 @@ namespace Alpaka.Scenes.Battle {
 
         public void SetElement(CreatureElement Element) {
             this.Element = Element;
-            foreach (EffectScript Script in Scripts) {
-                Script.Element = Element;
-            }
         }
+
+		public void SetBaseAttacks(int BasePhysical, int BaseMystical) {
+			this.BasePhysical = BasePhysical;
+			this.BaseMystical = BaseMystical;
+		}
 
 		public BattleEffect(BattleEffect Target, Player User) {
 			Name = Target.Name;
@@ -48,6 +53,8 @@ namespace Alpaka.Scenes.Battle {
 			CurrentLifespan = Target.Lifespan;
 			Placement = Target.Placement;
             Element = Target.Element;
+			BasePhysical = Target.BasePhysical;
+			BaseMystical = Target.BaseMystical;
 			Scripts = new List<EffectScript>(Target.Scripts);
 			this.User = User;
 		}

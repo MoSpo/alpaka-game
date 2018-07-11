@@ -30,7 +30,7 @@ namespace Alpaka.Scenes.Battle {
 					if (Effect.EffectAnimation != null) {
 						Animations.Add(Effect.EffectAnimation);
 					}
-					Animations.AddRange(Battle.InterpretEffect(Effect.GetTriggeredEffect(EffectTrigger.EACHTURN_UNTIL_EFFECT_END), Effect.User, null, Effect.CurrentPlacement));
+					Animations.AddRange(Battle.InterpretEffect(Effect, Effect.GetTriggeredEffect(EffectTrigger.EACHTURN_UNTIL_EFFECT_END), Effect.User, null, Effect.CurrentPlacement));
 				}
 				Effect.DecreaseLifespan();
 				if (Effect.IsLifespanDepleted()) {

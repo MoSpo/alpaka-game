@@ -6,7 +6,6 @@ namespace Alpaka.Scenes.Battle {
 
 		public EffectTrigger Trigger;
 		public byte Speed;
-        public CreatureElement Element;
         public List<byte> Script;
 
 		public EffectScript(EffectTrigger Trigger, byte Speed, byte[] Script) {

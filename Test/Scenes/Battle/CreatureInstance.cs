@@ -40,9 +40,20 @@ namespace Alpaka.Scenes.Battle {
             //
             AllActions temp2 = new AllActions();
             for (byte i = 0; i < 6; i++) {
-                Actions[i] = temp2.GetAction((short)(i +5));
+                Actions[i] = temp2.GetAction((short)(i + 0));
             }
-            //
+			Actions[6] = new CreatureAction(
+				"Attack", //NAME
+				CreatureType.Elements[0],
+				ActionCategory.PHYSICAL,
+				50,          //SPEED
+				0,           //PRIORITY MODIFIER
+				30,          //POWER
+				255,        //USAGE
+				0,           //MANA
+				null
+				);
+			//
 
 			for (byte i = 0; i < 6; i++) {
                 ActionAmountUsed[i] = 10;
@@ -53,12 +64,13 @@ namespace Alpaka.Scenes.Battle {
                 SetSkillPoints(Stat, 1);
                 CalculateStat(Stat);
             }
+
             for (byte i = 0; i < 12; i++) {
                 hasCondition[i] = false;
             }
 
 			Health = GetTotalStat(CreatureStats.HEALTH);
-			Kin = 0;
+			Kin = (short)Math.Floor(1.0 * GetTotalStat(CreatureStats.KIN) / 6);
 
 		}
 
@@ -128,6 +140,9 @@ namespace Alpaka.Scenes.Battle {
 		public byte GetActionUsage(byte ActionNumber) {
 			return ActionAmountUsed[ActionNumber];
 		}
-   
+
+		public byte GetKin(byte ActionNumber) {
+			return Actions[ActionNumber].Mana;
+		}
 	}
 }

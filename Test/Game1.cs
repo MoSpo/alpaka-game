@@ -65,8 +65,14 @@ namespace Alpaka {
 		public string getTeam(byte i) {
 			return engine.Player1.Team[i].Nickname;
 		}
-		public string getMove(byte i) {
+		public string getAction(byte i) {
 			return engine.Player1.ActiveCreature.GetAction(i).Name;
+		}
+		public string getCanUseAction(byte i) {
+			return engine.Player1.ActiveCreature.GetActionUsage(i) + "\n" + engine.Player1.ActiveCreature.GetKin(i);
+		}
+		public bool getCanUse(byte i) {
+			return engine.Player1.CanSelectAction(i);
 		}
 
         private void Animate() {
@@ -202,12 +208,12 @@ namespace Alpaka {
             phasecounter = new Phase(Content);
             leftbar = new LeftBar(Content, this);
             leftbar.setMaxHealth(engine.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
-            leftbar.setMaxKin(1000);
+            leftbar.setMaxKin(engine.Player1.ActiveCreature.Kin);
             leftbar.setElements((byte)engine.Player1.ActiveCreature.CreatureType.Elements[0], (byte)engine.Player1.ActiveCreature.CreatureType.Elements[1], (byte)engine.Player1.ActiveCreature.CreatureType.Elements[2]);
             leftbar.name = engine.Player1.ActiveCreature.Nickname;
             rightbar = new RightBar(Content, this);
             rightbar.setMaxHealth(engine.Player2.ActiveCreature.GetTotalStat(CreatureStats.HEALTH));
-            rightbar.setMaxKin(1000);
+            rightbar.setMaxKin(engine.Player2.ActiveCreature.Kin);
             rightbar.setElements((byte)engine.Player2.ActiveCreature.CreatureType.Elements[0], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[1], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[2]);
             rightbar.name = engine.Player2.ActiveCreature.Nickname;
 
@@ -290,7 +296,7 @@ namespace Alpaka {
                     engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
                     engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
                     if (menu.chosenCreature != 0) engine.Player1.SelectCreature(menu.chosenCreature);
-                    engine.Player2.SelectAction(1);
+                    engine.Player2.SelectAction(6);
                     engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
                     Console.WriteLine(TurnNumber);
                     TurnNumber++;

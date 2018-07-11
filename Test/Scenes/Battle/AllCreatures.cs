@@ -20,9 +20,9 @@ namespace Alpaka.Scenes.Battle {
                 new CreatureElement[] { CreatureElement.COSMIC },
                 CreatureType.INSECT,
                 60, //HEALTH
-                60, //KIN
+                70, //KIN
                 80, //STRENGTH
-                90, //ENDURANCE
+                100, //ENDURANCE
                 70, //INTELLIGENCE
                 90, //WISDOM
                 110, //PACE

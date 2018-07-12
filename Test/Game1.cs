@@ -119,7 +119,16 @@ namespace Alpaka {
                     break;
 
                     case SceneAnimation.SceneAnimationType.ATTACK:
-                    nextAnim = true;
+						if (an.Values[0] == 1) {
+							if(ActionCategory.PHYSICAL == (ActionCategory)an.Values[1] || ActionCategory.MYSTICAL == (ActionCategory)an.Values[1]) opponent.rumble = 100;
+							if (ActionCategory.DEFENSIVE == (ActionCategory)an.Values[1] || ActionCategory.ADAPTIVE == (ActionCategory)an.Values[1]) opponent.rumble = 10;
+							opponent.UseTimer = true;
+						} else {
+							if (ActionCategory.PHYSICAL == (ActionCategory)an.Values[1] || ActionCategory.MYSTICAL == (ActionCategory)an.Values[1]) user.rumble = 100;
+							if (ActionCategory.DEFENSIVE == (ActionCategory)an.Values[1] || ActionCategory.ADAPTIVE == (ActionCategory)an.Values[1]) user.rumble = 10;
+							user.UseTimer = true;
+						}
+						nextAnim = false;
                     break;
 					case SceneAnimation.SceneAnimationType.ARENA:
                     arena.rot = (int)an.Values[0];
@@ -163,18 +172,16 @@ namespace Alpaka {
                     case SceneAnimation.SceneAnimationType.SWITCH:
                     if (an.Values[0] == 1) {
                         leftbar.setMaxHealth((int)an.Values[3]);
-                        leftbar.setMaxKin(1000);
+                        leftbar.setMaxKin((int)an.Values[4]);
                         leftbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
                         leftbar.health = (int)an.Values[2];
-                        leftbar.kin = (int)an.Values[4];
                         user.changeID((int)an.Values[1]);
                         leftbar.name = an.Message;
                     } else {
                         rightbar.setMaxHealth((int)an.Values[3]);
-                        rightbar.setMaxKin(1000);
+						rightbar.setMaxKin((int)an.Values[4]);
                         rightbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
                         rightbar.health = (int)an.Values[2];
-                        rightbar.kin = (int)an.Values[4];
                         opponent.changeID((int)an.Values[1]);
                         rightbar.name = an.Message;
                     }
@@ -217,8 +224,8 @@ namespace Alpaka {
             rightbar.setElements((byte)engine.Player2.ActiveCreature.CreatureType.Elements[0], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[1], (byte)engine.Player2.ActiveCreature.CreatureType.Elements[2]);
             rightbar.name = engine.Player2.ActiveCreature.Nickname;
 
-            user = new Battler(Content, engine.Player1.ActiveCreature.CreatureType.ID, "battlers");
-            opponent = new Battler(Content, engine.Player2.ActiveCreature.CreatureType.ID, "battlers");
+            user = new Battler(Content, engine.Player1.ActiveCreature.CreatureType.ID, "battlers", this);
+            opponent = new Battler(Content, engine.Player2.ActiveCreature.CreatureType.ID, "battlers", this);
 
             background = Content.Load<Texture2D>("bkground2");
             shade = Content.Load<Texture2D>("shade");
@@ -268,6 +275,8 @@ namespace Alpaka {
             effects.Update(dt);
             leftbar.Update(dt);
             rightbar.Update(dt);
+			user.Update(dt);
+			opponent.Update(dt);
 
             if (chosen) { //has finished with the menu selection
                 if (IsUserDeathTurn) {

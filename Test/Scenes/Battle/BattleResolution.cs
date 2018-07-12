@@ -101,7 +101,8 @@ namespace Alpaka.Scenes.Battle {
 					}
 				} else {
 					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ATTACK, new double[] {
-				Battle.GetOpponent(User).playerNumber }, "#ATTACK ANIMATION#"));
+				Battle.GetOpponent(User).playerNumber, 
+						(double)Action.Catagory}, "#ATTACK ANIMATION#"));
 					//Animations.Add(Action.Animation); //TODO: DONT PASS AS ARGUMENT
 					User.amountOfAttacks = 1;
 				}

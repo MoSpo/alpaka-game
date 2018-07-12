@@ -113,7 +113,6 @@ namespace Alpaka {
 
                     for (int i = 3; i < 11; i++) {
                         if (middle[i].x + middle[i].width - 15 >= x && middle[i].y + middle[i].height - 6 >= y && middle[i].x + 15 <= x && middle[i].y + 6 <= y) {
-                            middle[i].texture = actionselect;
 							if (g.getCanUse((byte)(i - 3))) {
 								chosenAction = (byte)(i - 2);
 							} else {

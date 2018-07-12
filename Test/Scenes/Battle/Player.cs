@@ -331,7 +331,7 @@ namespace Alpaka.Scenes.Battle {
 			SwitchedStats = new byte[8];
 			HasNewElement = false;
 
-			ActiveCreature.Kin = 0;
+			ActiveCreature.Kin = (short)Math.Floor(1.0 * GetTotalStat(CreatureStats.KIN) / 6);
 
 			actionElementMaskFrom = new List<CreatureElement>();
 			actionElementMaskTo = new List<CreatureElement>();

@@ -34,7 +34,7 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
-        double GameSpeed = 0.7;
+        double GameSpeed = 0.3;
         int TurnNumber = 1;
         public bool chosen = false;
 

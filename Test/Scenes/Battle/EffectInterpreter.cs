@@ -141,19 +141,19 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		void SLINGSHOT() {
-				Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
+				//Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
+				//Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
+			Animations.Add(Opponent.GiveStatBoost(CreatureStats.STRENGTH, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " Strength is lowered!"));
 
 		}
 
 		void TRANSPORT_RIP() {
 			Trigger.HasActionDelay.SetFlag(255);
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Flag Set"));
 
 		}
 		void TRANSPORT_RIP2() {
 			Trigger.HasActionDelay.RemoveFlag();
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Flag Unset"));
 		}
 		void HOVER() {
 			User.NotEffectedByEarth.SetFlag(3);

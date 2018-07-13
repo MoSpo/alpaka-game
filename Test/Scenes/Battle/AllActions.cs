@@ -48,14 +48,15 @@ namespace Alpaka.Scenes.Battle {
 				70,          //POWER
 				5,          //USAGE
 				2,           //MANA
-				new BattleEffect(
-					10, //PRIORITY
-					0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
-														   100, //SPEED
-					                                       new byte[1] { 0x01 }) }
-					)
+				null
+				//new BattleEffect(
+				//	10, //PRIORITY
+				//	0, //LIFESPAN
+                //    new byte[1] { 9 }, //PLACEMENT
+				//	new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+				//										   100, //SPEED
+				//	                                       new byte[1] { 0x01 }) }
+				//	)
 				)
 			);
 

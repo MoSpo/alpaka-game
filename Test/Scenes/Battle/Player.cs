@@ -256,6 +256,7 @@ namespace Alpaka.Scenes.Battle {
 				if (ActiveCreature.GetActionUsage(ActionNumber) == 0 || ActiveCreature.GetKin(ActionNumber) > ActiveCreature.Kin) {
 					return false;
 				}
+				ActiveCreature.DepleteActionUsage(ActionNumber);
 			}
 				SelectedActionNumber = ActionNumber;
 				SelectedAction = ActiveCreature.GetAction(ActionNumber);

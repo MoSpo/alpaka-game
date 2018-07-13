@@ -56,7 +56,7 @@ namespace Alpaka.Scenes.Battle {
 			//
 
 			for (byte i = 0; i < 6; i++) {
-                ActionAmountUsed[i] = 10;
+				ActionAmountUsed[i] = Actions[i].Usage;
                 //ActionAmountUsed[i] = Actions[i].Usage; NEED TO SET THIS UP STILL
 			}
 
@@ -139,6 +139,10 @@ namespace Alpaka.Scenes.Battle {
 
 		public byte GetActionUsage(byte ActionNumber) {
 			return ActionAmountUsed[ActionNumber];
+		}
+
+		public void DepleteActionUsage(byte ActionNumber) {
+			if (ActionAmountUsed[ActionNumber] > 0) ActionAmountUsed[ActionNumber]--;
 		}
 
 		public byte GetKin(byte ActionNumber) {

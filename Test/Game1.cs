@@ -34,7 +34,7 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
-        double GameSpeed = 0.3;
+        double GameSpeed = 0.2;
         int TurnNumber = 1;
         public bool chosen = false;
 
@@ -65,6 +65,10 @@ namespace Alpaka {
 		public string getTeam(byte i) {
 			return engine.Player1.Team[i].Nickname;
 		}
+		public bool getCanUseTeam(byte i) {
+			return !engine.Player1.Team[i].killed;
+		}
+
 		public string getAction(byte i) {
 			return engine.Player1.ActiveCreature.GetAction(i).Name;
 		}
@@ -296,7 +300,12 @@ namespace Alpaka {
                     engine.Player1.SelectCreature(0);
                     engine.Player2.SelectAction(0);
                     engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
-                    engine.Player2.SelectCreature(1);
+					for (int i = 0; i < 6; i++) {
+						if (!engine.Player2.Team[i].killed) {
+							engine.Player2.SelectCreature((byte)i);
+							break;
+						}
+					}
 
                     IsOpponentDeathTurn = false;
                     List<SceneAnimation> a = engine.Poll();

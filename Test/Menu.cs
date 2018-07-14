@@ -16,6 +16,8 @@ namespace Alpaka {
         Texture2D actions;
         Texture2D actionselect;
         Texture2D disc;
+		Texture2D arrows;
+		Texture2D cross;
 
         Thing[] middle;
 
@@ -61,6 +63,9 @@ namespace Alpaka {
             actionselect = Content.Load<Texture2D>("actionselect");
             disc = Content.Load<Texture2D>("disc");
 
+			arrows = Content.Load<Texture2D>("arrows");
+			cross = Content.Load<Texture2D>("cross");
+
             Texture2D chooser = Content.Load<Texture2D>("chooser");
             Texture2D pointers = Content.Load<Texture2D>("pointers");
 
@@ -89,6 +94,13 @@ namespace Alpaka {
                 new Thing(outershell, 111, 0, 66, 224),
                 new Thing(outershell, 174, 0, 49, 224),
 
+				new Thing(arrows,0,0, 222, 74),
+				new Thing(cross, 0,0,122,122),
+				new Thing(cross, 0,0,122,122),
+				new Thing(cross, 0,0,122,122),
+				new Thing(cross, 0,0,122,122),
+				new Thing(cross, 0,0,122,122),
+				new Thing(cross, 0,0,122,122),
             };
 
             for (int i = 3; i < 11; i++) {
@@ -102,71 +114,90 @@ namespace Alpaka {
                 timer += dt;
             }
 
-            if (clicked && !useTimer) {
-                if (currentMode == MenuMode.CLOSED) {
-                    //newMode = MenuMode.ACTION;
-                    //useTimer = true;
+			if (clicked && !useTimer) {
+				if (currentMode == MenuMode.CLOSED) {
+					//newMode = MenuMode.ACTION;
+					//useTimer = true;
 
-                } else if (currentMode == MenuMode.MESSAGE) {
+				} else if (currentMode == MenuMode.MESSAGE) {
 
-                } else if (currentMode == MenuMode.ACTION) {
+				} else if (currentMode == MenuMode.ACTION) {
 
-                    for (int i = 3; i < 11; i++) {
-                        if (middle[i].x + middle[i].width - 15 >= x && middle[i].y + middle[i].height - 6 >= y && middle[i].x + 15 <= x && middle[i].y + 6 <= y) {
+					for (int i = 3; i < 11; i++) {
+						if (middle[i].x + middle[i].width - 15 >= x && middle[i].y + middle[i].height - 6 >= y && middle[i].x + 15 <= x && middle[i].y + 6 <= y) {
 							if (g.getCanUse((byte)(i - 3))) {
 								chosenAction = (byte)(i - 2);
 							} else {
 								chosenAction = 0;
 							}
-                        } else {
-                            middle[i].texture = actions;
-                        }
-                    }
-                    if (chosenAction != 0) {
-                        if (creatureChoose) {
-                            newMode = MenuMode.ACTION_CHOICE;
-                        } else {
-                            newMode = MenuMode.MOVEMENT;
-                        }
-                        useTimer = true;
+						} else {
+							middle[i].texture = actions;
+						}
+					}
+					if (chosenAction != 0) {
+						if (creatureChoose) {
+							newMode = MenuMode.ACTION_CHOICE;
+						} else {
+							newMode = MenuMode.MOVEMENT;
+						}
+						useTimer = true;
 
-                    }
-                } else if (currentMode == MenuMode.CLOSED_CHOICE) {
-                    if (y > 430) {
-                        chosenCreature = (byte)(Math.Floor((double)x * 6 / 720));
-                        newMode = MenuMode.MESSAGE;
-                        useTimer = true;
+					}
+				} else if (currentMode == MenuMode.CLOSED_CHOICE) {
+					if (y > 430) {
+						byte choose = (byte)(Math.Floor((double)x * 6 / 720));
+						if (g.getCanUseTeam(choose)) {
+							chosenCreature = choose;
+							newMode = MenuMode.MESSAGE;
+							useTimer = true;
+						}
+					}
+				} else if (currentMode == MenuMode.ACTION_CHOICE) {
+					if (y > 430) {
+						byte choose = (byte)(Math.Floor((double)x * 6 / 720));
+						if (g.getCanUseTeam(choose)) {
+							chosenCreature = choose;
+							newMode = MenuMode.MOVEMENT;
+							useTimer = true;
+						}
+					} else if (middle[12].x + middle[12].width - 15 >= x && middle[12].y + middle[12].height - 15 >= y && middle[12].x + 15 <= x && middle[12].y + 15 <= y) {
+						newMode = MenuMode.ACTION;
+						useTimer = true;
+					}
 
-                    }
-                } else if (currentMode == MenuMode.ACTION_CHOICE) {
-                    if (y > 430) {
-                        chosenCreature = (byte)(Math.Floor((double)x * 6 / 720));
-                        newMode = MenuMode.MOVEMENT;
-                        useTimer = true;
-
-                    } else if (middle[12].x + middle[12].width - 15 >= x && middle[12].y + middle[12].height - 15 >= y && middle[12].x + 15 <= x && middle[12].y + 15 <= y) {
-                        newMode = MenuMode.ACTION;
-                        useTimer = true;
-                    }
-
-                } else if (currentMode == MenuMode.MOVEMENT) {
-                    if (y > 435 && y < 490) {
-                        for (int i = 13; i < 17; i++) {
-                            if (middle[i].x + middle[i].width - 2 >= x && middle[i].x + 2 <= x) {
-                                middle[i].texture = outershellbuttons;
-                                chosenMovement = (byte)(i - 12);
-                                newMode = MenuMode.MESSAGE;
-                                useTimer = true;
-                            } else {
-                                middle[i].texture = outershell;
-                            }
-                        }
-                    } else if (middle[12].x + middle[12].width - 15 >= x && middle[12].y + middle[12].height - 15 >= y && middle[12].x + 15 <= x && middle[12].y + 15 <= y) {
-                        newMode = MenuMode.ACTION;
-                        useTimer = true;
-                    }
-                }
-            }
+				} else if (currentMode == MenuMode.MOVEMENT) {
+					if (y > 435 && y < 490) {
+						for (int i = 13; i < 17; i++) {
+							if (middle[i].x + middle[i].width - 2 >= x && middle[i].x + 2 <= x) {
+								middle[i].texture = outershellbuttons;
+								chosenMovement = (byte)(i - 12);
+								newMode = MenuMode.MESSAGE;
+								useTimer = true;
+							} else {
+								middle[i].texture = outershell;
+							}
+						}
+					} else if (middle[12].x + middle[12].width - 15 >= x && middle[12].y + middle[12].height - 15 >= y && middle[12].x + 15 <= x && middle[12].y + 15 <= y) {
+						newMode = MenuMode.ACTION;
+						useTimer = true;
+					}
+				}
+			} else if (!clicked && !useTimer) {
+				if (currentMode == MenuMode.MOVEMENT) {
+					if (y > 435 && y < 490) {
+						byte u = 0;
+						for (int i = 13; i < 17; i++) {
+							if (middle[i].x + middle[i].width - 2 >= x && middle[i].x + 2 <= x) {
+								middle[17].sourcey = 74 * (i - 12);
+							} else {
+								u++;
+							}
+						}
+						if(u >=4) middle[17].sourcey = 0;
+						u = 0;
+					}
+				}
+			}
         }
 
         public void Rotate(double dt) {
@@ -505,6 +536,12 @@ namespace Alpaka {
                     middle[11].Draw(spriteBatch);
                     middle[12].Draw(spriteBatch);
 
+					for (int i = 18; i < 24; i++) {
+						if (!g.getCanUseTeam((byte)(i - 18))) {
+							middle[i].Draw(120 * (i - 18), 418, spriteBatch);
+						}
+					}
+
 					spriteBatch.DrawString(g.font, g.getTeam(0), new Vector2(10, 500), Color.Black);
 					spriteBatch.DrawString(g.font, g.getTeam(1), new Vector2(130, 500), Color.Black);
 					spriteBatch.DrawString(g.font, g.getTeam(2), new Vector2(250, 500), Color.Black);
@@ -520,6 +557,8 @@ namespace Alpaka {
                     middle[14].Draw(248 + 47, 475 - 80, spriteBatch);
                     middle[15].Draw(248 + 111, 475 - 80, spriteBatch);
                     middle[16].Draw(248 + 174, 475 - 80, spriteBatch);
+
+					middle[17].Draw(249, 328, spriteBatch);
 
                     middle[12].Draw(spriteBatch);
 

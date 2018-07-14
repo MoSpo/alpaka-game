@@ -34,11 +34,11 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
-        double GameSpeed = 0.2;
+        double GameSpeed = 0.7;
         int TurnNumber = 1;
         public bool chosen = false;
 
-        String message;
+        string message;
 
         public bool nextAnim = false;
 

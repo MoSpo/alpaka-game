@@ -92,7 +92,7 @@ namespace Alpaka.Scenes.Battle {
 		Action OP_0_(byte OP) {
 			Action[] OP_ = {
 				new Action(COSMIC_STING), new Action(SPEED_SLASH), new Action(SLINGSHOT), new Action(TRANSPORT_RIP), new Action(HOVER), new Action(BEND_PRESENCE), new Action(FLASH_FREEZE), new Action(SOLIDIFY),
-				new Action(CEASEFIRE), new Action(COLD_STORAGE), new Action(HEALING_BELL), new Action(TRANSPORT_RIP2), new Action(SMOULDER_SMASH), new Action(CLOBBER), new Action(ANCIENT_ROAR), new Action(SCORCHED_EARTH)
+				new Action(CEASEFIRE), new Action(COLD_STORAGE), new Action(HEALING_BELL), new Action(TRANSPORT_RIP2), new Action(SMOULDER_SMASH), new Action(CLOBBER), new Action(ANCIENT_ROAR), new Action(POLISH)
 			};
 			return OP_[OP];
 		}
@@ -100,7 +100,7 @@ namespace Alpaka.Scenes.Battle {
 		Action OP_1_(byte OP) {
 			Action[] OP_ = {
 				new Action(KINDLE), new Action(DETER), new Action(MACH_SPEED), new Action(WINDTUNNEL), new Action(PRESSURISE), new Action(METAMORPH), new Action(ASTEROIDS), new Action(COMET_LAUNCHER),
-				new Action(OP_18), new Action(OP_19), new Action(OP_1A), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
+				new Action(SWITCH), new Action(MIND_STRIKE), new Action(OP_1A), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
 			};
 			return OP_[OP];
 		}
@@ -174,8 +174,9 @@ namespace Alpaka.Scenes.Battle {
         void CEASEFIRE() {
 			User.CanBeAttacked.SetFlag(2);
 			Opponent.CanBeAttacked.SetFlag(2);
-		}
-		void COLD_STORAGE() {
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "Neither Player can directly attack the other next turn!"));
+        }
+        void COLD_STORAGE() {
 			if (Trigger.JustSwitchedIn) {
                 Animations.Add(Trigger.GiveCondition((byte)CreatureCondition.FROZEN));
 				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE,null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " is Frozen!"));
@@ -195,25 +196,26 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		void ANCIENT_ROAR() {
-			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] health from damage
+            Opponent.forceSwitched = true;
+        }
 
-		}
+        void POLISH() {
+            Animations.AddRange(User.Heal(20));
+            Animations.Add(User.GiveStatBoost(CreatureStats.ENDURANCE, true));
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Endurance of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
+        }
 
-		void SCORCHED_EARTH() {
-			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] health
+        void KINDLE() {
+            Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BURNED));
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Burned!"));
+        }
 
-		}
+        void DETER() {
+            User.CanBeMoved.SetFlag(3);
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " cannot be moved for 3 turns!"));
+        }
 
-		void KINDLE() {
-			//gain [POS/NEG] [NUMBER] of [USR/PNT/ALL] health
-
-		}
-
-		void DETER() {
-			//heal [POS/NEG] [NUMBER] % of[USR / PNT / ALL] kin
-
-		}
-		void MACH_SPEED() {
+        void MACH_SPEED() {
 			//gain [POS/NEG] [NUMBER] of [USR/PNT/ALL] kin
 
 		}
@@ -229,32 +231,33 @@ namespace Alpaka.Scenes.Battle {
 
 		void METAMORPH() {
 			Animations.Add(User.GiveStatBoost(CreatureStats.STRENGTH, true));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " has its Strength increased!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Strength of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
 		}
 
 		void ASTEROIDS() {
 			Animations.AddRange(Trigger.GiveDamage(CreatureElement.ROCK, ActionCategory.PHYSICAL, 60, BasePhysical, BaseMystical, Trigger.GetTotalStat(CreatureStats.ENDURANCE), Trigger.GetTotalStat(CreatureStats.WISDOM), 1, Trigger.GetElementEffectiveness(Element)));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + Opponent.ActiveCreature.Nickname + " takes damage from Asteroids!"));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " takes damage from Asteroids!"));
 		}
 
 		void COMET_LAUNCHER() {
 			if (PrevElement == CreatureElement.COSMIC) {
 				Animations.AddRange(Opponent.GiveDamage(CreatureElement.ICE, ActionCategory.PHYSICAL, 60, BasePhysical, BaseMystical, Opponent.GetTotalStat(CreatureStats.ENDURANCE), Opponent.GetTotalStat(CreatureStats.WISDOM), 1, Opponent.GetElementEffectiveness(Element)));
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + Opponent.ActiveCreature.Nickname + " takes damage from Comet Launcher!"));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " takes damage from Comet Launcher!"));
 			}
 		}
 
-		void OP_18() {
-			//give [ELEMENT] [POS/NEG] buff to [USR/PNT/ALL]
-			//[ALL/USR/PNT/TGR] [ELEMENT] [POS/NEG] [NUMBER]
-		}
+		void SWITCH() {
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " is exiting the arena!"));
+            Animations.AddRange(Battle.Switch(User));
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " has taken it's place!"));
+        }
 
-		void OP_19() {
-			//remove all buffs [USR/PNT/ALL]
+        void MIND_STRIKE() {
+            Animations.Add(User.GiveStatBoost(CreatureStats.WISDOM, true));
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Wisdom of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
+        }
 
-		}
-
-		void OP_1A() {
+        void OP_1A() {
 			//give [ELEMENT] [NUMBER] [POS/NEG] priority to [USR/PNT/ALL]
 
 		}

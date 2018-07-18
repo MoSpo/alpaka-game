@@ -108,15 +108,19 @@ namespace Alpaka.Scenes.Battle {
                     if (IsDeathTurn) {
                         List<SceneAnimation> DeathTurn = new List<SceneAnimation>();
 
-                        if (Player1.IsKilled()) {
-                            Player1.tempNotKilled = true;
+                        if (Player1.IsNotInArena()) {
+
+                            Player1.forceSwitched = false;
+                            Player1.InSwitchState = true;
                             DeathTurn.AddRange(Switch(Player1));
-                            Player1.tempNotKilled = false;
+                            Player1.InSwitchState = false;
                         }
-                        if (Player2.IsKilled()) {
-                            Player2.tempNotKilled = true;
+                        if (Player2.IsNotInArena()) {
+
+                            Player2.forceSwitched = false;
+                            Player2.InSwitchState = true;
                             DeathTurn.AddRange(Switch(Player2));
-                            Player2.tempNotKilled = false;
+                            Player2.InSwitchState = false;
                         }
 
                         IsDeathTurn = false;
@@ -162,11 +166,11 @@ namespace Alpaka.Scenes.Battle {
                             }
 
                             List<SceneAnimation> FinishTurn = new List<SceneAnimation>();
-                            if (Player1.IsKilled()) {
+                            if (Player1.IsNotInArena()) {
                                 IsDeathTurn = true;
                                 FinishTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.USER_DEATH_SELECT, null, "#USER DEATH TURN ACTIVATED#"));
                             }
-                            if (Player2.IsKilled()) {
+                            if (Player2.IsNotInArena()) {
                                 IsDeathTurn = true;
                                 List<SceneAnimation> death = new List<SceneAnimation>();
                                 FinishTurn.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.OPPONENT_DEATH_SELECT, null, "#OPPONENT DEATH TURN ACTIVATED#"));
@@ -410,7 +414,7 @@ namespace Alpaka.Scenes.Battle {
             Target.Reset();
             Target.JustSwitchedIn = true;
 
-            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH, new double[] {
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH_IN, new double[] {
                 Target.playerNumber,
                 Target.ActiveCreature.CreatureType.ID,
                 Target.ActiveCreature.Health,
@@ -450,7 +454,7 @@ namespace Alpaka.Scenes.Battle {
                     //Animations.Add(AttackAnimation); //TODO: DONT PASS AS ARGUMENT
 
 				Animations.AddRange(Target.GiveDamage(Element, Catagory, BaseAmount, GetOpponent(Target).GetTotalStat(CreatureStats.STRENGTH), GetOpponent(Target).GetTotalStat(CreatureStats.INTELLIGENCE),Target.GetTotalStat(CreatureStats.ENDURANCE),Target.GetTotalStat(CreatureStats.WISDOM),GetOpponent(Target).HasElement(Element) ? 1.5 : 1, Target.GetElementEffectiveness(Element)));
-                    if (Target.IsKilled()) {
+                    if (Target.IsNotInArena()) {
                         AmountOfAttacks = (byte)(i + 1);
                         break;
                     }
@@ -463,21 +467,8 @@ namespace Alpaka.Scenes.Battle {
                     }
                 }
                 if (Target.IsKilled()) {
-                    Target.ActiveCreature.killed = false;
-                    Animations.AddRange(
-                        RunEffectType(EffectTrigger.ON_YOUR_DEATH, Target)
-                    );
-                    Target.ActiveCreature.killed = true;
-
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.DEATH, new double[] {
-                Target.playerNumber }, "#DEATH ANIMATION#"));
-
-                    Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " collapses!"));
-
-                    Animations.AddRange(
-                        RunEffectType(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target))
-                    );
-                } else {
+                    Animations.AddRange(RemoveFromArena(Target, true));
+                } else if(!Target.IsNotInArena()) {
                     if (TriggersAttackFlags) {
                         Animations.AddRange(
                             RunEffectType(EffectTrigger.AFTER_ATTACKED, Target)
@@ -487,13 +478,38 @@ namespace Alpaka.Scenes.Battle {
             return Animations;
         }
 
+        public List<SceneAnimation> RemoveFromArena(Player Target, bool IsKilled) {
+            List<SceneAnimation> Animations = new List<SceneAnimation>();
+            if (IsKilled) {
+                Target.ActiveCreature.killed = false;
+                Animations.AddRange(
+                    RunEffectType(EffectTrigger.ON_YOUR_DEATH, Target)
+                );
+                Target.ActiveCreature.killed = true;
+            }
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH_OUT, new double[] {
+                Target.playerNumber,
+                IsKilled ? 1 : 0
+            }, "#REMOVAL ANIMATION#"));
+
+            if (IsKilled) {
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " collapses!"));
+
+                Animations.AddRange(
+                    RunEffectType(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target))
+                );
+            } else {
+                Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " has been forced out of the arena!"));
+            }
+            return Animations;
+        }
 
         public List<SceneAnimation> RunEffectType(EffectTrigger Trigger, Player TargetUser) {
 			//If TargetUser is parsed it will only run if they are not killed and own the effect
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
 
-            if (TargetUser == null || !TargetUser.IsKilled()) {
+            if (TargetUser == null || !TargetUser.IsNotInArena()) {
                 foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
                     foreach (BattleEffect Effect in Effects) {
                         if (Effect.User == TargetUser || TargetUser == null) {
@@ -522,40 +538,16 @@ namespace Alpaka.Scenes.Battle {
             Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
 			Player Target = User;
-			if (Target.IsKilled() && !Target.ActiveCreature.killed) {
-				Target.ActiveCreature.killed = false;
-				Animations.AddRange(
-					RunEffectType(EffectTrigger.ON_YOUR_DEATH, Target)
-				);
-				Target.ActiveCreature.killed = true;
+            if(Target.IsNotInArena()) {
+                Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
+            }
 
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.DEATH, new double[] {
-				Target.playerNumber }, "#DEATH ANIMATION#"));
-
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " collapses!"));
-
-				Animations.AddRange(
-					RunEffectType(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target))
-				);
-			}
 			Target = GetOpponent(User);
-			if (Target.IsKilled() && !Target.ActiveCreature.killed) {
-				Target.ActiveCreature.killed = false;
-				Animations.AddRange(
-					RunEffectType(EffectTrigger.ON_YOUR_DEATH, Target)
-				);
-				Target.ActiveCreature.killed = true;
+            if (Target.IsNotInArena()) {
+                Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
+            }
 
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.DEATH, new double[] {
-				Target.playerNumber }, "#DEATH ANIMATION#"));
-
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " collapses!"));
-
-				Animations.AddRange(
-					RunEffectType(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target))
-				);
-			}
-			return Animations; //TODO: GET ANIMATIONS FROM SCRIPT
+            return Animations; //TODO: GET ANIMATIONS FROM SCRIPT
         }
 
 
@@ -685,7 +677,7 @@ namespace Alpaka.Scenes.Battle {
                 foreach (BattleEffect Effect in DeadEffects) {
                     Animations.AddRange(RemoveEffect(Effect, true));
                 }
-            } else if (!Target.IsKilled()) {
+            } else if (!Target.IsNotInArena()) {
                 foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
                     foreach (BattleEffect Effect in Effects) {
                         if (Effect.CurrentPlacement == Target.Placement) {

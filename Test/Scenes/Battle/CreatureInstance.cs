@@ -40,7 +40,11 @@ namespace Alpaka.Scenes.Battle {
             //
             AllActions temp2 = new AllActions();
             for (byte i = 0; i < 6; i++) {
-                Actions[i] = temp2.GetAction((short)(i + 0));
+                if ((BaseCreature.ID - 1) * 6 <= 22) {
+                    Actions[i] = temp2.GetAction((short)(i + (BaseCreature.ID - 1) * 6));
+                } else {
+                    Actions[i] = temp2.GetAction(1);
+                }
             }
 			Actions[6] = new CreatureAction(
 				"Attack", //NAME
@@ -53,9 +57,29 @@ namespace Alpaka.Scenes.Battle {
 				0,           //MANA
 				null
 				);
-			//
 
-			for (byte i = 0; i < 6; i++) {
+            Actions[7] = new CreatureAction(
+                "Switch", //NAME
+                CreatureType.Elements[0],
+                ActionCategory.DEFENSIVE,
+                50,          //SPEED
+                -3,           //PRIORITY MODIFIER
+                0,          //POWER
+                255,        //USAGE
+                0,           //MANA
+                new BattleEffect(
+                    10, //PRIORITY
+                    0, //LIFESPAN
+                    new byte[1] { 9 }, //PLACEMENT
+                    new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+                                                           50, //SPEED
+					                                       new byte[1] { 0x18 }) }
+                    )
+                );
+            Actions[7].IsSwitch = true;
+            //
+
+            for (byte i = 0; i < 6; i++) {
 				ActionAmountUsed[i] = Actions[i].Usage;
                 //ActionAmountUsed[i] = Actions[i].Usage; NEED TO SET THIS UP STILL
 			}

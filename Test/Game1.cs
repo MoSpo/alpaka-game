@@ -66,7 +66,7 @@ namespace Alpaka {
 			return engine.Player1.Team[i].Nickname;
 		}
 		public bool getCanUseTeam(byte i) {
-			return !engine.Player1.Team[i].killed;
+			return !engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature;
 		}
 
 		public string getAction(byte i) {
@@ -78,6 +78,10 @@ namespace Alpaka {
 		public bool getCanUse(byte i) {
 			return engine.Player1.CanSelectAction(i);
 		}
+
+        public bool getSwitch(byte i) {
+            return engine.Player1.ActiveCreature.GetAction(i).IsSwitch;
+        }
 
         private void Animate() {
             if (nextAnim) {
@@ -144,7 +148,7 @@ namespace Alpaka {
                     phasecounter.SetPhase((byte)an.Values[0], this);
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.DEATH:
+					case SceneAnimation.SceneAnimationType.SWITCH_OUT:
                     break;
 					case SceneAnimation.SceneAnimationType.CONDITION:
                     if (an.Values[0] == 1) {
@@ -173,19 +177,23 @@ namespace Alpaka {
                     }
 
                     break;
-                    case SceneAnimation.SceneAnimationType.SWITCH:
+                    case SceneAnimation.SceneAnimationType.SWITCH_IN:
                     if (an.Values[0] == 1) {
-                        leftbar.setMaxHealth((int)an.Values[3]);
-                        leftbar.setMaxKin((int)an.Values[4]);
                         leftbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
                         leftbar.health = (int)an.Values[2];
+                        leftbar.totalHealth = (int)an.Values[3];
+                        leftbar.oldhealth = (int)an.Values[2];
+                        leftbar.kin = (int)an.Values[4];
+                        leftbar.oldkin = (int)an.Values[4];
                         user.changeID((int)an.Values[1]);
                         leftbar.name = an.Message;
                     } else {
-                        rightbar.setMaxHealth((int)an.Values[3]);
-						rightbar.setMaxKin((int)an.Values[4]);
                         rightbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
                         rightbar.health = (int)an.Values[2];
+                        rightbar.totalHealth = (int)an.Values[3];
+                        rightbar.oldhealth = (int)an.Values[2];
+                        rightbar.kin = (int)an.Values[4];
+                        rightbar.oldkin = (int)an.Values[4];
                         opponent.changeID((int)an.Values[1]);
                         rightbar.name = an.Message;
                     }
@@ -301,7 +309,7 @@ namespace Alpaka {
                     engine.Player2.SelectAction(0);
                     engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
 					for (int i = 0; i < 6; i++) {
-						if (!engine.Player2.Team[i].killed) {
+						if (!engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature) {
 							engine.Player2.SelectCreature((byte)i);
 							break;
 						}
@@ -313,9 +321,9 @@ namespace Alpaka {
                 } else {
                     engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
                     engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
-                    if (menu.chosenCreature != 0) engine.Player1.SelectCreature(menu.chosenCreature);
+                    if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature-1));
                     engine.Player2.SelectAction(6);
-                    engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+                    engine.Player2.SelectMovement(MovementCategory.MOVE_LEFT);
                     Console.WriteLine(TurnNumber);
                     TurnNumber++;
                     for (int i = 0; i < 10; i++) {

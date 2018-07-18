@@ -135,7 +135,7 @@ namespace Alpaka {
 						}
 					}
 					if (chosenAction != 0) {
-						if (creatureChoose) {
+						if (g.getSwitch((byte)(chosenAction-1))) {
 							newMode = MenuMode.ACTION_CHOICE;
 						} else {
 							newMode = MenuMode.MOVEMENT;
@@ -146,8 +146,8 @@ namespace Alpaka {
 				} else if (currentMode == MenuMode.CLOSED_CHOICE) {
 					if (y > 430) {
 						byte choose = (byte)(Math.Floor((double)x * 6 / 720));
-						if (g.getCanUseTeam(choose)) {
-							chosenCreature = choose;
+						if (choose < 6 && g.getCanUseTeam(choose)) {
+							chosenCreature = (byte)(choose + 1);
 							newMode = MenuMode.MESSAGE;
 							useTimer = true;
 						}
@@ -155,8 +155,8 @@ namespace Alpaka {
 				} else if (currentMode == MenuMode.ACTION_CHOICE) {
 					if (y > 430) {
 						byte choose = (byte)(Math.Floor((double)x * 6 / 720));
-						if (g.getCanUseTeam(choose)) {
-							chosenCreature = choose;
+						if (choose < 6 && g.getCanUseTeam(choose)) {
+							chosenCreature = (byte)(choose + 1);
 							newMode = MenuMode.MOVEMENT;
 							useTimer = true;
 						}

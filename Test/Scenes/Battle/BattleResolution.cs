@@ -31,17 +31,22 @@ namespace Alpaka.Scenes.Battle {
 
 			if (RotationDelta != 0) {
 
-				Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_MOVEMENT, null));
+                    Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_MOVEMENT, null));
 
-				if (RotationDelta > 0) {
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves right..."));
-				} else if (RotationDelta < 0) {
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves left..."));
-				}
-				//Do Movement
-				Animations.AddRange(Battle.DeltaRotate(RotationDelta));
+                    if (RotationDelta > 0) {
+                        Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves right..."));
+                    } else if (RotationDelta < 0) {
+                        Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves left..."));
+                    }
+                //Do Movement
 
-				Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_MOVEMENT, null));
+                if (!Opponent.CanBeMoved.Evaluate()) {
+                    Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But " + Opponent.ActiveCreature.Nickname + " cannot be moved!"));
+                } else {
+                    Animations.AddRange(Battle.DeltaRotate(RotationDelta));
+
+                    Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_MOVEMENT, null));
+                }
 			} else {
 				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " stays still..."));
 			}
@@ -69,7 +74,7 @@ namespace Alpaka.Scenes.Battle {
 
 				Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ACTION, User));
 
-				if (Opponent.CanBeAttacked.Evaluate()) {
+				if (Opponent.CanBeAttacked.Evaluate() || !(Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL)) {
 					if (Action.Mana > 0) {
 						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
 							User.playerNumber,
@@ -130,54 +135,25 @@ namespace Alpaka.Scenes.Battle {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
-			if (!Battle.Player1.IsKilled()) {
-				if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) {
-					short Increase = (short)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10);
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
-						1,
-						Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
-						Battle.Player1.ActiveCreature.Health + Increase,
-						Increase,
-						1,1}, "#END PHASE KIN [ADDED TO HEALTH]#"));
-					Battle.Player1.ActiveCreature.Health += Increase;
-				} else {
-					short Increase = (short)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6);
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
-						1,
-						Battle.Player1.ActiveCreature.Kin,
-						Battle.Player1.ActiveCreature.Kin + Increase,
-						Increase,
-						}, "#END PHASE KIN#"));
-					Battle.Player1.ActiveCreature.Kin += Increase;
-				}
+			if (!Battle.Player1.IsNotInArena()) {
+                if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) {
+                    Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10));
+                } else {
+                    Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6));
+                }
 				Battle.Player1.DecreaseFlags();
 			}
-			if (!Battle.Player2.IsKilled()) {
-				if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) {
-					short Increase = (short)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10);
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
-						2,
-						Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
-						Battle.Player2.ActiveCreature.Health + Increase,
-						Increase,
-						1,1}, "#END PHASE KIN [ADDED TO HEALTH]#"));
-					Battle.Player2.ActiveCreature.Health += Increase;
-				} else {
-					//short Increase = (short)Math.Floor(Battle.Player2.actionCombo * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 5);
-					short Increase = (short)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6);
-					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
-				2,
-				Battle.Player2.ActiveCreature.Kin,
-				Battle.Player2.ActiveCreature.Kin + Increase,
-				Increase,
-				}, "#END PHASE KIN#"));
-					Battle.Player2.ActiveCreature.Kin += Increase;
-				}
-				Battle.Player2.DecreaseFlags();
 
-			}
+            if (!Battle.Player2.IsNotInArena()) {
+                if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) {
+                    Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10));
+                } else {
+                    Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6));
+                }
+                Battle.Player2.DecreaseFlags();
+            }
 
-			return Animations;
+            return Animations;
 		}
 	}
 }

@@ -40,17 +40,15 @@ namespace Alpaka.Scenes.Battle {
 
 		public bool SentData = false;
 
-		public bool tempNotKilled = false; //used for switching only
+		public bool InSwitchState = false; //used for switching only
+        public bool forceSwitched = false;
 
-		//FLAGS
-		public Flag CanUseActionThisTurn = new Flag(true);
+        //FLAGS
+        public Flag CanUseActionThisTurn = new Flag(true);
 		public Flag TriggersAttackFlags = new Flag(true);
-		public Flag CanBeMovedBackwards = new Flag(true);
-		public Flag CanBeMovedByEffects = new Flag(true);
-		public Flag MovingTwiceAmount = new Flag(false);
 		public Flag HasActionDelay = new Flag(false);
 		public Flag CanBeAttacked = new Flag(true);
-		public Flag LosesStatsOnSwitch = new Flag(true);
+        public Flag LosesStatsOnSwitch = new Flag(true);
 		public Flag ConditionsPassedOnSwitch = new Flag(false);
 		public Flag NotEffectedByEarth = new Flag(false);
 		public Flag SkillDisabled = new Flag(false);
@@ -59,7 +57,10 @@ namespace Alpaka.Scenes.Battle {
 		public Flag CanMove = new Flag(true);
 		public Flag CanMoveLeft = new Flag(true);
 		public Flag CanMoveRight = new Flag(true);
-		public Flag CanChooseAction = new Flag(true);
+        public Flag CanBeMoved = new Flag(true);
+        public Flag CanBeMovedByEffects = new Flag(true);
+        public Flag MovingTwiceAmount = new Flag(false);
+        public Flag CanChooseAction = new Flag(true);
 		public Flag IsJumping = new Flag(false);
 		public Flag RestoreHealthInseadOfMana = new Flag(false);
 		//
@@ -121,8 +122,8 @@ namespace Alpaka.Scenes.Battle {
 		public void setStart(byte s) {  //STAND IN CODE
 			AllCreatures temp = new AllCreatures();
 			if (playerNumber == 1) {
-				Team[0] = new CreatureInstance(temp.GetCreature(0));
-				Team[1] = new CreatureInstance(temp.GetCreature(1));
+				Team[0] = new CreatureInstance(temp.GetCreature(1));
+				Team[1] = new CreatureInstance(temp.GetCreature(0));
 				Team[2] = new CreatureInstance(temp.GetCreature(2));
 				Team[3] = new CreatureInstance(temp.GetCreature(3));
 				Team[4] = new CreatureInstance(temp.GetCreature(5));
@@ -184,11 +185,48 @@ namespace Alpaka.Scenes.Battle {
 			return Animations;
 		}
 
-		public void GainKin() {
-			//TODO GAIN KIN
-		}
+        public List<SceneAnimation> Heal(int Percentage) {
 
-		public int GetTotalStat(CreatureStats Stat) {
+            List<SceneAnimation> Animations = new List<SceneAnimation>();
+
+            int amt = (int)(GetTotalStat(CreatureStats.HEALTH) * (double)Percentage / 100);
+
+            if (amt + ActiveCreature.Health > GetTotalStat(CreatureStats.HEALTH)) amt = GetTotalStat(CreatureStats.HEALTH) - ActiveCreature.Health;
+
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
+                        playerNumber,
+                        GetTotalStat(CreatureStats.HEALTH),
+                        ActiveCreature.Health + amt,
+                        amt,
+                        1,1}, "#HEALTH HEAL#"));
+
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, ActiveCreature.Nickname + " was healed!"));
+
+            ActiveCreature.Health += amt;
+            return Animations;
+
+        }
+
+        public List<SceneAnimation> GainKin(int amt) {
+
+            List<SceneAnimation> Animations = new List<SceneAnimation>();
+
+            if (amt + ActiveCreature.Kin > 1000) amt = 1000 - ActiveCreature.Kin;
+
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.KIN_BAR, new double[] {
+                        playerNumber,
+                        ActiveCreature.Kin,
+                        ActiveCreature.Kin + amt,
+                        amt,
+                        }, "#GAIN KIN#"));
+
+
+            ActiveCreature.Kin += amt;
+            return Animations;
+
+        }
+
+        public int GetTotalStat(CreatureStats Stat) {
 			int s = Statboosts[Stat] - 5;
 			double boost = 1;
 			if (s > 0) {
@@ -301,9 +339,6 @@ namespace Alpaka.Scenes.Battle {
 		public void Reset() {
 			CanUseActionThisTurn.RemoveFlag();
 			TriggersAttackFlags.RemoveFlag();
-			CanBeMovedBackwards.RemoveFlag();
-			CanBeMovedByEffects.RemoveFlag();
-			MovingTwiceAmount.RemoveFlag();
 			HasActionDelay.RemoveFlag();
 			CanBeAttacked.RemoveFlag();
 			LosesStatsOnSwitch.RemoveFlag();
@@ -315,7 +350,10 @@ namespace Alpaka.Scenes.Battle {
 			CanMove.RemoveFlag();
 			CanMoveLeft.RemoveFlag();
 			CanMoveRight.RemoveFlag();
-			CanChooseAction.RemoveFlag();
+            CanBeMoved.RemoveFlag();
+            CanBeMovedByEffects.RemoveFlag();
+            MovingTwiceAmount.RemoveFlag();
+            CanChooseAction.RemoveFlag();
 			IsJumping.RemoveFlag();
 			RestoreHealthInseadOfMana.RemoveFlag();
 
@@ -341,9 +379,6 @@ namespace Alpaka.Scenes.Battle {
 		public void DecreaseFlags() {
 			CanUseActionThisTurn.DecreaseLifespan();
 			TriggersAttackFlags.DecreaseLifespan();
-			CanBeMovedBackwards.DecreaseLifespan();
-			CanBeMovedByEffects.DecreaseLifespan();
-			MovingTwiceAmount.DecreaseLifespan();
 			HasActionDelay.DecreaseLifespan();
 			CanBeAttacked.DecreaseLifespan();
 			LosesStatsOnSwitch.DecreaseLifespan();
@@ -355,17 +390,24 @@ namespace Alpaka.Scenes.Battle {
 			CanMove.DecreaseLifespan();
 			CanMoveLeft.DecreaseLifespan();
 			CanMoveRight.DecreaseLifespan();
-			CanChooseAction.DecreaseLifespan();
+            CanBeMoved.DecreaseLifespan();
+            CanBeMovedByEffects.DecreaseLifespan();
+            MovingTwiceAmount.DecreaseLifespan();
+            CanChooseAction.DecreaseLifespan();
 			IsJumping.DecreaseLifespan();
 			RestoreHealthInseadOfMana.DecreaseLifespan();
 		}
 
-		public bool IsKilled() {
+		public bool IsNotInArena() {
 
-			return ActiveCreature.killed && !tempNotKilled;
+			return (ActiveCreature.killed && !InSwitchState) || forceSwitched;
 		}
 
-	}
+        public bool IsKilled() {
+            return ActiveCreature.killed;
+        }
+
+    }
 
 	public class Flag {
 

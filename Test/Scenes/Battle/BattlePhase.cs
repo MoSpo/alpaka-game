@@ -18,7 +18,7 @@ namespace Alpaka.Scenes.Battle {
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.PHASE, new double[] { PhaseNumber }, "#PHASE ANIMATION#"));
 
 			foreach (BattleResolution Resolution in Resolutions) {
-					if (Resolution.GetUser() == null || !Resolution.GetUser().IsKilled()) { //TODO: STOP GET USER BEING NULL I.E. REDESIGN END RESOLUTION
+					if (Resolution.GetUser() == null || !Resolution.GetUser().IsNotInArena()) { //TODO: STOP GET USER BEING NULL I.E. REDESIGN END RESOLUTION
 					Animations.AddRange(Resolution.Resolve());
 				}
             }

@@ -104,14 +104,14 @@ namespace Alpaka {
             totalHealth = sh;
             health = sh;
             oldhealth = sh;
-            h = 0;
+           // h = 0;
         }
 
         public void setMaxKin(int sm) {
             totalKin = 1000;
             kin = sm;
             oldkin = sm;
-            m = 0;
+         //   m = 0;
         }
 
         public void setElements(byte e1, byte e2, byte e3) {

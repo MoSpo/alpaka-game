@@ -373,57 +373,28 @@ namespace Alpaka.Scenes.Battle {
 					)
 				)
 			);
-			c.Add(new CreatureAction(
-				"Mach Speed", //NAME
-				CreatureElement.WIND,
-				ActionCategory.PHYSICAL,
-				70,          //SPEED
-				-2,           //PRIORITY MODIFIER
-				100,          //POWER
-				50,          //USAGE
-				2,           //MANA
-				new BattleEffect(
-					10, //PRIORITY
-					0, //LIFESPAN
-					new byte[1] { 9 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
-														   55, //SPEED
+
+            //4//
+            c.Add(new CreatureAction(
+                "Sleet Hammer", //NAME
+                CreatureElement.ICE,
+                ActionCategory.PHYSICAL,
+                70,          //SPEED
+                -1,           //PRIORITY MODIFIER
+                100,          //POWER
+                5,          //USAGE
+                2,           //MANA
+                new BattleEffect(
+                    10, //PRIORITY
+                    0, //LIFESPAN
+                    new byte[1] { 9 }, //PLACEMENT
+                    new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+                                                           55, //SPEED
 					                                       new byte[1] { 0x12 }) }
-					)
-				)
-			);
-			c.Add(new CreatureAction(
-				"Air Cutter", //NAME
-				CreatureElement.WIND,
-				ActionCategory.PHYSICAL,
-				55,          //SPEED
-				0,           //PRIORITY MODIFIER
-				80,          //POWER
-				5,          //USAGE
-				0,           //MANA
-				null				
-				)
-			);
-			
-			c.Add(new CreatureAction(
-                "Earth Wave", //NAME
-				CreatureElement.ETHER,
-				ActionCategory.DEFENSIVE,
-				55,          //SPEED
-				0,           //PRIORITY MODIFIER
-				0,          //POWER
-				5,          //USAGE
-				2,           //MANA
-				new BattleEffect(
-					10, //PRIORITY
-					0, //LIFESPAN
-					new byte[1] { 9 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
-														   55, //SPEED
-					                                       new byte[1] { 0x0A }) }
-					)
-				)
-			);
+                    )
+                )
+            );
+
 			c.Add(new CreatureAction(
 				"Windtunnel", //NAME
 				CreatureElement.WIND,
@@ -434,15 +405,18 @@ namespace Alpaka.Scenes.Battle {
 				3,          //USAGE
 				1,           //MANA
 				new BattleEffect(
-					10, //PRIORITY
-					0, //LIFESPAN
-					new byte[1] { 0 }, //PLACEMENT
-					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
-														   55, //SPEED
-					                                       new byte[1] { 0x13 }) }
-					)
-				)
-			);
+					9, //PRIORITY
+					4, //LIFESPAN
+					new byte[4] { 1,2,6,7 }, //PLACEMENT
+                    new EffectScript[2] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
+                                                           70, //SPEED
+					                                       new byte[1] { 0x13 }),
+                        new EffectScript(EffectTrigger.ON_STAND_EXIT,
+                                                           68, //SPEED
+														   new byte[1] { 0x1A }) }
+                    )
+                )
+            );
 			c.Add(new CreatureAction( //TODO: AFTER SCORCHED EARTH
 				"Cyclone", //NAME
 				CreatureElement.ETHER,
@@ -562,6 +536,58 @@ namespace Alpaka.Scenes.Battle {
                     new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
                                                            80, //SPEED
 					                                       new byte[1] { 0x07 }) }
+                    )
+                )
+            );
+
+            c.Add(new CreatureAction(
+                "Mach Speed", //NAME
+                CreatureElement.WIND,
+                ActionCategory.PHYSICAL,
+                70,          //SPEED
+                -2,           //PRIORITY MODIFIER
+                100,          //POWER
+                50,          //USAGE
+                2,           //MANA
+                new BattleEffect(
+                    10, //PRIORITY
+                    0, //LIFESPAN
+                    new byte[1] { 9 }, //PLACEMENT
+                    new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+                                                           55, //SPEED
+					                                       new byte[1] { 0x12 }) }
+                    )
+                )
+            );
+            c.Add(new CreatureAction(
+                "Air Cutter", //NAME
+                CreatureElement.WIND,
+                ActionCategory.PHYSICAL,
+                55,          //SPEED
+                0,           //PRIORITY MODIFIER
+                80,          //POWER
+                5,          //USAGE
+                0,           //MANA
+                null
+                )
+            );
+
+            c.Add(new CreatureAction(
+                "Earth Wave", //NAME
+                CreatureElement.ETHER,
+                ActionCategory.DEFENSIVE,
+                55,          //SPEED
+                0,           //PRIORITY MODIFIER
+                0,          //POWER
+                5,          //USAGE
+                2,           //MANA
+                new BattleEffect(
+                    10, //PRIORITY
+                    0, //LIFESPAN
+                    new byte[1] { 9 }, //PLACEMENT
+                    new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+                                                           55, //SPEED
+					                                       new byte[1] { 0x0A }) }
                     )
                 )
             );

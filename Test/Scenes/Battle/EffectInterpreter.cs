@@ -99,8 +99,8 @@ namespace Alpaka.Scenes.Battle {
 
 		Action OP_1_(byte OP) {
 			Action[] OP_ = {
-				new Action(KINDLE), new Action(DETER), new Action(MACH_SPEED), new Action(WINDTUNNEL), new Action(PRESSURISE), new Action(METAMORPH), new Action(ASTEROIDS), new Action(COMET_LAUNCHER),
-				new Action(SWITCH), new Action(MIND_STRIKE), new Action(OP_1A), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
+				new Action(KINDLE), new Action(DETER), new Action(SLEET_HAMMER), new Action(WINDTUNNEL), new Action(KAMAKAZI), new Action(METAMORPH), new Action(ASTEROIDS), new Action(COMET_LAUNCHER),
+				new Action(SWITCH), new Action(MIND_STRIKE), new Action(WINDTUNNEL2), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
 			};
 			return OP_[OP];
 		}
@@ -215,16 +215,17 @@ namespace Alpaka.Scenes.Battle {
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " cannot be moved for 3 turns!"));
         }
 
-        void MACH_SPEED() {
-			//gain [POS/NEG] [NUMBER] of [USR/PNT/ALL] kin
+        void SLEET_HAMMER() {
+            Animations.Add(Opponent.GiveStatBoost(CreatureStats.AWE, false));
+            Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Awe of " + OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " decreased!"));
 
-		}
-		void WINDTUNNEL() {
+        }
+        void WINDTUNNEL() {
 			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] kin from damage
 
 		}
 
-		void PRESSURISE() {
+		void KAMAKAZI() {
 			//change all elements to singular element
 			//[ALL/USR/PNT/TGR] [ELEMENT]
 		}
@@ -257,7 +258,7 @@ namespace Alpaka.Scenes.Battle {
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Wisdom of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
         }
 
-        void OP_1A() {
+        void WINDTUNNEL2() {
 			//give [ELEMENT] [NUMBER] [POS/NEG] priority to [USR/PNT/ALL]
 
 		}

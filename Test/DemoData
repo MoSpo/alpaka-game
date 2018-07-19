@@ -1,145 +1,52 @@
-<2> Name: Space Insect
-ELEMENTS: Cosmic
-
-HEALTH: --
-KIN: --
-STRENGTH: |
-ENDURANCE: +
-INTELLIGENCE: -
-WISDOM: +
-PACE: +++
-AWE: -
-
-Moves:
+Space Insect -
 1: Cosmic Sting
 2: Speed Slash 
 3: Slingshot
+4: Metamorph
+5: Asteroids
+6: Comet Launcher
 
-4: Transport Rip
-5: Hover
-6: Bend Presence
-
-<3> Name: Ice Guy
-ELEMENTS: Ice
-
-HEALTH: --
-KIN: ++
-STRENGTH: ---
-ENDURANCE: --
-INTELLIGENCE: ++
-WISDOM: ++
-PACE: ++
-AWE: --
-
-Moves:
+Ice Guy -
 1: Flash Freeze
-2: Solidify
+2: Meditate
 3: Water Beam
-
 4: Ceasefire
 5: Cold Storage
 6: Healing Bell
 
-<4> Name: Rage
-ELEMENTS: Fire
-
-HEALTH: +++
-KIN: ---
-STRENGTH: +++
-ENDURANCE: +
-INTELLIGENCE: --
-WISDOM: ---
-PACE: --
-AWE: ++
-
-Moves:
+Rage -
 1: Smoulder Smash
 2: Clobber
 3: Ancient Roar
-
-4: Scorched Earth
+4: Polish
 5: Kindle
 6: Deter
 
-<5> Name: Wingman
-ELEMENTS: WInd
-
-HEALTH: |
-KIN: --
-STRENGTH: |
-ENDURANCE: ++
-INTELLIGENCE: -
-WISDOM: |
-PACE: +
-AWE: |
-
-Moves:
-1: Mach Speed
-2: Air Cutter
-3: Drill Digger
-
+Wingman -//
+1: Sleet Hammer
+2: Kamakazi
+3: Earth Grind
 4: Windtunnel
-5: Cyclone
-6: Pressurise
+5: Spring of Illusion
+6: Motivator
 
-<14> Name: Clown
-ELEMENTS: Dark
-
-HEALTH: +
-KIN: +
-STRENGTH: -
-ENDURANCE: --
-INTELLIGENCE: +
-WISDOM: |
-PACE: -
-AWE: |
-
-Moves:
+Clown -//
 1: Fireball
 2: Speed Slash
 3: Chasm
-
 4: Illullaby
 5: Sharp Mind
 6: Intimidate
 
-<27> Name: Quarantine
-ELEMENTS: Nuclear / Steel
-
-HEALTH: ++
-KIN: |
-STRENGTH: +
-ENDURANCE: +
-INTELLIGENCE: +
-WISDOM: ---
-PACE: -
-AWE: |
-
-Moves:
+Quarantine -//
 1: Magnum
 2: Piston Punch
 3: Life Sap
-
 4: Toxic Sludge
 5: Weapon Recall
 6: Gear Shift
 
-
-#####
-
-<8.5> Name: Not Present
-ELEMENTS:Void
-
-HEALTH:|
-KIN:++
-STRENGTH:++
-ENDURANCE:---
-INTELLIGENCE:+
-WISDOM:|
-PACE:+
-AWE:--
-
-Moves:
+Not Present -//
 1:Health Snatch
 2:Blood Siphon
 3:Grudge
@@ -147,19 +54,7 @@ Moves:
 5:Malevolent Nail
 6:Jinxed Barrier
 
-<23.5> Name: Calesvol
-ELEMENTS:Rock
-
-HEALTH:++
-KIN:--
-STRENGTH:++
-ENDURANCE:+
-INTELLIGENCE:--
-WISDOM:-
-PACE:--
-AWE:++
-
-Moves:
+Calesvol -//
 1:Rock CLub
 2:Clobber
 3:Pelt
@@ -167,40 +62,15 @@ Moves:
 5:Grand Rock
 6:Stone Switch
 
-<37> Name: Garphene
-ELEMENTS: Rock / Steel
+Garphene -
+1: Solidify
+2: Battering Ram
+3: Steel Beam
+4: Gear Shift
+5: Transverse Wave
+6: System Dock
 
-HEALTH:+
-KIN:--
-STRENGTH:++
-ENDURANCE:----
-INTELLIGENCE:-
-WISDOM:-
-PACE:+++
-AWE:++
-
-Moves:
-1:Piston Punch
-2:Iron Clamp
-3:Steel Beam
-4:Gear Shift
-5:Metal Weight
-6:System Dock 
-
-
-<39> Name: Aygon
-ELEMENTS: Cosmic / Void
-
-HEALTH:--
-KIN:-
-STRENGTH:--
-ENDURANCE:|
-INTELLIGENCE:++
-WISDOM:+++
-PACE:-
-AWE:+
-
-Moves:
+Aygon -//
 1:Shadow Swarm
 2:Matter Whip
 3:Chasm
@@ -208,19 +78,7 @@ Moves:
 5:Allegretta
 6:Sharp Mind
 
-<42> Name: Yeboi
-ELEMENTS: Water
-
-HEALTH:-
-KIN:+
-STRENGTH:|
-ENDURANCE:++
-INTELLIGENCE:++
-WISDOM:+
-PACE:---
-AWE:--
-
-Moves:
+Yeboi -//
 1:Water Beam
 2:Steam Stream
 3:Whirlpool
@@ -228,21 +86,7 @@ Moves:
 5:Cold Storage
 6:Spring of Illusion
 
----
-
-<51> Name: Sandlurker
-ELEMENTS: Earth
-
-HEALTH:---
-KIN:+
-STRENGTH:+++
-ENDURANCE:++
-INTELLIGENCE:--
-WISDOM:---
-PACE:+++
-AWE:+
-
-Moves:
+Sandlurker -//
 1:Rumble
 2:Seismic Shock
 3:Tectonic Shatter

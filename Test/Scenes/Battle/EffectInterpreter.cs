@@ -14,6 +14,8 @@ namespace Alpaka.Scenes.Battle {
 
 		public abstract void SetTargets(Player User, Player Opponent, Player Trigger, byte TriggerPosition);
 
+		public abstract void SetEffect(BattleEffect Effect);
+
         public abstract void SetElement(CreatureElement Element);
 
 		public abstract void SetPrevElement(CreatureElement Element);
@@ -29,6 +31,7 @@ namespace Alpaka.Scenes.Battle {
 		Player Trigger;
 		byte TriggerPosition;
 		byte PlayersEffected;
+		BattleEffect CurrentEffect;
 
 		public int BasePhysical;
 		public int BaseMystical;
@@ -58,7 +61,14 @@ namespace Alpaka.Scenes.Battle {
 			this.TriggerPosition = TriggerPosition;
 		}
 
-        public override void SetElement(CreatureElement Element) {
+		public override void SetEffect(BattleEffect Effect) {
+			CurrentEffect = Effect;
+			SetElement(Effect.Element);
+			SetBaseAttacks(Effect.BasePhysical, Effect.BaseMystical);
+		}
+
+
+		public override void SetElement(CreatureElement Element) {
             this.Element = Element;
         }
 
@@ -100,7 +110,7 @@ namespace Alpaka.Scenes.Battle {
 		Action OP_1_(byte OP) {
 			Action[] OP_ = {
 				new Action(KINDLE), new Action(DETER), new Action(SLEET_HAMMER), new Action(WINDTUNNEL), new Action(KAMAKAZI), new Action(METAMORPH), new Action(ASTEROIDS), new Action(COMET_LAUNCHER),
-				new Action(SWITCH), new Action(MIND_STRIKE), new Action(WINDTUNNEL2), new Action(OP_1B), new Action(OP_1C), new Action(OP_1D), new Action(OP_1E), new Action(OP_1F)
+				new Action(SWITCH), new Action(MIND_STRIKE), new Action(WINDTUNNEL2), new Action(SPRING_OF_ILLUSION), new Action(MOTIVATOR), new Action(MOTIVATOR2), new Action(OP_1E), new Action(OP_1F)
 			};
 			return OP_[OP];
 		}
@@ -143,7 +153,7 @@ namespace Alpaka.Scenes.Battle {
 		void SLINGSHOT() {
 				//Animations.Add(Opponent.GiveCondition((byte)CreatureCondition.BLIND));
 				//Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " is Blind!"));
-			Animations.Add(Opponent.GiveStatBoost(CreatureStats.STRENGTH, false));
+			Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.STRENGTH, false));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " Strength is lowered!"));
 
 		}
@@ -191,7 +201,7 @@ namespace Alpaka.Scenes.Battle {
 		}
 
 		void CLOBBER() {
-			Animations.Add(Opponent.GiveStatBoost(CreatureStats.ENDURANCE, false));
+			Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.ENDURANCE, false));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " Endurance is lowered!"));
 		}
 
@@ -201,7 +211,7 @@ namespace Alpaka.Scenes.Battle {
 
         void POLISH() {
             Animations.AddRange(User.Heal(20));
-            Animations.Add(User.GiveStatBoost(CreatureStats.ENDURANCE, true));
+            Animations.AddRange(User.GiveStatBoost(CreatureStats.ENDURANCE, true));
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Endurance of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
         }
 
@@ -216,22 +226,24 @@ namespace Alpaka.Scenes.Battle {
         }
 
         void SLEET_HAMMER() {
-            Animations.Add(Opponent.GiveStatBoost(CreatureStats.AWE, false));
+            Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.AWE, false));
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Awe of " + OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " decreased!"));
 
         }
         void WINDTUNNEL() {
-			//heal [POS/NEG] [NUMBER]% of [USR/PNT/ALL] kin from damage
-
+			Animations.Add(User.GiveElementBoost(CreatureElement.WIND, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " became more proficient with Wind Actions!"));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
 		}
 
 		void KAMAKAZI() {
-			//change all elements to singular element
-			//[ALL/USR/PNT/TGR] [ELEMENT]
+			Animations.AddRange(User.GiveDamage(CreatureElement.FIRE, ActionCategory.PHYSICAL, 255, BasePhysical, BaseMystical, User.GetTotalStat(CreatureStats.ENDURANCE)/4, User.GetTotalStat(CreatureStats.WISDOM)/4, 1, User.GetElementEffectiveness(Element)));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " takes damage from Kamakazi!"));
 		}
 
 		void METAMORPH() {
-			Animations.Add(User.GiveStatBoost(CreatureStats.STRENGTH, true));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.STRENGTH, true));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Strength of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
 		}
 
@@ -254,26 +266,34 @@ namespace Alpaka.Scenes.Battle {
         }
 
         void MIND_STRIKE() {
-            Animations.Add(User.GiveStatBoost(CreatureStats.WISDOM, true));
+            Animations.AddRange(User.GiveStatBoost(CreatureStats.WISDOM, true));
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Wisdom of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
         }
 
         void WINDTUNNEL2() {
-			//give [ELEMENT] [NUMBER] [POS/NEG] priority to [USR/PNT/ALL]
-
+			Animations.Add(User.GiveElementBoost(CreatureElement.WIND, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " became less proficient with Wind Actions!"));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(User) + User.ActiveCreature.Nickname + " decreased!"));
 		}
 
-		void OP_1B() {
-			//give [NUMBER] [POS/NEG] priority to [USR/PNT/ALL]
-
+		void SPRING_OF_ILLUSION() {
+			byte sm = 1;
+			for (int i = 0; i < 3; i++) {
+				if (Battle.AllEffects[Opponent.Placement].effects[i] != null) {
+					if(sm > Battle.AllEffects[Opponent.Placement].effects[i].CurrentLifespan) sm = Battle.AllEffects[Opponent.Placement].effects[i].CurrentLifespan;
+					CurrentEffect.Scripts.AddRange(Battle.AllEffects[Opponent.Placement].effects[i].Scripts);
+				}
+			}
+			CurrentEffect.CurrentLifespan = sm;
 		}
 
-		void OP_1C() {
-			//increase mana cost of [USR/PNT/ALL] [ELEMENT] moves by [NUMBER]
+		void MOTIVATOR() {
+			Trigger.AttackGainOnStatBoost.SetFlag(255);
 		}
 
-		void OP_1D() {
-			//change [USR/PNT/ALL] move elements all to [ELEMENT]
+		void MOTIVATOR2() {
+			Trigger.AttackGainOnStatBoost.RemoveFlag();
 
 		}
 

@@ -396,6 +396,38 @@ namespace Alpaka.Scenes.Battle {
             );
 
 			c.Add(new CreatureAction(
+				"Kamakazi", //NAME
+				CreatureElement.FIRE,
+				ActionCategory.PHYSICAL,
+				70,          //SPEED
+				3,           //PRIORITY MODIFIER
+				255,          //POWER
+				1,          //USAGE
+				3,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   55, //SPEED
+					                                       new byte[1] { 0x14 }) }
+					)
+				)
+			);
+			c.Add(new CreatureAction(
+				"Earth Grind", //NAME
+				CreatureElement.EARTH,
+				ActionCategory.PHYSICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				100,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				null
+				)
+			);
+
+			c.Add(new CreatureAction(
 				"Windtunnel", //NAME
 				CreatureElement.WIND,
 				ActionCategory.ADAPTIVE,
@@ -406,7 +438,7 @@ namespace Alpaka.Scenes.Battle {
 				1,           //MANA
 				new BattleEffect(
 					9, //PRIORITY
-					4, //LIFESPAN
+					7, //LIFESPAN
 					new byte[4] { 1,2,6,7 }, //PLACEMENT
                     new EffectScript[2] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
                                                            70, //SPEED
@@ -417,6 +449,51 @@ namespace Alpaka.Scenes.Battle {
                     )
                 )
             );
+
+			c.Add(new CreatureAction(
+				"Spring Of Illusion", //NAME
+				CreatureElement.WATER,
+				ActionCategory.ADAPTIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				1,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					9, //PRIORITY
+					5, //LIFESPAN
+					new byte[1] { 0 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x1B }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Motivator", //NAME
+				CreatureElement.ETHER,
+				ActionCategory.ADAPTIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				4,          //USAGE
+				0,           //MANA
+				new BattleEffect(
+					9, //PRIORITY
+					5, //LIFESPAN
+					new byte[3] { 0, 1, 7 }, //PLACEMENT
+					new EffectScript[2] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
+														   70, //SPEED
+					                                       new byte[1] { 0x1C }),
+						new EffectScript(EffectTrigger.ON_STAND_EXIT,
+														   68, //SPEED
+														   new byte[1] { 0x1D }) }
+					)
+				)
+			);
+
+
 			c.Add(new CreatureAction( //TODO: AFTER SCORCHED EARTH
 				"Cyclone", //NAME
 				CreatureElement.ETHER,

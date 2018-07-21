@@ -35,7 +35,7 @@ namespace Alpaka.Scenes.Battle {
         public bool IsDeathTurn;
 
         public BattleTile[] AllEffects = new BattleTile[11]; //0-7 tileeffects, 8 centre effects, 9-10 creature effects
-
+		//TODO: I THINK YOU SHOULD SCRAP ALLEFFECTS AND JUST GO WITH THE SORTEDEFFECTS
         private BattlePhase[] BattlePhases = new BattlePhase[9];
 
         public Dictionary<EffectTrigger, SortedList<byte, List<BattleEffect>>> SortedEffects;
@@ -533,8 +533,7 @@ namespace Alpaka.Scenes.Battle {
 
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
-			Interpreter.SetElement(Effect.Element);
-			Interpreter.SetBaseAttacks(Effect.BasePhysical, Effect.BaseMystical);
+			Interpreter.SetEffect(Effect);
             Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
 			Player Target = User;

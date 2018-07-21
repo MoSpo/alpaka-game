@@ -21,6 +21,7 @@ namespace Alpaka {
             END_TURN,
             ELEMENT_CHANGE,
 			STAT_BOOST,
+			ELEMENT_BOOST
 		}
 
 		public SceneAnimationType Type;

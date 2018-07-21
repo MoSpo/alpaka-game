@@ -29,7 +29,7 @@ namespace Alpaka.Scenes.Battle {
 
 		private Dictionary<CreatureStats, byte> Statboosts = new Dictionary<CreatureStats, byte>();
 
-		public byte[] ElementBoosts = new byte[Enum.GetNames(typeof(CreatureElement)).Length];
+		public bool[] ElementBoosts = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
 
 		public byte[] SwitchedStats = new byte[8];
 		public bool HasNewElement = false;
@@ -47,6 +47,7 @@ namespace Alpaka.Scenes.Battle {
         public Flag CanUseActionThisTurn = new Flag(true);
 		public Flag TriggersAttackFlags = new Flag(true);
 		public Flag HasActionDelay = new Flag(false);
+		public Flag AttackGainOnStatBoost = new Flag(false);
 		public Flag CanBeAttacked = new Flag(true);
         public Flag LosesStatsOnSwitch = new Flag(true);
 		public Flag ConditionsPassedOnSwitch = new Flag(false);
@@ -122,10 +123,10 @@ namespace Alpaka.Scenes.Battle {
 		public void setStart(byte s) {  //STAND IN CODE
 			AllCreatures temp = new AllCreatures();
 			if (playerNumber == 1) {
-				Team[0] = new CreatureInstance(temp.GetCreature(1));
-				Team[1] = new CreatureInstance(temp.GetCreature(0));
+				Team[0] = new CreatureInstance(temp.GetCreature(3));
+				Team[1] = new CreatureInstance(temp.GetCreature(1));
 				Team[2] = new CreatureInstance(temp.GetCreature(2));
-				Team[3] = new CreatureInstance(temp.GetCreature(3));
+				Team[3] = new CreatureInstance(temp.GetCreature(0));
 				Team[4] = new CreatureInstance(temp.GetCreature(5));
 				Team[5] = new CreatureInstance(temp.GetCreature(7));
 
@@ -150,12 +151,17 @@ namespace Alpaka.Scenes.Battle {
 			return ElementBonus;
 		}
 
+		private double GetElementBoost(CreatureElement Element) {
+			if (ElementBoosts[(byte)Element] == true) return 1.5;          
+			return 1.0;
+		}
+
 		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, int AttackerStrength, int AttackerIntelligence, int AttackedEndurance, int AttackedWisdom, double ElementBoost, double ElementEffectiveness) {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
 			int Damage = 0;
-			double Bonuses = ElementEffectiveness * ElementBoost;
+			double Bonuses = ElementEffectiveness * ElementBoost * GetElementBoost(Element);
 
 			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
 				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((AttackerStrength * BaseActionPower * Bonuses / AttackedEndurance) +2.0);
@@ -253,28 +259,36 @@ namespace Alpaka.Scenes.Battle {
 			return new SceneAnimation(SceneAnimation.SceneAnimationType.CONDITION, new double[] { playerNumber, Condition }, "#CONDITION ANIMATION#");
 		}
 
-		public SceneAnimation GiveStatBoost(CreatureStats Stat, bool IsPositiveBoost) {
+		public SceneAnimation GiveElementBoost(CreatureElement Element, bool IsPositiveBoost) {
+			if (IsPositiveBoost) {
+				ElementBoosts[(byte)Element] = true;
+				return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Element, 1 }, "#ELEMENT BOOST ANIMATION#");
+			}
+			ElementBoosts[(byte)Element] = false;
+			return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Element, -1 }, "#ELEMENT BOOST ANIMATION#");
+		}
+
+		public List<SceneAnimation> GiveStatBoost(CreatureStats Stat, bool IsPositiveBoost) {
+			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
 			if (Stat == CreatureStats.HEALTH || Stat == CreatureStats.KIN) {
-				return new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "#ERROR#");
-
 			}
 			if (IsPositiveBoost) {
 				if (Statboosts[Stat] < 10) {
 					Statboosts[Stat]++;
-					return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, 1 }, "#STAT BOOST ANIMATION#");
-
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, 1 }, "#STAT BOOST ANIMATION#"));
+					if (AttackGainOnStatBoost.Evaluate() && Stat != CreatureStats.STRENGTH && Stat != CreatureStats.INTELLIGENCE) {
+						Animations.AddRange(GiveStatBoost(CreatureStats.STRENGTH, true));
+					}
 				}
-				return new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "");
-
 			}
 			if (Statboosts[Stat] > 0) {
 				Statboosts[Stat]--;
-				return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, -1 }, "#STAT BOOST ANIMATION#");
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, -1 }, "#STAT BOOST ANIMATION#"));
 
 			}
 
-			return new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "");
+			return Animations;
 		}
 
 
@@ -339,6 +353,7 @@ namespace Alpaka.Scenes.Battle {
 		public void Reset() {
 			CanUseActionThisTurn.RemoveFlag();
 			TriggersAttackFlags.RemoveFlag();
+			AttackGainOnStatBoost.RemoveFlag();
 			HasActionDelay.RemoveFlag();
 			CanBeAttacked.RemoveFlag();
 			LosesStatsOnSwitch.RemoveFlag();
@@ -365,7 +380,7 @@ namespace Alpaka.Scenes.Battle {
 				Statboosts[Stat] = 5;
 			}
 
-			ElementBoosts = new byte[Enum.GetNames(typeof(CreatureElement)).Length];
+			ElementBoosts = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
 
 			SwitchedStats = new byte[8];
 			HasNewElement = false;
@@ -379,6 +394,7 @@ namespace Alpaka.Scenes.Battle {
 		public void DecreaseFlags() {
 			CanUseActionThisTurn.DecreaseLifespan();
 			TriggersAttackFlags.DecreaseLifespan();
+			AttackGainOnStatBoost.DecreaseLifespan();
 			HasActionDelay.DecreaseLifespan();
 			CanBeAttacked.DecreaseLifespan();
 			LosesStatsOnSwitch.DecreaseLifespan();

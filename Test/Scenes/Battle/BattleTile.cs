@@ -33,6 +33,18 @@ namespace Alpaka.Scenes.Battle {
             }
         }
 
+
+		public bool EffectInPosition(string name) {
+			for (byte i = 0; i < 3; i++) {
+				if (effects[i] != null) {
+					if (effects[i].Name.Equals(name)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
         private void sortEffects() {
             BattleEffect[] temp = new BattleEffect[3];
             byte index = 0;

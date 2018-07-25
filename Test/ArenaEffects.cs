@@ -58,7 +58,16 @@ namespace Alpaka {
 
 		public void Remove(int pos, string name) {
 			ArenaEffect eff = effects[pos];
-			eff.amt--;
+			for (int i = 0; i < 3; i++) {
+				if (i == eff.amt) {
+					eff.amt--;
+					return;
+				}
+				if (eff.text[i].Equals(name)) {
+					eff.text[i] = eff.text[i + 1];
+					eff.text[i + 1] = name;
+				}
+			}
 		}
 
 		public void Rotate(double dt) {

@@ -64,6 +64,8 @@ namespace Alpaka.Scenes.Battle {
         public Flag CanChooseAction = new Flag(true);
 		public Flag IsJumping = new Flag(false);
 		public Flag RestoreHealthInseadOfMana = new Flag(false);
+		public Flag RestoreMana = new Flag(true);
+
 		//
 
 		public byte[][] ElementEffectiveness = new byte[][] {
@@ -123,11 +125,11 @@ namespace Alpaka.Scenes.Battle {
 		public void setStart(byte s) {  //STAND IN CODE
 			AllCreatures temp = new AllCreatures();
 			if (playerNumber == 1) {
-				Team[0] = new CreatureInstance(temp.GetCreature(3));
+				Team[0] = new CreatureInstance(temp.GetCreature(5));
 				Team[1] = new CreatureInstance(temp.GetCreature(1));
 				Team[2] = new CreatureInstance(temp.GetCreature(2));
-				Team[3] = new CreatureInstance(temp.GetCreature(0));
-				Team[4] = new CreatureInstance(temp.GetCreature(5));
+				Team[3] = new CreatureInstance(temp.GetCreature(3));
+				Team[4] = new CreatureInstance(temp.GetCreature(0));
 				Team[5] = new CreatureInstance(temp.GetCreature(7));
 
 			} else {
@@ -278,14 +280,15 @@ namespace Alpaka.Scenes.Battle {
 					Statboosts[Stat]++;
 					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, 1 }, "#STAT BOOST ANIMATION#"));
 					if (AttackGainOnStatBoost.Evaluate() && Stat != CreatureStats.STRENGTH && Stat != CreatureStats.INTELLIGENCE) {
+						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Strength of " + ActiveCreature.Nickname + " increased!"));
 						Animations.AddRange(GiveStatBoost(CreatureStats.STRENGTH, true));
 					}
 				}
-			}
-			if (Statboosts[Stat] > 0) {
-				Statboosts[Stat]--;
-				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, -1 }, "#STAT BOOST ANIMATION#"));
-
+			} else {
+				if (Statboosts[Stat] > 0) {
+					Statboosts[Stat]--;
+					Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Stat, -1 }, "#STAT BOOST ANIMATION#"));
+				}
 			}
 
 			return Animations;
@@ -371,6 +374,7 @@ namespace Alpaka.Scenes.Battle {
             CanChooseAction.RemoveFlag();
 			IsJumping.RemoveFlag();
 			RestoreHealthInseadOfMana.RemoveFlag();
+			RestoreMana.RemoveFlag();
 
 			actionCombo = 1;
 
@@ -412,6 +416,7 @@ namespace Alpaka.Scenes.Battle {
             CanChooseAction.DecreaseLifespan();
 			IsJumping.DecreaseLifespan();
 			RestoreHealthInseadOfMana.DecreaseLifespan();
+			RestoreMana.DecreaseLifespan();
 		}
 
 		public bool IsNotInArena() {
@@ -447,6 +452,7 @@ namespace Alpaka.Scenes.Battle {
 		public void RemoveFlag() {
 			Timer = 0;
 			Bool = false;
+			IsInfinate = false;
 		}
 
 		public void DecreaseLifespan() {

@@ -19,7 +19,7 @@ namespace Alpaka.Scenes.Battle {
 		public List<CreatureAction> HardCodedActions() {
 			List<CreatureAction> c = new List<CreatureAction>();
 
-            //1//
+			//1//
 			c.Add(new CreatureAction(
 				"Cosmic Sting", //NAME
 				CreatureElement.COSMIC,
@@ -32,7 +32,7 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
+					new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.BEFORE_ATTACKING,
 														   100, //SPEED
 					                                       new byte[1] { 0x00 }) }
@@ -53,7 +53,7 @@ namespace Alpaka.Scenes.Battle {
 				//new BattleEffect(
 				//	10, //PRIORITY
 				//	0, //LIFESPAN
-                //    new byte[1] { 9 }, //PLACEMENT
+				//    new byte[1] { 9 }, //PLACEMENT
 				//	new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 				//										   100, //SPEED
 				//	                                       new byte[1] { 0x01 }) }
@@ -73,7 +73,7 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
+					new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   100, //SPEED
 					                                       new byte[1] { 0x02 }) }
@@ -114,7 +114,7 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					9, //PRIORITY
 					5, //LIFESPAN
-					new byte[2] { 2,5 }, //PLACEMENT
+					new byte[2] { 2, 5 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
 														   70, //SPEED
 					                                       new byte[1] { 0x16 })}
@@ -142,7 +142,7 @@ namespace Alpaka.Scenes.Battle {
 				)
 			);
 
-            //2//
+			//2//
 
 			c.Add(new CreatureAction(
 				"Flash Freeze", //NAME
@@ -156,7 +156,7 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
+					new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
 														   120, //SPEED
 					                                       new byte[1] { 0x06 }) }
@@ -164,40 +164,40 @@ namespace Alpaka.Scenes.Battle {
 				)
 			);
 
-            c.Add(new CreatureAction(
-                "Mind Strike", //NAME
-                CreatureElement.MAGIC,
-                ActionCategory.MYSTICAL,
-                80,          //SPEED
-                0,           //PRIORITY MODIFIER
-                80,          //POWER
-                5,          //USAGE
-                1,           //MANA
-                new BattleEffect(
-                    10, //PRIORITY
-                    0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
-                    new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
-                                                           90, //SPEED
+			c.Add(new CreatureAction(
+				"Mind Strike", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.MYSTICAL,
+				80,          //SPEED
+				0,           //PRIORITY MODIFIER
+				80,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   90, //SPEED
 					                                       new byte[1] { 0x19 }) }
-                    )
-                )
-            );
+					)
+				)
+			);
 
-            c.Add(new CreatureAction(
-                "Water Stream", //NAME
-                CreatureElement.WATER,
-                ActionCategory.MYSTICAL,
-                75,          //SPEED
-                0,           //PRIORITY MODIFIER
-                80,          //POWER
-                6,          //USAGE
-                0,           //MANA
-                null
-                )
-            );
+			c.Add(new CreatureAction(
+				"Water Stream", //NAME
+				CreatureElement.WATER,
+				ActionCategory.MYSTICAL,
+				75,          //SPEED
+				0,           //PRIORITY MODIFIER
+				80,          //POWER
+				6,          //USAGE
+				0,           //MANA
+				null
+				)
+			);
 
-            c.Add(new CreatureAction(
+			c.Add(new CreatureAction(
 				"Ceasefire", //NAME
 				CreatureElement.ETHER,
 				ActionCategory.DEFENSIVE,
@@ -209,7 +209,7 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
+					new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
 														   50, //SPEED
 					                                       new byte[1] { 0x08 }) }
@@ -249,7 +249,7 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					10, //PRIORITY
 					0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
+					new byte[1] { 9 }, //PLACEMENT
 					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
 														   55, //SPEED
 					                                       new byte[1] { 0x0A }) }
@@ -257,7 +257,7 @@ namespace Alpaka.Scenes.Battle {
 				)
 			);
 
-            //3//
+			//3//
 			c.Add(new CreatureAction(
 				"Smoulder Smash", //NAME
 				CreatureElement.FIRE,
@@ -277,7 +277,7 @@ namespace Alpaka.Scenes.Battle {
 					)
 				)
 			);
-			
+
 			c.Add(new CreatureAction(
 				"Clobber", //NAME
 				CreatureElement.ROCK,
@@ -314,7 +314,7 @@ namespace Alpaka.Scenes.Battle {
 														   55, //SPEED
 					                                       new byte[1] { 0x0E }) }
 					)
-                )
+				)
 			);
 			c.Add(new CreatureAction(
 				"Polish", //NAME
@@ -374,26 +374,26 @@ namespace Alpaka.Scenes.Battle {
 				)
 			);
 
-            //4//
-            c.Add(new CreatureAction(
-                "Sleet Hammer", //NAME
-                CreatureElement.ICE,
-                ActionCategory.PHYSICAL,
-                70,          //SPEED
-                -1,           //PRIORITY MODIFIER
-                100,          //POWER
-                5,          //USAGE
-                2,           //MANA
-                new BattleEffect(
-                    10, //PRIORITY
-                    0, //LIFESPAN
-                    new byte[1] { 9 }, //PLACEMENT
-                    new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
-                                                           55, //SPEED
+			//4//
+			c.Add(new CreatureAction(
+				"Sleet Hammer", //NAME
+				CreatureElement.ICE,
+				ActionCategory.PHYSICAL,
+				70,          //SPEED
+				-1,           //PRIORITY MODIFIER
+				100,          //POWER
+				5,          //USAGE
+				2,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   55, //SPEED
 					                                       new byte[1] { 0x12 }) }
-                    )
-                )
-            );
+					)
+				)
+			);
 
 			c.Add(new CreatureAction(
 				"Kamakazi", //NAME
@@ -439,16 +439,16 @@ namespace Alpaka.Scenes.Battle {
 				new BattleEffect(
 					9, //PRIORITY
 					7, //LIFESPAN
-					new byte[4] { 1,2,6,7 }, //PLACEMENT
-                    new EffectScript[2] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
-                                                           70, //SPEED
+					new byte[4] { 1, 2, 6, 7 }, //PLACEMENT
+					new EffectScript[2] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
+														   70, //SPEED
 					                                       new byte[1] { 0x13 }),
-                        new EffectScript(EffectTrigger.ON_STAND_EXIT,
-                                                           68, //SPEED
+						new EffectScript(EffectTrigger.ON_STAND_EXIT,
+														   68, //SPEED
 														   new byte[1] { 0x1A }) }
-                    )
-                )
-            );
+					)
+				)
+			);
 
 			c.Add(new CreatureAction(
 				"Spring Of Illusion", //NAME
@@ -493,6 +493,436 @@ namespace Alpaka.Scenes.Battle {
 				)
 			);
 
+			//5//
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.FIRE,
+				ActionCategory.MYSTICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				80,          //POWER
+				5,          //USAGE
+				0,           //MANA
+				null
+				)
+		   );
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.NUCLEAR,
+				ActionCategory.PHYSICAL,
+				90,          //SPEED
+				0,           //PRIORITY MODIFIER
+				85,          //POWER
+				6,          //USAGE
+				0,           //MANA
+				null
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.DARK,
+				ActionCategory.PHYSICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				100,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   55, //SPEED
+					                                       new byte[1] { 0x1E}) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				2,           //PRIORITY MODIFIER
+				0,          //POWER
+				2,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					8, //PRIORITY
+					2, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.ON_EFFECT_TIMEOUT,
+														   70, //SPEED
+														   new byte[1] { 0x1F }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x20 }) }
+					)
+				)
+			);
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.DARK,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x21 }) }
+					)
+				)
+			);
+			//6//
+			c.Add(new CreatureAction(
+				"Fireball", //NAME
+				CreatureElement.FIRE,
+				ActionCategory.MYSTICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				80,          //POWER
+				5,          //USAGE
+				0,           //MANA
+				null
+				)
+		   );
+
+			c.Add(new CreatureAction(
+				"Nuclear Burst", //NAME
+				CreatureElement.NUCLEAR,
+				ActionCategory.PHYSICAL,
+				90,          //SPEED
+				0,           //PRIORITY MODIFIER
+				85,          //POWER
+				6,          //USAGE
+				0,           //MANA
+				null
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Soul Crush", //NAME
+				CreatureElement.DARK,
+				ActionCategory.PHYSICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				100,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   55, //SPEED
+					                                       new byte[1] { 0x1E}) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Future Zoom", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				2,           //PRIORITY MODIFIER
+				0,          //POWER
+				2,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					8, //PRIORITY
+					2, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.ON_EFFECT_TIMEOUT,
+														   70, //SPEED
+														   new byte[1] { 0x1F }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Sharp Mind", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x20 }) }
+					)
+				)
+			);
+			c.Add(new CreatureAction(
+				"Intimidate", //NAME
+				CreatureElement.DARK,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x21 }) }
+					)
+				)
+			);
+
+			//7//
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.FIRE,
+				ActionCategory.MYSTICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				80,          //POWER
+				5,          //USAGE
+				0,           //MANA
+				null
+				)
+		   );
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.NUCLEAR,
+				ActionCategory.PHYSICAL,
+				90,          //SPEED
+				0,           //PRIORITY MODIFIER
+				85,          //POWER
+				6,          //USAGE
+				0,           //MANA
+				null
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.DARK,
+				ActionCategory.PHYSICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				100,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   55, //SPEED
+					                                       new byte[1] { 0x1E}) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				2,           //PRIORITY MODIFIER
+				0,          //POWER
+				2,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					8, //PRIORITY
+					2, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.ON_EFFECT_TIMEOUT,
+														   70, //SPEED
+														   new byte[1] { 0x1F }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.MAGIC,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x20 }) }
+					)
+				)
+			);
+			c.Add(new CreatureAction(
+				"---", //NAME
+				CreatureElement.DARK,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x21 }) }
+					)
+				)
+			);
+
+			//8//
+			c.Add(new CreatureAction(
+				"Piston Punch", //NAME
+				CreatureElement.STEEL,
+				ActionCategory.MYSTICAL,
+				70,          //SPEED
+				-2,           //PRIORITY MODIFIER
+				60,          //POWER
+				8,          //USAGE
+				0,           //MANA
+				null
+				)
+		   );
+
+			c.Add(new CreatureAction(
+				"Sea Scatter", //NAME
+				CreatureElement.WATER,
+				ActionCategory.PHYSICAL,
+				90,          //SPEED
+				0,           //PRIORITY MODIFIER
+				85,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   60, //SPEED
+														   new byte[1] { 0x22 }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Isobind", //NAME
+				CreatureElement.NUCLEAR,
+				ActionCategory.MYSTICAL,
+				70,          //SPEED
+				0,           //PRIORITY MODIFIER
+				100,          //POWER
+				6,          //USAGE
+				2,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ATTACKING,
+														   55, //SPEED
+					                                       new byte[1] { 0x23 }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Spikes", //NAME
+				CreatureElement.ROCK,
+				ActionCategory.ADAPTIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				10,          //USAGE
+				0,           //MANA
+				new BattleEffect(
+					9, //PRIORITY
+					6, //LIFESPAN
+					new byte[3] { 3,4,5 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.ON_STAND_ENTER,
+														   70, //SPEED
+														   new byte[1] { 0x24 }) }
+					)
+				)
+			);
+
+			c.Add(new CreatureAction(
+				"Detox", //NAME
+				CreatureElement.NUCLEAR,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				0,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				0,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x25 }) }
+					)
+				)
+			);
+			c.Add(new CreatureAction(
+				"Weapon Recall", //NAME
+				CreatureElement.STEEL,
+				ActionCategory.DEFENSIVE,
+				40,          //SPEED
+				-2,           //PRIORITY MODIFIER
+				0,          //POWER
+				5,          //USAGE
+				1,           //MANA
+				new BattleEffect(
+					10, //PRIORITY
+					0, //LIFESPAN
+					new byte[1] { 9 }, //PLACEMENT
+					new EffectScript[1] { new EffectScript(EffectTrigger.AFTER_ACTION,
+														   60, //SPEED
+														   new byte[1] { 0x26 }) }
+					)
+				)
+			);
+			
 
 			c.Add(new CreatureAction( //TODO: AFTER SCORCHED EARTH
 				"Cyclone", //NAME

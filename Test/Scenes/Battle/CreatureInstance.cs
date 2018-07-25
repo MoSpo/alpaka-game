@@ -40,7 +40,7 @@ namespace Alpaka.Scenes.Battle {
             //
             AllActions temp2 = new AllActions();
             for (byte i = 0; i < 6; i++) {
-                if ((BaseCreature.ID - 1) * 6 <= 22) {
+                if ((BaseCreature.ID - 1) * 6 <= 32) {
                     Actions[i] = temp2.GetAction((short)(i + (BaseCreature.ID - 1) * 6));
                 } else {
                     Actions[i] = temp2.GetAction(1);

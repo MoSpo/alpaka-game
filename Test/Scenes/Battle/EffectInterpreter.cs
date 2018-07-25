@@ -110,18 +110,16 @@ namespace Alpaka.Scenes.Battle {
 		Action OP_1_(byte OP) {
 			Action[] OP_ = {
 				new Action(KINDLE), new Action(DETER), new Action(SLEET_HAMMER), new Action(WINDTUNNEL), new Action(KAMAKAZI), new Action(METAMORPH), new Action(ASTEROIDS), new Action(COMET_LAUNCHER),
-				new Action(SWITCH), new Action(MIND_STRIKE), new Action(WINDTUNNEL2), new Action(SPRING_OF_ILLUSION), new Action(MOTIVATOR), new Action(MOTIVATOR2), new Action(OP_1E), new Action(OP_1F)
+				new Action(SWITCH), new Action(MIND_STRIKE), new Action(WINDTUNNEL2), new Action(SPRING_OF_ILLUSION), new Action(MOTIVATOR), new Action(MOTIVATOR2), new Action(SOUL_CRUSH), new Action(FUTURE_ZOOM)
 			};
 			return OP_[OP];
 		}
 		Action OP_2_(byte OP) {
-			/*
 			 Action[] OP_ = {
-					new Action(OP_20), new Action(OP_21), new Action(OP_22), new Action(OP_23), new Action(OP_24), new Action(OP_25), new Action(OP_26), new Action(OP_27),
+					new Action(SHARP_MIND), new Action(INTIMIDATE), new Action(OP_22), new Action(OP_23), new Action(OP_24), new Action(OP_25), new Action(OP_26), new Action(OP_27),
 					new Action(OP_28), new Action(OP_29), new Action(OP_2A), new Action(OP_2B), new Action(OP_2C), new Action(OP_2D), new Action(OP_2E), new Action(OP_2F)
 				};
-				return OP_[OP]; */
-			return null;
+				return OP_[OP];
 		}
 		Action OP_3_(byte OP) {
 			/*
@@ -231,10 +229,10 @@ namespace Alpaka.Scenes.Battle {
 
         }
         void WINDTUNNEL() {
-			Animations.Add(User.GiveElementBoost(CreatureElement.WIND, true));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " became more proficient with Wind Actions!"));
-			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
+			Animations.Add(Trigger.GiveElementBoost(CreatureElement.WIND, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " became more proficient with Wind Actions!"));
+			Animations.AddRange(Trigger.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " increased!"));
 		}
 
 		void KAMAKAZI() {
@@ -271,10 +269,10 @@ namespace Alpaka.Scenes.Battle {
         }
 
         void WINDTUNNEL2() {
-			Animations.Add(User.GiveElementBoost(CreatureElement.WIND, false));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " became less proficient with Wind Actions!"));
-			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, false));
-			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(User) + User.ActiveCreature.Nickname + " decreased!"));
+			Animations.Add(Trigger.GiveElementBoost(CreatureElement.WIND, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " became less proficient with Wind Actions!"));
+			Animations.AddRange(Trigger.GiveStatBoost(CreatureStats.PACE, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " decreased!"));
 		}
 
 		void SPRING_OF_ILLUSION() {
@@ -297,16 +295,84 @@ namespace Alpaka.Scenes.Battle {
 
 		}
 
-		void OP_1E() {
-			//replace [USR/PNT/ALL] [ELEMENT] move elements with [ELEMENT]
-
+		void SOUL_CRUSH() {
+			Opponent.RestoreMana.SetFlag(1);
 		}
 
-		void OP_1F() {
-			//reset last move element changes
+		void FUTURE_ZOOM() {
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.PACE, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased drastically from Future Zoom!"));
+		}
+		void SHARP_MIND() {
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.WISDOM, true));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.WISDOM, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Wisdom of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
 
 		}
+		void INTIMIDATE() {
+			Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.AWE, false));
+			Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.AWE, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Awe of " + OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " decreased!"));
 
+		}
+		void OP_22() {
+			Animations.Add(Opponent.GiveElementBoost(CreatureElement.FIRE, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " became less proficient with Fire Actions!"));
+		}
+		void OP_23() {
+			Animations.Add(User.GiveElementBoost(CreatureElement.NUCLEAR, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " became more proficient with Nuclear Actions!"));
+		}
+		void OP_24() {
+			if (Trigger.JustSwitchedIn) {
+				Animations.AddRange(Trigger.GiveDamage(CreatureElement.ROCK, ActionCategory.PHYSICAL, 60, BasePhysical, BaseMystical, Trigger.GetTotalStat(CreatureStats.ENDURANCE), Trigger.GetTotalStat(CreatureStats.WISDOM), 1, Trigger.GetElementEffectiveness(Element)));
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " takes damage from Spikes!"));
+			}
+		}
+		void OP_25() {
+			Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.WISDOM, false));
+			Animations.AddRange(Opponent.GiveStatBoost(CreatureStats.WISDOM, false));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Wisdom of " + OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " decreased!"));
+
+		}
+		void OP_26() {
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " is exiting the arena!"));
+			Animations.AddRange(Battle.Switch(User));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " has taken it's place!"));
+			Animations.AddRange(User.GiveStatBoost(CreatureStats.STRENGTH, true));
+			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Strength of " + OpponentText(User) + User.ActiveCreature.Nickname + " increased!"));
+		}
+		void OP_27() {
+
+		}
+		void OP_28() {
+
+		}
+		void OP_29() {
+
+		}
+		void OP_2A() {
+
+		}
+		void OP_2B() {
+
+		}
+		void OP_2C() {
+
+		}
+		void OP_2D() {
+
+		}
+		void OP_2E() {
+
+		}
+		void OP_2F() {
+
+		}
 	}
 	/*
 	class EffectInterpreter : EffectExecute {

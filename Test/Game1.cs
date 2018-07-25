@@ -323,7 +323,7 @@ namespace Alpaka {
                     engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
                     if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature-1));
                     engine.Player2.SelectAction(6);
-                    engine.Player2.SelectMovement(MovementCategory.MOVE_LEFT);
+					engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
                     Console.WriteLine(TurnNumber);
                     TurnNumber++;
                     for (int i = 0; i < 10; i++) {

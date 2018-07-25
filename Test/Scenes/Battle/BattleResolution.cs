@@ -31,7 +31,7 @@ namespace Alpaka.Scenes.Battle {
 
 			if (RotationDelta != 0) {
 
-                    Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_MOVEMENT, null));
+                    Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_MOVEMENT, null));
 
                     if (RotationDelta > 0) {
                         Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves right..."));
@@ -45,7 +45,7 @@ namespace Alpaka.Scenes.Battle {
                 } else {
                     Animations.AddRange(Battle.DeltaRotate(RotationDelta));
 
-                    Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_MOVEMENT, null));
+                    Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_MOVEMENT, null));
                 }
 			} else {
 				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " stays still..."));
@@ -72,7 +72,7 @@ namespace Alpaka.Scenes.Battle {
 
 			if (User.CanUseActionThisTurn.Evaluate()) {
 
-				Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ACTION, User));
+				Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_ACTION, User));
 
 				if (Opponent.CanBeAttacked.Evaluate() || !(Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL)) {
 					if (Action.Mana > 0) {
@@ -93,14 +93,14 @@ namespace Alpaka.Scenes.Battle {
 				if ((Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL)) { //TODO: ADD ADAPTIVES AND DEFENSIVES
 
 					if (Opponent.CanBeAttacked.Evaluate()) {
-						Animations.AddRange(Battle.RunEffectType(EffectTrigger.BEFORE_ATTACKING, User));
+						Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_ATTACKING, User));
 
 						//Do Attack
 						Animations.AddRange(Battle.Damage(Opponent, Action.Element, Action.Catagory, Action.Power, User.amountOfAttacks, Action.Animation, User.TriggersAttackFlags.Evaluate())); //BEOFRE_ATTACKED migrated into here
 
 						User.amountOfAttacks = 1; //Needed for if any following effects inflict damage
 
-						Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ATTACKING, User));
+						Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_ATTACKING, User));
 					} else {
 						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Opponent.ActiveCreature.Nickname + " cannot be attacked!"));
 					}
@@ -112,7 +112,7 @@ namespace Alpaka.Scenes.Battle {
 					User.amountOfAttacks = 1;
 				}
 
-				Animations.AddRange(Battle.RunEffectType(EffectTrigger.AFTER_ACTION, User));
+				Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_ACTION, User));
 
 			} else {
 				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But the Action failed!"));
@@ -137,18 +137,18 @@ namespace Alpaka.Scenes.Battle {
 
 			if (!Battle.Player1.IsNotInArena()) {
                 if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) {
-                    Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10));
-                } else {
-                    Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6));
+					Animations.AddRange(Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10)));
+                } else if (Battle.Player1.RestoreMana.Evaluate()) {
+					Animations.AddRange(Battle.Player1.GainKin((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6)));
                 }
 				Battle.Player1.DecreaseFlags();
 			}
 
             if (!Battle.Player2.IsNotInArena()) {
                 if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) {
-                    Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10));
-                } else {
-                    Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6));
+					Animations.AddRange(Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10)));
+				} else if (Battle.Player2.RestoreMana.Evaluate()) {
+					Animations.AddRange(Battle.Player2.GainKin((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6)));
                 }
                 Battle.Player2.DecreaseFlags();
             }

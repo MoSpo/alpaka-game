@@ -9,6 +9,7 @@ namespace Alpaka.Scenes.Battle {
 	abstract class EffectExecute {
 
 		public List<SceneAnimation> Animations;
+		public List<List<SceneAnimation>> AnimationStack;
 
 		public abstract List<SceneAnimation> ExecuteEffect(EffectScript Script);
 
@@ -44,6 +45,8 @@ namespace Alpaka.Scenes.Battle {
 		public override List<SceneAnimation> ExecuteEffect(EffectScript Script) {
 
 			Animations = new List<SceneAnimation>();
+			AnimationStack.Add(Animations);
+
 			if (!(Element == CreatureElement.EARTH && Opponent.NotEffectedByEarth.Evaluate())) {
 
 				List<byte> Memory = Script.Script;
@@ -51,7 +54,15 @@ namespace Alpaka.Scenes.Battle {
 					OP_Decode[Memory[i] >> 4]((byte)(Memory[i] & 0x0F))();
 				}
 			}
-			return Animations;
+			AnimationStack.Remove(Animations);
+			List<SceneAnimation> Finished = Animations;
+			if (AnimationStack.Count > 0) {
+				Animations = AnimationStack.Last();
+			} else {
+				AnimationStack.Clear();
+				Animations = null;
+			}
+			return Finished;
 		}
 
 		public override void SetTargets(Player User, Player Opponent, Player Trigger, byte TriggerPosition) {
@@ -91,6 +102,7 @@ namespace Alpaka.Scenes.Battle {
 
 		public EffectHardExecute(BattleEngine Battle) {
 			this.Battle = Battle;
+			AnimationStack = new List<List<SceneAnimation>>();
 
 			OP_[] fun = {OP_0_, OP_1_, OP_2_, OP_3_};
 

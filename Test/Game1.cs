@@ -10,7 +10,8 @@ namespace Alpaka {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-       BattleEngine engine;
+        BattleEngine engine;
+		Badai ai;
 
         Arena arena;
         ArenaEffects effects;
@@ -34,7 +35,7 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
-        double GameSpeed = 0.7;
+        double GameSpeed = 0.5;
         int TurnNumber = 1;
         public bool chosen = false;
 
@@ -66,7 +67,7 @@ namespace Alpaka {
 			return engine.Player1.Team[i].Nickname;
 		}
 		public bool getCanUseTeam(byte i) {
-			return !engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature;
+			return !engine.Player1.Team[i].killed && engine.Player1.Team[i] != engine.Player1.ActiveCreature;
 		}
 
 		public string getAction(byte i) {
@@ -82,6 +83,15 @@ namespace Alpaka {
         public bool getSwitch(byte i) {
             return engine.Player1.ActiveCreature.GetAction(i).IsSwitch;
         }
+
+		public bool getOppCanUseTeam(byte i) {
+			return !engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature;
+		}
+
+		public bool getOppCanUse(byte i) {
+			return engine.Player2.CanSelectAction(i);
+		}
+
 
         private void Animate() {
             if (nextAnim) {
@@ -149,7 +159,13 @@ namespace Alpaka {
                     nextAnim = false;
                     break;
 					case SceneAnimation.SceneAnimationType.SWITCH_OUT:
-                    break;
+						if (an.Values[0] == 1) {
+							user.changeID(0);
+						} else {
+							opponent.changeID(0);
+						}
+
+						break;
 					case SceneAnimation.SceneAnimationType.CONDITION:
                     if (an.Values[0] == 1) {
                         leftbar.st = (byte)(an.Values[1] + 1);
@@ -207,7 +223,7 @@ namespace Alpaka {
         protected override void Initialize() {
             anim = new List<SceneAnimation>();
             engine = new BattleEngine();
-
+			ai = new Badai(this);
             engine.Player2.ActiveCreature.CreatureType.BaseStats[CreatureStats.PACE] -= 1;
             engine.Player2.ActiveCreature.CreatureType.BaseStats[CreatureStats.AWE] -= 1;
 
@@ -295,7 +311,7 @@ namespace Alpaka {
                     engine.Player1.SelectAction(0);
                     engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
                     engine.Player1.SelectCreature(menu.chosenCreature);
-                    engine.Player2.SelectAction(0);
+					engine.Player2.SelectAction(0);
                     engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
                     engine.Player2.SelectCreature(0);
 
@@ -308,12 +324,7 @@ namespace Alpaka {
                     engine.Player1.SelectCreature(0);
                     engine.Player2.SelectAction(0);
                     engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
-					for (int i = 0; i < 6; i++) {
-						if (!engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature) {
-							engine.Player2.SelectCreature((byte)i);
-							break;
-						}
-					}
+					engine.Player1.SelectCreature(ai.SelectCreature());
 
                     IsOpponentDeathTurn = false;
                     List<SceneAnimation> a = engine.Poll();
@@ -322,8 +333,9 @@ namespace Alpaka {
                     engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
                     engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
                     if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature-1));
-                    engine.Player2.SelectAction(6);
-					engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+					engine.Player2.SelectAction(ai.SelectAction());
+					engine.Player2.SelectMovement(ai.SelectMovement());
+					engine.Player2.SelectCreature(ai.SelectCreature());
                     Console.WriteLine(TurnNumber);
                     TurnNumber++;
                     for (int i = 0; i < 10; i++) {

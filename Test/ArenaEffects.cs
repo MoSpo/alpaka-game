@@ -59,7 +59,7 @@ namespace Alpaka {
 		public void Remove(int pos, string name) {
 			ArenaEffect eff = effects[pos];
 			for (int i = 0; i < 3; i++) {
-				if (i == eff.amt) {
+				if (i == eff.amt-1) {
 					eff.amt--;
 					return;
 				}

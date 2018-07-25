@@ -92,18 +92,8 @@ namespace Alpaka.Scenes.Battle {
                 }
                 if (!Player2.Ready) {
                     //TODO: LOCK THE UI SO YOU CANT CHOOSE ANYTHING ELSE
-                    //Player2.SelectAction(0);
-                    //Player2.SelectMovement(MovementCategory.HOLD_GROUND);
-                    var tmp = new byte[2];
-                    tmp[0] = 0;
-                    tmp[1] = (byte)MovementCategory.HOLD_GROUND;
-                    Network.SendAsOfflineServer(tmp);
-                }
-                if (!Player2.Ready) {
-                    //TODO: LOCK THE UI SO YOU CANT CHOOSE ANYTHING ELSE
                     var tmp = Network.ReadServer();
-                    Player2.SelectAction(tmp[0]);
-                    Player2.SelectMovement(tmp[1]);
+
                 } else {
                     if (IsDeathTurn) {
                         List<SceneAnimation> DeathTurn = new List<SceneAnimation>();

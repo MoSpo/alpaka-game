@@ -124,11 +124,12 @@ namespace Alpaka.Scenes.Battle {
 
 		public void setStart(byte s) {  //STAND IN CODE
 			AllCreatures temp = new AllCreatures();
-			if (playerNumber == 1) {
-				Team[0] = new CreatureInstance(temp.GetCreature(5));
+			if (true) {
+			//if (playerNumber == 1) {
+				Team[0] = new CreatureInstance(temp.GetCreature(3));
 				Team[1] = new CreatureInstance(temp.GetCreature(1));
 				Team[2] = new CreatureInstance(temp.GetCreature(2));
-				Team[3] = new CreatureInstance(temp.GetCreature(3));
+				Team[3] = new CreatureInstance(temp.GetCreature(5));
 				Team[4] = new CreatureInstance(temp.GetCreature(0));
 				Team[5] = new CreatureInstance(temp.GetCreature(7));
 

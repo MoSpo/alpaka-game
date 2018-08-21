@@ -14,7 +14,7 @@ namespace Alpaka.Scenes.Battle {
         }
 
         public void AddEffect(BattleEffect effect) {
-            if (amount >= 2) {
+            if (amount > 2) {
                 effects[0] = null;
                 sortEffects();
 				effects[amount] = effect;
@@ -24,6 +24,10 @@ namespace Alpaka.Scenes.Battle {
             }
 		}
 
+        public bool CanAddEffect() {
+            return amount <= 2;
+        }
+
         public void RemoveEffect(BattleEffect effect) {
             for (byte i = 0; i < 3; i++) {
                 if (effects[i] == effect) {
@@ -31,6 +35,7 @@ namespace Alpaka.Scenes.Battle {
                     sortEffects();
                 }
             }
+            amount--;
         }
 
 
@@ -54,7 +59,6 @@ namespace Alpaka.Scenes.Battle {
                     index++;
                 }
             }
-            amount = index;
             effects = temp;
         }
     }

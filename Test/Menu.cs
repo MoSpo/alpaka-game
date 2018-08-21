@@ -13,13 +13,15 @@ namespace Alpaka {
         Texture2D outershell;
         Texture2D outershellbuttons;
         Texture2D shell;
-        Texture2D actions;
-        Texture2D actionselect;
+        Texture2D normalactions;
+        Texture2D smallactions;
+        Texture2D unusableactions;
         Texture2D disc;
 		Texture2D arrows;
 		Texture2D cross;
 
         Thing[] middle;
+        ActionThing[] actions;
 
         public Game1 g;
 
@@ -59,8 +61,9 @@ namespace Alpaka {
             outershell = Content.Load<Texture2D>("outershell");
             outershellbuttons = Content.Load<Texture2D>("outershellbuttons");
             shell = Content.Load<Texture2D>("shell");
-            actions = Content.Load<Texture2D>("actions");
-            actionselect = Content.Load<Texture2D>("actionselect");
+            normalactions = Content.Load<Texture2D>("actions");
+            smallactions = Content.Load<Texture2D>("smallactions");
+            unusableactions = Content.Load<Texture2D>("noactions");
             disc = Content.Load<Texture2D>("disc");
 
 			arrows = Content.Load<Texture2D>("arrows");
@@ -75,16 +78,18 @@ namespace Alpaka {
                 new Thing(outershell, 0, 0, 224, 224),
                 new Thing(disc, 0, 0, 222, 74),
 
-                new Thing(actions, 0, 192, 180, 64),
-                new Thing(actions, 0, 192, 180, 64),
-                new Thing(actions, 0, 192, 180, 64),
+                ////
+                new ActionThing(normalactions, 0, 192, 180, 64, true),
+                new ActionThing(normalactions, 0, 192, 180, 64, true),
+                new ActionThing(normalactions, 0, 192, 180, 64, true),
 
-                new Thing(actions, 0, 128, 180, 64),
-                new Thing(actions, 0, 128, 180, 64),
-                new Thing(actions, 0, 128, 180, 64),
+                new ActionThing(normalactions, 0, 128, 180, 64, false),
+                new ActionThing(normalactions, 0, 128, 180, 64, false),
+                new ActionThing(normalactions, 0, 128, 180, 64, false),
 
-                new Thing(actions, 0, 64, 140, 64),
-                new Thing(actions, 0, 0, 140, 64),
+                new ActionThing(smallactions, 0, 64, 140, 64, true),
+                new ActionThing(smallactions, 0, 0, 140, 64, false),
+                ////
 
                 new Thing(chooser, 0, 0, 720, 122),
                 new Thing(pointers, 64, 0, 86, 50),
@@ -103,7 +108,21 @@ namespace Alpaka {
 				new Thing(cross, 0,0,122,122),
             };
 
+            actions = new ActionThing[] {
+                new ActionThing(normalactions, 0, 192, 180, 64, true),
+                new ActionThing(normalactions, 0, 192, 180, 64, true),
+                new ActionThing(normalactions, 0, 192, 180, 64, true),
+
+                new ActionThing(normalactions, 0, 128, 180, 64, false),
+                new ActionThing(normalactions, 0, 128, 180, 64, false),
+                new ActionThing(normalactions, 0, 128, 180, 64, false),
+
+                new ActionThing(smallactions, 0, 64, 130, 64, true),
+                new ActionThing(smallactions, 0, 0, 130, 64, false),
+            };
+
             for (int i = 3; i < 11; i++) {
+                middle[i] = actions[i - 3];
                 middle[i].color = new Color(0, 0, 0, 0);
             }
         }
@@ -131,8 +150,9 @@ namespace Alpaka {
 								chosenAction = 0;
 							}
 						} else {
-							middle[i].texture = actions;
-						}
+                            if (i < 9) middle[i].texture = normalactions;
+                            else middle[i].texture = smallactions;
+                        }
 					}
 					if (chosenAction != 0) {
 						if (g.getSwitch((byte)(chosenAction-1))) {
@@ -238,6 +258,13 @@ namespace Alpaka {
             if (useTimer) {
                 if (newMode == MenuMode.ACTION) {
                     if (currentMode == MenuMode.CLOSED) {
+
+                        for (int i = 0; i < 8; i++) {
+                            actions[i].element = g.getActionElement((byte)i)-1;
+                            actions[i].type = g.getActionType((byte)i);
+                        }
+
+
                         middle[0].Draw(248, 505 - (int)((505 - 368) * Bezier(timer / 0.35)), spriteBatch);
                         middle[1].Draw(248, 475 - (int)((475 - 475) * Bezier(timer / 0.35)), spriteBatch);
                         middle[2].Draw(249, 464 - (int)((464 - 328) * Bezier(timer / 0.35)), spriteBatch);
@@ -262,7 +289,7 @@ namespace Alpaka {
                         middle[8].Draw(424 - 50 + (int)(50 * Bezier((timer - 0.1) / 0.2)), 475, spriteBatch);
 
                         middle[9].Draw(50 - (int)(50 * Bezier((timer - 0.05) / 0.2)), 475, spriteBatch);
-                        middle[10].Draw(580 - 50 + (int)(50 * Bezier((timer - 0.05) / 0.2)), 475, spriteBatch);
+                        middle[10].Draw(590 - 50 + (int)(50 * Bezier((timer - 0.05) / 0.2)), 475, spriteBatch);
                         if (timer > 1 * 0.2 + 0.2) {
                             timer = 0;
                             currentMode = MenuMode.ACTION;
@@ -282,7 +309,7 @@ namespace Alpaka {
                         middle[8].Draw(424, 475, spriteBatch);
 
                         middle[9].Draw(0, 475, spriteBatch);
-                        middle[10].Draw(580, 475, spriteBatch);
+                        middle[10].Draw(590, 475, spriteBatch);
 
 
                         middle[11].Draw(0, 540 - (int)(122 * Bezier(1 - (timer / 0.2))), spriteBatch);
@@ -318,7 +345,7 @@ namespace Alpaka {
                         middle[8].Draw(424 - 50 + (int)(50 * Bezier((timer - 0.1) / 0.2)), 475, spriteBatch);
 
                         middle[9].Draw(50 - (int)(50 * Bezier((timer - 0.05) / 0.2)), 475, spriteBatch);
-                        middle[10].Draw(580 - 50 + (int)(50 * Bezier((timer - 0.05) / 0.2)), 475, spriteBatch);
+                        middle[10].Draw(590 - 50 + (int)(50 * Bezier((timer - 0.05) / 0.2)), 475, spriteBatch);
 
                         blend(middle[12], Bezier(timer / 0.3), new Color(255, 255, 255, 255), new Color(0, 0, 0, 0));
                         middle[12].Draw(317, 510 - 18 + (int)(18 * Bezier(timer / 0.3)), spriteBatch);
@@ -344,7 +371,7 @@ namespace Alpaka {
                     middle[8].Draw(424, 475, spriteBatch);
 
                     middle[9].Draw(0, 475, spriteBatch);
-                    middle[10].Draw(580, 475, spriteBatch);
+                    middle[10].Draw(590, 475, spriteBatch);
 
 
                     middle[11].Draw(0, 540 - (int)(122 * Bezier(timer / 0.2)), spriteBatch);
@@ -395,7 +422,7 @@ namespace Alpaka {
                         middle[8].Draw(424 - 50 + (int)(50 * Bezier(1 - ((timer - 0.1) / 0.2))), 475, spriteBatch);
 
                         middle[9].Draw(50 - (int)(50 * Bezier(1 - ((timer - 0.05) / 0.2))), 475, spriteBatch);
-                        middle[10].Draw(580 - 50 + (int)(50 * Bezier(1 - ((timer - 0.05) / 0.2))), 475, spriteBatch);
+                        middle[10].Draw(590 - 50 + (int)(50 * Bezier(1 - ((timer - 0.05) / 0.2))), 475, spriteBatch);
 
                         blend(middle[12], Bezier(timer / 0.3), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
                         middle[12].Draw(317, 510 - (int)(18 * Bezier(timer / 0.3)), spriteBatch);
@@ -430,7 +457,7 @@ namespace Alpaka {
                         middle[8].Draw(424 - 50 + (int)(50 * Bezier(1 - ((timer - 0.1) / 0.2))), 475, spriteBatch);
 
                         middle[9].Draw(50 - (int)(50 * Bezier(1 - ((timer - 0.05) / 0.2))), 475, spriteBatch);
-                        middle[10].Draw(580 - 50 + (int)(50 * Bezier(1 - ((timer - 0.05) / 0.2))), 475, spriteBatch);
+                        middle[10].Draw(590 - 50 + (int)(50 * Bezier(1 - ((timer - 0.05) / 0.2))), 475, spriteBatch);
 
 
                         middle[11].Draw(0, 540 - (int)(122 * Bezier(1 - (timer / 0.2))), spriteBatch);
@@ -491,9 +518,9 @@ namespace Alpaka {
 
 					for (int i = 3; i < 9; i++) {
 						if (!g.getCanUse((byte)(i-3))) {
-							middle[i].texture = actionselect;
+							middle[i].texture = unusableactions;
 						} else {
-							middle[i].texture = actions;
+							middle[i].texture = normalactions;
 						}
 					}
 					for (int i = 0; i < 11; i++) {
@@ -521,7 +548,14 @@ namespace Alpaka {
                     for (int i = 0; i < 13; i++) {
                         middle[i].Draw(spriteBatch);
                     }
-					spriteBatch.DrawString(g.font, g.getTeam(0), new Vector2(10, 500), Color.Black);
+
+                    for (int i = 18; i < 24; i++) {
+                        if (!g.getCanUseTeam((byte)(i - 18))) {
+                            middle[i].Draw(120 * (i - 18), 418, spriteBatch);
+                        }
+                    }
+
+                    spriteBatch.DrawString(g.font, g.getTeam(0), new Vector2(10, 500), Color.Black);
 					spriteBatch.DrawString(g.font, g.getTeam(1), new Vector2(130, 500), Color.Black);
 					spriteBatch.DrawString(g.font, g.getTeam(2), new Vector2(250, 500), Color.Black);
 					spriteBatch.DrawString(g.font, g.getTeam(3), new Vector2(370, 500), Color.Black);
@@ -607,15 +641,50 @@ namespace Alpaka {
             color = new Color(255, 255, 255, 255);
         }
 
-        public void Draw(int x, int y, SpriteBatch spriteBatch) {
+        public virtual void Draw(int x, int y, SpriteBatch spriteBatch) {
             this.x = x;
             this.y = y;
             spriteBatch.Draw(texture, new Rectangle(x, y, width, height), new Rectangle(sourcex, sourcey, width, height), color);
         }
-        public void Draw(SpriteBatch spriteBatch) {
+        public virtual void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Draw(texture, new Rectangle(x, y, width, height), new Rectangle(sourcex, sourcey, width, height), color);
         }
 
+
+    }
+
+    public class ActionThing : Thing {
+
+        public int element = 0;
+        public int type = 0;
+        public bool isRight;
+
+        public ActionThing(Texture2D texture, int sourcex, int sourcey, int width, int height, bool isRight) : base(texture, sourcex, sourcey, width, height) {
+            this.isRight = isRight;
+        }
+
+        public override void Draw(int x, int y, SpriteBatch spriteBatch) {
+            this.x = x;
+            this.y = y;
+            int width = this.width - 45;
+            if (isRight) {
+                spriteBatch.Draw(texture, new Rectangle(x + 9, y+4, width, 55), new Rectangle(width + 23 * 4, element * 55, width, 55), color);
+                spriteBatch.Draw(texture, new Rectangle(x + 9 + width, y+4, 23, 55), new Rectangle(width * 2 + 23 * 4 + 23 * (3-type), element * 55, 23, 55), color);
+            } else {
+                spriteBatch.Draw(texture, new Rectangle(x + 9 + 23, y+4, width, 55), new Rectangle(23 * 4, element * 55, width, 55), color);
+                spriteBatch.Draw(texture, new Rectangle(x + 9, y+4, 23, 55), new Rectangle(23 * type, element * 55, 23, 55), color);
+            }
+        }
+        public override void Draw(SpriteBatch spriteBatch) {
+            int width = this.width - 45;
+            if (isRight) {
+                spriteBatch.Draw(texture, new Rectangle(x+9, y+4, width, 55), new Rectangle(width + 23 * 4, element * 55, width, 55), color);
+                spriteBatch.Draw(texture, new Rectangle(x + 9 + width, y+4, 23, 55), new Rectangle(width*2 + 23*4 + 23 * (3-type), element * 55, 23, 55), color);
+            } else {
+                spriteBatch.Draw(texture, new Rectangle(x + 9 + 23, y+4, width, 55), new Rectangle(23 * 4, element * 55, width, 55), color);
+                spriteBatch.Draw(texture, new Rectangle(x + 9, y+4, 23, 55), new Rectangle(23 * type, element * 55, 23, 55), color);
+            }
+        }
 
     }
 }

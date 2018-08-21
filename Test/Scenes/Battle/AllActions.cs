@@ -814,7 +814,7 @@ namespace Alpaka.Scenes.Battle {
 			c.Add(new CreatureAction(
 				"Piston Punch", //NAME
 				CreatureElement.STEEL,
-				ActionCategory.MYSTICAL,
+				ActionCategory.PHYSICAL,
 				70,          //SPEED
 				-2,           //PRIORITY MODIFIER
 				60,          //POWER

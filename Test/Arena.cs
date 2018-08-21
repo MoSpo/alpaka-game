@@ -103,7 +103,8 @@ namespace Alpaka {
                     effect.LightingEnabled = true;
                     effect.DirectionalLight0.DiffuseColor = new Vector3(0.7f, 0.7f, 0.7f);
                     effect.DirectionalLight0.Direction = new Vector3(0, -1, 0);
-                    effect.AmbientLightColor = new Vector3(0.2f, 0.2f, 0.2f);
+                    effect.AmbientLightColor = new Vector3(0.5f, 0.5f, 0.5f);
+
                 }
 
                 mesh.Draw();

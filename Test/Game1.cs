@@ -69,7 +69,6 @@ namespace Alpaka {
 		public bool getCanUseTeam(byte i) {
 			return !engine.Player1.Team[i].killed && engine.Player1.Team[i] != engine.Player1.ActiveCreature;
 		}
-
 		public string getAction(byte i) {
 			return engine.Player1.ActiveCreature.GetAction(i).Name;
 		}
@@ -79,6 +78,12 @@ namespace Alpaka {
 		public bool getCanUse(byte i) {
 			return engine.Player1.CanSelectAction(i);
 		}
+        public int getActionElement(byte i) {
+            return (int)engine.Player1.ActiveCreature.GetAction(i).Element;
+        }
+        public int getActionType(byte i) {
+            return (int)engine.Player1.ActiveCreature.GetAction(i).Catagory;
+        }
 
         public bool getSwitch(byte i) {
             return engine.Player1.ActiveCreature.GetAction(i).IsSwitch;
@@ -255,7 +260,7 @@ namespace Alpaka {
             user = new Battler(Content, engine.Player1.ActiveCreature.CreatureType.ID, "battlers", this);
             opponent = new Battler(Content, engine.Player2.ActiveCreature.CreatureType.ID, "battlers", this);
 
-            background = Content.Load<Texture2D>("bkground2");
+            background = Content.Load<Texture2D>("bkground3");
             shade = Content.Load<Texture2D>("shade");
         }
 
@@ -361,7 +366,7 @@ namespace Alpaka {
             arena.Draw();
 
             spriteBatch.Begin();
-            spriteBatch.Draw(shade, Vector2.Zero);
+            //spriteBatch.Draw(shade, Vector2.Zero);
 
             effects.DrawBackground(spriteBatch);
 
@@ -378,7 +383,7 @@ namespace Alpaka {
 
 
             if (builtmessage != null) {
-                spriteBatch.DrawString(font, builtmessage, new Vector2(250, 430), Color.White);
+                spriteBatch.DrawString(font, builtmessage, new Vector2(250, 430), Color.Black);
             }
 
             spriteBatch.End();

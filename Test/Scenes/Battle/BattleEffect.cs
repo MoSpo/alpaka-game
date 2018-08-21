@@ -4,6 +4,7 @@ using System.Linq;
 namespace Alpaka.Scenes.Battle {
 	class BattleEffect {
 		public string Name;
+        private int CurrentEffectGroup;
 		public byte Priority;
 
 		public byte Lifespan;
@@ -41,7 +42,15 @@ namespace Alpaka.Scenes.Battle {
             this.Element = Element;
         }
 
-		public void SetBaseAttacks(int BasePhysical, int BaseMystical) {
+        public void SetEffectGroup(int GroupNumber) {
+            CurrentEffectGroup = GroupNumber;
+        }
+
+        public int GetEffectGroup() {
+            return CurrentEffectGroup;
+        }
+
+        public void SetBaseAttacks(int BasePhysical, int BaseMystical) {
 			this.BasePhysical = BasePhysical;
 			this.BaseMystical = BaseMystical;
 		}

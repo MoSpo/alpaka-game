@@ -5,39 +5,20 @@ using System;
 using System.IO;
 using Lidgren.Network;
 
-namespace lidgren_client {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
-    public class GameClient : Game {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        SpriteFont font;
+namespace Alpaka {
+
+    public class NetworkClient {
 
         string consoleOutput;
 
         bool connected;
+        bool ready = true;
 
-        private Random random; //
+        double timer = 0;
 
-        static NetClient Client;
+        NetClient Client;
 
-        enum PacketTypes {
-            JOIN,
-            CHOICE,
-            DEBUG
-        }
-
-        public GameClient() {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-        }
-
-
-        protected override void Initialize() {
-
-            random = new Random();
-
+        public NetworkClient() {
             string path = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory), @"ip.txt");
             StreamReader sr = new StreamReader(path);
             string ip = sr.ReadLine();
@@ -56,46 +37,51 @@ namespace lidgren_client {
 
             Client.Connect(ip, 20000, hailmsg);
 
-            consoleOutput += "Client Started...\n";
+            WriteLine("Client Started...\n");
 
-            base.Initialize();
         }
 
 
-        protected override void LoadContent() {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            font = Content.Load<SpriteFont>("File");
-        }
+        public void Update(double dt) {
+            if (timer <= 500) timer += dt;
 
-
-        protected override void UnloadContent() {
-            // TODO: Unload any non ContentManager content here
-        }
-
-
-        protected override void Update(GameTime gameTime) {
             CheckServerMessages();
-            if (connected && Keyboard.GetState().IsKeyDown(Keys.C)) {
+
+            if (connected && Keyboard.GetState().IsKeyDown(Keys.C) & timer > 500) {
                 GetInput();
+                timer = 0;
             }
-            base.Update(gameTime);
         }
 
         private void GetInput() {
-            byte a = (byte)random.Next(0, 4);
-            byte b = (byte)random.Next(0, 6);
-            byte c = (byte)random.Next(0, 8);
-
             NetOutgoingMessage outmsg = Client.CreateMessage();
 
-            outmsg.Write((byte)PacketTypes.CHOICE);
-            outmsg.Write(a);
-            outmsg.Write(b);
-            outmsg.Write(c);
-            Client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
-            string s = "Choice Sent... (" + a + " " + b + " " + c + ")";
-            Console.WriteLine(s);
-            consoleOutput += s + "\n";
+            if (ready) {
+                outmsg.Write((byte)PacketTypes.DEBUG); //TODO
+                //outmsg.Write(debug);
+                Client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
+
+                outmsg = Client.CreateMessage();
+                outmsg.Write((byte)PacketTypes.READY);
+                Client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
+                string s = "Finished turn...";
+                Console.WriteLine(s);
+                consoleOutput += s + "\n";
+
+            } else {
+                byte a = 0; //TODO
+                byte b = 0;
+                byte c = 0;
+
+                outmsg.Write((byte)PacketTypes.CHOICE);
+                outmsg.Write(a);
+                outmsg.Write(b);
+                outmsg.Write(c);
+                Client.SendMessage(outmsg, NetDeliveryMethod.ReliableOrdered);
+                string s = "Choice Sent... (" + a + " " + b + " " + c + ")";
+                Console.WriteLine(s);
+                consoleOutput += s + "\n";
+            }
         }
 
         private void CheckServerMessages() {
@@ -116,6 +102,10 @@ namespace lidgren_client {
                         case PacketTypes.CHOICE:
                         s = msg.MessageType + ":[" + type + "] " + msg.ReadByte() + " " + msg.ReadByte() + " " + msg.ReadByte();
                         break;
+                        case PacketTypes.READY:
+                        ready = !ready;
+                        s = msg.MessageType + ":[" + type + "] ";
+                        break;
                     }
 
                     break;
@@ -131,13 +121,20 @@ namespace lidgren_client {
             }
         }
 
-        protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
+        protected void Draw(SpriteBatch spriteBatch, SpriteFont font) {
             spriteBatch.DrawString(font, consoleOutput, new Vector2(0, 0), Color.White);
-            spriteBatch.End();
-
-            base.Draw(gameTime);
         }
+
+        private void WriteLine(string arg) {
+            consoleOutput += arg;
+            Console.WriteLine(arg);
+        }
+    }
+
+    enum PacketTypes {
+        JOIN,
+        READY,
+        CHOICE,
+        DEBUG,
     }
 }

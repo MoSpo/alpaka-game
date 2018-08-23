@@ -11,6 +11,7 @@ namespace Alpaka {
         SpriteBatch spriteBatch;
 
         BattleEngine engine;
+        NetworkClient client;
 		Badai ai;
 
         Arena arena;
@@ -42,6 +43,9 @@ namespace Alpaka {
         string message;
 
         public bool nextAnim = false;
+
+        public bool isOnline = true;
+
 
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -226,6 +230,7 @@ namespace Alpaka {
         }
 
         protected override void Initialize() {
+            if (isOnline) client = new NetworkClient();
             anim = new List<SceneAnimation>();
             engine = new BattleEngine();
 			ai = new Badai(this);

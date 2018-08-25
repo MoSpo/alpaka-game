@@ -12,7 +12,7 @@ namespace Alpaka {
 
         BattleEngine engine;
         NetworkClient client;
-		Badai ai;
+        Badai ai;
 
         Arena arena;
         ArenaEffects effects;
@@ -46,6 +46,9 @@ namespace Alpaka {
 
         public bool isOnline = true;
 
+        public bool userchosen = false;
+        public bool firstready = false;
+        public bool play = false;
 
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
@@ -56,51 +59,52 @@ namespace Alpaka {
         }
 
         private void PrintAnim() {
-            foreach (SceneAnimation an in anim) {
-				Console.Write(an.Type + ": ");
-                if (an.Values != null) {
-					foreach (double i in an.Values) {
-                        Console.Write(i + " ");
+                string s = "";
+                foreach (SceneAnimation an in anim) {
+                    Console.Write(an.Type + ": ");
+                    s += an.Type + ": ";
+                    if (an.Values != null) {
+                        foreach (double i in an.Values) {
+                            Console.Write(i + " ");
+                            s += i + " ";
+                        }
                     }
+                    Console.WriteLine("[" + an.Message + "]");
+                    s += "[" + an.Message + "]\r\n";
                 }
-                Console.WriteLine("[" + an.Message + "]");
-            }
+            if (isOnline) client.SendDebug(s);
         }
 
-		public string getTeam(byte i) {
-			return engine.Player1.Team[i].Nickname;
-		}
-		public bool getCanUseTeam(byte i) {
-			return !engine.Player1.Team[i].killed && engine.Player1.Team[i] != engine.Player1.ActiveCreature;
-		}
-		public string getAction(byte i) {
-			return engine.Player1.ActiveCreature.GetAction(i).Name;
-		}
-		public string getCanUseAction(byte i) {
-			return engine.Player1.ActiveCreature.GetActionUsage(i) + "\n" + engine.Player1.ActiveCreature.GetKin(i);
-		}
-		public bool getCanUse(byte i) {
-			return engine.Player1.CanSelectAction(i);
-		}
+        public string getTeam(byte i) {
+            return engine.Player1.Team[i].Nickname;
+        }
+        public bool getCanUseTeam(byte i) {
+            return !engine.Player1.Team[i].killed && engine.Player1.Team[i] != engine.Player1.ActiveCreature;
+        }
+        public string getAction(byte i) {
+            return engine.Player1.ActiveCreature.GetAction(i).Name;
+        }
+        public string getCanUseAction(byte i) {
+            return engine.Player1.ActiveCreature.GetActionUsage(i) + "\n" + engine.Player1.ActiveCreature.GetKin(i);
+        }
+        public bool getCanUse(byte i) {
+            return engine.Player1.CanSelectAction(i);
+        }
         public int getActionElement(byte i) {
             return (int)engine.Player1.ActiveCreature.GetAction(i).Element;
         }
         public int getActionType(byte i) {
             return (int)engine.Player1.ActiveCreature.GetAction(i).Catagory;
         }
-
         public bool getSwitch(byte i) {
             return engine.Player1.ActiveCreature.GetAction(i).IsSwitch;
         }
-
-		public bool getOppCanUseTeam(byte i) {
-			return !engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature;
-		}
-
-		public bool getOppCanUse(byte i) {
-			return engine.Player2.CanSelectAction(i);
-		}
-
+        public bool getOppCanUseTeam(byte i) {
+            return !engine.Player2.Team[i].killed && engine.Player2.Team[i] != engine.Player2.ActiveCreature;
+        }
+        public bool getOppCanUse(byte i) {
+            return engine.Player2.CanSelectAction(i);
+        }
 
         private void Animate() {
             if (nextAnim) {
@@ -108,6 +112,7 @@ namespace Alpaka {
                     builtmessage = null;
                     animPointer = 0;
                     nextAnim = false;
+                    if (isOnline) client.SendReady();
                     if (IsUserDeathTurn) {
                         menu.newMode = Menu.MenuMode.CLOSED_CHOICE;
                     } else if (IsOpponentDeathTurn) {
@@ -123,12 +128,12 @@ namespace Alpaka {
                 }
                 SceneAnimation an = anim[animPointer];
                 switch (an.Type) {
-					case SceneAnimation.SceneAnimationType.ADD_MESSAGE:
+                    case SceneAnimation.SceneAnimationType.ADD_MESSAGE:
                     message = an.Message;
                     doTimer = true;
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.HEALTH_BAR:
+                    case SceneAnimation.SceneAnimationType.HEALTH_BAR:
                     if (an.Values[0] == 1) {
                         leftbar.setHealth((int)an.Values[2]);
                     } else {
@@ -146,18 +151,18 @@ namespace Alpaka {
                     break;
 
                     case SceneAnimation.SceneAnimationType.ATTACK:
-						if (an.Values[0] == 1) {
-							if(ActionCategory.PHYSICAL == (ActionCategory)an.Values[1] || ActionCategory.MYSTICAL == (ActionCategory)an.Values[1]) opponent.rumble = 100;
-							if (ActionCategory.DEFENSIVE == (ActionCategory)an.Values[1] || ActionCategory.ADAPTIVE == (ActionCategory)an.Values[1]) opponent.rumble = 10;
-							opponent.UseTimer = true;
-						} else {
-							if (ActionCategory.PHYSICAL == (ActionCategory)an.Values[1] || ActionCategory.MYSTICAL == (ActionCategory)an.Values[1]) user.rumble = 100;
-							if (ActionCategory.DEFENSIVE == (ActionCategory)an.Values[1] || ActionCategory.ADAPTIVE == (ActionCategory)an.Values[1]) user.rumble = 10;
-							user.UseTimer = true;
-						}
-						nextAnim = false;
+                    if (an.Values[0] == 1) {
+                        if (ActionCategory.PHYSICAL == (ActionCategory)an.Values[1] || ActionCategory.MYSTICAL == (ActionCategory)an.Values[1]) opponent.rumble = 100;
+                        if (ActionCategory.DEFENSIVE == (ActionCategory)an.Values[1] || ActionCategory.ADAPTIVE == (ActionCategory)an.Values[1]) opponent.rumble = 10;
+                        opponent.UseTimer = true;
+                    } else {
+                        if (ActionCategory.PHYSICAL == (ActionCategory)an.Values[1] || ActionCategory.MYSTICAL == (ActionCategory)an.Values[1]) user.rumble = 100;
+                        if (ActionCategory.DEFENSIVE == (ActionCategory)an.Values[1] || ActionCategory.ADAPTIVE == (ActionCategory)an.Values[1]) user.rumble = 10;
+                        user.UseTimer = true;
+                    }
+                    nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.ARENA:
+                    case SceneAnimation.SceneAnimationType.ARENA:
                     arena.rot = (int)an.Values[0];
                     effects.rot = (int)an.Values[0];
                     menu.rot = (int)an.Values[0];
@@ -167,26 +172,26 @@ namespace Alpaka {
                     phasecounter.SetPhase((byte)an.Values[0], this);
                     nextAnim = false;
                     break;
-					case SceneAnimation.SceneAnimationType.SWITCH_OUT:
-						if (an.Values[0] == 1) {
-							user.changeID(0);
-						} else {
-							opponent.changeID(0);
-						}
+                    case SceneAnimation.SceneAnimationType.SWITCH_OUT:
+                    if (an.Values[0] == 1) {
+                        user.changeID(0);
+                    } else {
+                        opponent.changeID(0);
+                    }
 
-						break;
-					case SceneAnimation.SceneAnimationType.CONDITION:
+                    break;
+                    case SceneAnimation.SceneAnimationType.CONDITION:
                     if (an.Values[0] == 1) {
                         leftbar.st = (byte)(an.Values[1] + 1);
                     } else {
                         rightbar.st = (byte)(an.Values[1] + 1);
                     }
                     break;
-					case SceneAnimation.SceneAnimationType.ADD_EFFECT:
-						effects.Add((int)an.Values[0], an.Message);
+                    case SceneAnimation.SceneAnimationType.ADD_EFFECT:
+                    effects.Add((int)an.Values[0], an.Message);
                     break;
-					case SceneAnimation.SceneAnimationType.REMOVE_EFFECT:
-						effects.Remove((int)an.Values[0], an.Message);
+                    case SceneAnimation.SceneAnimationType.REMOVE_EFFECT:
+                    effects.Remove((int)an.Values[0], an.Message);
                     break;
                     case SceneAnimation.SceneAnimationType.USER_DEATH_SELECT:
                     IsUserDeathTurn = true;
@@ -230,10 +235,10 @@ namespace Alpaka {
         }
 
         protected override void Initialize() {
-            if (isOnline) client = new NetworkClient();
+            if (isOnline) client = new NetworkClient(this);
             anim = new List<SceneAnimation>();
             engine = new BattleEngine();
-			ai = new Badai(this);
+            ai = new Badai(this);
             engine.Player2.ActiveCreature.CreatureType.BaseStats[CreatureStats.PACE] -= 1;
             engine.Player2.ActiveCreature.CreatureType.BaseStats[CreatureStats.AWE] -= 1;
 
@@ -244,7 +249,7 @@ namespace Alpaka {
         protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-			font = Content.Load<SpriteFont>("File");
+            font = Content.Load<SpriteFont>("File");
 
             arena = new Arena(Content);
             effects = new ArenaEffects(Content, font);
@@ -279,121 +284,173 @@ namespace Alpaka {
         String builtmessage;
 
         protected override void Update(GameTime gameTime) {
-   
-            double dt = gameTime.ElapsedGameTime.TotalSeconds/ GameSpeed;
 
-           /* floattimer += dt*5;
-            if (floattimer > Math.PI*2) {
-                floattimer = 0;
-            }*/
+            double dt = gameTime.ElapsedGameTime.TotalSeconds / GameSpeed;
 
-            if (doTimer) {
-                timer += dt;
-                if (timer < 0.75) {
-                    builtmessage = message.Substring(0, (int)(timer * message.Length / 0.75));
-                } else {
-                    builtmessage = message;
-                }
-                if (timer > 1.5) {
-                    timer = 0;
-                    doTimer = false;
-                    nextAnim = true;
-                }
-            }
+            if (isOnline) client.Update(dt);
 
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+            if (isOnline && !firstready && Keyboard.GetState().IsKeyDown(Keys.O)) isOnline = false;
 
-            MouseState state = Mouse.GetState();
-            menu.Update(dt, state.LeftButton == ButtonState.Pressed, state.X, state.Y);
-            phasecounter.Update(dt);
-            arena.Rotate(dt, this);
-            menu.Rotate(dt);
-            effects.Rotate(dt);
-            effects.Update(dt);
-            leftbar.Update(dt);
-            rightbar.Update(dt);
-			user.Update(dt);
-			opponent.Update(dt);
+                if (!isOnline || firstready) {
 
-            if (chosen) { //has finished with the menu selection
-                if (IsUserDeathTurn) {
-                    engine.Player1.SelectAction(0);
-                    engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
-                    engine.Player1.SelectCreature(menu.chosenCreature);
-					engine.Player2.SelectAction(0);
-                    engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
-                    engine.Player2.SelectCreature(0);
-
-                    IsUserDeathTurn = false;
-                    List<SceneAnimation> a = engine.Poll();
-                    anim.AddRange(a);
-                } else if (IsOpponentDeathTurn) {
-                    engine.Player1.SelectAction(0);
-                    engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
-                    engine.Player1.SelectCreature(0);
-                    engine.Player2.SelectAction(0);
-                    engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
-					engine.Player1.SelectCreature(ai.SelectCreature());
-
-                    IsOpponentDeathTurn = false;
-                    List<SceneAnimation> a = engine.Poll();
-                    anim.AddRange(a);
-                } else {
-                    engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
-                    engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
-                    if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature-1));
-					engine.Player2.SelectAction(ai.SelectAction());
-					engine.Player2.SelectMovement(ai.SelectMovement());
-					engine.Player2.SelectCreature(ai.SelectCreature());
-                    Console.WriteLine(TurnNumber);
-                    TurnNumber++;
-                    for (int i = 0; i < 10; i++) {
-                        List<SceneAnimation> a = engine.Poll();
-                        anim.AddRange(a);
+                if (doTimer) {
+                    timer += dt;
+                    if (timer < 0.75) {
+                        builtmessage = message.Substring(0, (int)(timer * message.Length / 0.75));
+                    } else {
+                        builtmessage = message;
+                    }
+                    if (timer > 1.5) {
+                        timer = 0;
+                        doTimer = false;
+                        nextAnim = true;
                     }
                 }
-                    PrintAnim();
-                    chosen = false;
-                    nextAnim = true;
+
+                MouseState state = Mouse.GetState();
+                menu.Update(dt, state.LeftButton == ButtonState.Pressed, state.X, state.Y);
+                phasecounter.Update(dt);
+                arena.Rotate(dt, this);
+                menu.Rotate(dt);
+                effects.Rotate(dt);
+                effects.Update(dt);
+                leftbar.Update(dt);
+                rightbar.Update(dt);
+                user.Update(dt);
+                opponent.Update(dt);
+
+                if (isOnline) {
+                    if (chosen) {
+                        if (!userchosen) {
+                            if (IsUserDeathTurn) {
+                                client.SendInput(0, (byte)MovementCategory.DO_NOTHING, menu.chosenCreature);
+                                engine.Player1.SelectAction(0);
+                                engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
+                                engine.Player1.SelectCreature(menu.chosenCreature);
+                                IsUserDeathTurn = false;
+
+                            } else if (IsOpponentDeathTurn) {
+                                client.SendInput(0, (byte)MovementCategory.DO_NOTHING, 0);
+                                engine.Player1.SelectAction(0);
+                                engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
+                                engine.Player1.SelectCreature(0);
+                                IsOpponentDeathTurn = false;
+
+                            } else {
+                                client.SendInput((byte)(menu.chosenAction - 1), menu.chosenMovement, menu.chosenCreature);
+                                engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
+                                engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
+                                if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature - 1));
+                            }
+                            userchosen = true;
+                        }
+                        if (play) {
+                            TurnNumber++;
+                            for (int i = 0; i < 10; i++) {
+                                List<SceneAnimation> a = engine.Poll();
+                                anim.AddRange(a);
+                            }
+                            PrintAnim();
+                            chosen = false;
+                            userchosen = false;
+                            nextAnim = true;
+                        }
+                    }
+                } else {
+                    if (chosen) { //has finished with the menu selection
+                        if (IsUserDeathTurn) {
+                            engine.Player1.SelectAction(0);
+                            engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
+                            if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature - 1));
+                            engine.Player2.SelectAction(0);
+                            engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+                            engine.Player2.SelectCreature(0);
+
+                            IsUserDeathTurn = false;
+                            List<SceneAnimation> a = engine.Poll();
+                            anim.AddRange(a);
+                        } else if (IsOpponentDeathTurn) {
+                            engine.Player1.SelectAction(0);
+                            engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
+                            engine.Player1.SelectCreature(0);
+                            engine.Player2.SelectAction(0);
+                            engine.Player2.SelectMovement(MovementCategory.DO_NOTHING);
+                            engine.Player2.SelectCreature(ai.SelectCreature());
+
+                            IsOpponentDeathTurn = false;
+                            List<SceneAnimation> a = engine.Poll();
+                            anim.AddRange(a);
+                        } else {
+                            engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
+                            engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
+                            if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature - 1));
+                            engine.Player2.SelectAction(ai.SelectAction());
+                            engine.Player2.SelectMovement(ai.SelectMovement());
+                            engine.Player2.SelectCreature(ai.SelectCreature());
+                            Console.WriteLine(TurnNumber);
+                            TurnNumber++;
+                            for (int i = 0; i < 10; i++) {
+                                List<SceneAnimation> a = engine.Poll();
+                                anim.AddRange(a);
+                            }
+                        }
+                        PrintAnim();
+                        chosen = false;
+                        nextAnim = true;
+                    }
+                }
+                Animate();
             }
-            Animate();
-            base.Update(gameTime);
+                base.Update(gameTime);
+        }
+
+        public void setOpponentChoice(byte a, byte b, byte c) {
+            engine.Player2.SelectAction(a);
+            engine.Player2.SelectMovement(b);
+            if (c != 0) engine.Player2.SelectCreature((byte)(c - 1));
         }
 
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
-            spriteBatch.Begin();
-            spriteBatch.Draw(background, Vector2.Zero);
-            spriteBatch.End();
+            if (!isOnline || firstready) {
 
-            arena.Draw();
+                spriteBatch.Begin();
+                spriteBatch.Draw(background, Vector2.Zero);
+                spriteBatch.End();
 
-            spriteBatch.Begin();
-            //spriteBatch.Draw(shade, Vector2.Zero);
+                arena.Draw();
 
-            effects.DrawBackground(spriteBatch);
+                spriteBatch.Begin();
+                //spriteBatch.Draw(shade, Vector2.Zero);
 
-            user.Draw(spriteBatch, 0);
-            opponent.Draw(spriteBatch, 464);
+                effects.DrawBackground(spriteBatch);
 
-            effects.DrawForeground(spriteBatch);
+                user.Draw(spriteBatch, 0);
+                opponent.Draw(spriteBatch, 464);
 
-
-            leftbar.Draw(spriteBatch, 7, 22 + (int)(Math.Sin(floattimer)*2));
-            rightbar.Draw(spriteBatch, 720 - 336 - 7, 22 + (int)(Math.Sin(floattimer) * 2));
-            menu.Draw(spriteBatch);
-            phasecounter.Draw(spriteBatch);
+                effects.DrawForeground(spriteBatch);
 
 
-            if (builtmessage != null) {
-                spriteBatch.DrawString(font, builtmessage, new Vector2(250, 430), Color.Black);
+                leftbar.Draw(spriteBatch, 7, 22 + (int)(Math.Sin(floattimer) * 2));
+                rightbar.Draw(spriteBatch, 720 - 336 - 7, 22 + (int)(Math.Sin(floattimer) * 2));
+                menu.Draw(spriteBatch);
+                phasecounter.Draw(spriteBatch);
+
+
+                if (builtmessage != null) {
+                    spriteBatch.DrawString(font, builtmessage, new Vector2(250, 430), Color.Black);
+                }
+
+                spriteBatch.End();
+
+            } else if(isOnline){
+                spriteBatch.Begin();
+                client.Draw(spriteBatch, font);
+                spriteBatch.End();
             }
-
-            spriteBatch.End();
-
             base.Draw(gameTime);
+
         }
     }
 }

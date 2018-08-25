@@ -45,7 +45,7 @@ namespace Alpaka.Scenes.Battle {
         private EffectExecute Interpreter;
         private BattleNetwork Network;
 
-        private Random randomGen;
+        public Random randomGen;
 
         public BattleEngine() {
             Player1 = new Player(1, 0);

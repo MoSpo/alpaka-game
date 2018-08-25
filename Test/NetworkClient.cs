@@ -67,9 +67,16 @@ namespace Alpaka {
                         WriteLine(msg.MessageType + ":[" + type + "] " + a + " " + b + " " + c);
                         break;
                         case PacketTypes.READY:
-                        if (!g.firstready) g.firstready = true;
-                        else g.play = !g.play;
-                        WriteLine(msg.MessageType + ":[" + type + "] ");
+                        byte n = msg.ReadByte();
+
+                        if (!g.firstready) {
+                            g.firstready = true;
+                            g.setServerNumber(n);
+                        } else {
+                            g.play = !g.play;
+                            if(!g.play) g.setMenu();
+                        }
+                        WriteLine(msg.MessageType + ":[" + type + "] " + n);
                         break;
                     }
 

@@ -68,7 +68,7 @@ namespace Alpaka.Scenes.Battle {
                 70, //INTELLIGENCE
                 80, //WISDOM
                 100, //PACE
-                80  //AWE
+                90  //AWE
                 ));
             count++;
             c.Add(new Creature(count,
@@ -123,8 +123,8 @@ namespace Alpaka.Scenes.Battle {
                 90, //ENDURANCE
                 90, //INTELLIGENCE
                 50, //WISDOM
-                70, //PACE
-                80  //AWE
+                75, //PACE
+                85  //AWE
                 ));
             count++;
             c.Add(new Creature(count,

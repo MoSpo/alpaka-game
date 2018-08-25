@@ -922,9 +922,9 @@ namespace Alpaka.Scenes.Battle {
 					)
 				)
 			);
-			
+            c.Last().IsSwitch = true;
 
-			c.Add(new CreatureAction( //TODO: AFTER SCORCHED EARTH
+            c.Add(new CreatureAction( //TODO: AFTER SCORCHED EARTH
 				"Cyclone", //NAME
 				CreatureElement.ETHER,
 				ActionCategory.DEFENSIVE,

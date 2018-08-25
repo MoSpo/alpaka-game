@@ -50,6 +50,8 @@ namespace Alpaka {
         public bool firstready = false;
         public bool play = false;
 
+        int j;
+
         public Game1() {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 720;
@@ -106,24 +108,31 @@ namespace Alpaka {
             return engine.Player2.CanSelectAction(i);
         }
 
+
+        public void setMenu() {
+            if (IsUserDeathTurn) {
+                menu.newMode = Menu.MenuMode.CLOSED_CHOICE;
+            } else if (IsOpponentDeathTurn) {
+                chosen = true;
+            } else {
+                menu.newMode = Menu.MenuMode.ACTION;
+            }
+            menu.useTimer = true;
+            anim.Clear();
+            phasecounter.SetPhase(0, null);
+        }
+
         private void Animate() {
             if (nextAnim) {
                 if (animPointer >= anim.Count) {
                     builtmessage = null;
                     animPointer = 0;
                     nextAnim = false;
-                    if (isOnline) client.SendReady();
-                    if (IsUserDeathTurn) {
-                        menu.newMode = Menu.MenuMode.CLOSED_CHOICE;
-                    } else if (IsOpponentDeathTurn) {
-                        chosen = true;
-                    } else {
-                        menu.newMode = Menu.MenuMode.ACTION;
-                    }
 
-                    menu.useTimer = true;
-                    anim.Clear();
-                    phasecounter.SetPhase(0, null);
+                    if (!isOnline) setMenu();
+
+                    if (isOnline) client.SendReady();
+
                     return;
                 }
                 SceneAnimation an = anim[animPointer];
@@ -290,8 +299,10 @@ namespace Alpaka {
             if (isOnline) client.Update(dt);
 
             if (isOnline && !firstready && Keyboard.GetState().IsKeyDown(Keys.O)) isOnline = false;
+            if (Keyboard.GetState().IsKeyDown(Keys.Q)) GameSpeed *= 0.99;
+            if (Keyboard.GetState().IsKeyDown(Keys.E)) GameSpeed *= 1.01;
 
-                if (!isOnline || firstready) {
+            if (!isOnline || firstready) {
 
                 if (doTimer) {
                     timer += dt;
@@ -326,8 +337,9 @@ namespace Alpaka {
                                 client.SendInput(0, (byte)MovementCategory.DO_NOTHING, menu.chosenCreature);
                                 engine.Player1.SelectAction(0);
                                 engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
-                                engine.Player1.SelectCreature(menu.chosenCreature);
+                                engine.Player1.SelectCreature((byte)(menu.chosenCreature - 1));
                                 IsUserDeathTurn = false;
+                                j = 1;
 
                             } else if (IsOpponentDeathTurn) {
                                 client.SendInput(0, (byte)MovementCategory.DO_NOTHING, 0);
@@ -335,20 +347,22 @@ namespace Alpaka {
                                 engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
                                 engine.Player1.SelectCreature(0);
                                 IsOpponentDeathTurn = false;
+                                j = 1;
 
                             } else {
                                 client.SendInput((byte)(menu.chosenAction - 1), menu.chosenMovement, menu.chosenCreature);
                                 engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
                                 engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
                                 if (menu.chosenCreature != 0) engine.Player1.SelectCreature((byte)(menu.chosenCreature - 1));
+                                j = 10;
                             }
                             userchosen = true;
                         }
                         if (play) {
                             TurnNumber++;
-                            for (int i = 0; i < 10; i++) {
+                            for (int i = 0; i < j; i++) {
                                 List<SceneAnimation> a = engine.Poll();
-                                anim.AddRange(a);
+                                if(a != null) anim.AddRange(a);
                             }
                             PrintAnim();
                             chosen = false;
@@ -408,6 +422,12 @@ namespace Alpaka {
             engine.Player2.SelectAction(a);
             engine.Player2.SelectMovement(b);
             if (c != 0) engine.Player2.SelectCreature((byte)(c - 1));
+        }
+
+        public void setServerNumber(byte n) {
+            engine.Player1.playerServerNumber = n;
+            if(n ==0)  engine.Player2.playerServerNumber = 1;
+            if (n == 1) engine.Player2.playerServerNumber = 0;
         }
 
         protected override void Draw(GameTime gameTime) {

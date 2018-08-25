@@ -137,7 +137,7 @@ namespace Alpaka.Scenes.Battle {
 
 			if (!Battle.Player1.IsNotInArena()) {
                 if (Battle.Player1.RestoreHealthInseadOfMana.Evaluate()) {
-					Animations.AddRange(Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10)));
+					Animations.AddRange(Battle.Player1.Heal((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 60)));
                 } else if (Battle.Player1.RestoreMana.Evaluate()) {
 					Animations.AddRange(Battle.Player1.GainKin((int)Math.Floor(1.0 * Battle.Player1.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6)));
                 }
@@ -146,7 +146,7 @@ namespace Alpaka.Scenes.Battle {
 
             if (!Battle.Player2.IsNotInArena()) {
                 if (Battle.Player2.RestoreHealthInseadOfMana.Evaluate()) {
-					Animations.AddRange(Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 10)));
+					Animations.AddRange(Battle.Player2.Heal((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 60)));
 				} else if (Battle.Player2.RestoreMana.Evaluate()) {
 					Animations.AddRange(Battle.Player2.GainKin((int)Math.Floor(1.0 * Battle.Player2.ActiveCreature.GetTotalStat(CreatureStats.KIN) / 6)));
                 }

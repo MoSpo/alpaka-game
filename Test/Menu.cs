@@ -146,22 +146,19 @@ namespace Alpaka {
 						if (middle[i].x + middle[i].width - 15 >= x && middle[i].y + middle[i].height - 6 >= y && middle[i].x + 15 <= x && middle[i].y + 6 <= y) {
 							if (g.getCanUse((byte)(i - 3))) {
 								chosenAction = (byte)(i - 2);
-							} else {
+                                if (g.getSwitch((byte)(chosenAction - 1))) {
+                                    newMode = MenuMode.ACTION_CHOICE;
+                                } else {
+                                    newMode = MenuMode.MOVEMENT;
+                                }
+                                useTimer = true;
+                            } else {
 								chosenAction = 0;
 							}
 						} else {
                             if (i < 9) middle[i].texture = normalactions;
                             else middle[i].texture = smallactions;
                         }
-					}
-					if (chosenAction != 0) {
-						if (g.getSwitch((byte)(chosenAction-1))) {
-							newMode = MenuMode.ACTION_CHOICE;
-						} else {
-							newMode = MenuMode.MOVEMENT;
-						}
-						useTimer = true;
-
 					}
 				} else if (currentMode == MenuMode.CLOSED_CHOICE) {
 					if (y > 430) {

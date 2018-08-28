@@ -453,8 +453,9 @@ namespace Alpaka.Scenes.Battle {
                 (double)Catagory}, "#ATTACK ANIMATION#"));
                 //Animations.Add(AttackAnimation); //TODO: DONT PASS AS ARGUMENT
 
-                Animations.AddRange(Target.GiveDamage(Element, Catagory, BaseAmount, GetOpponent(Target).GetTotalStat(CreatureStats.STRENGTH), GetOpponent(Target).GetTotalStat(CreatureStats.INTELLIGENCE), Target.GetTotalStat(CreatureStats.ENDURANCE), Target.GetTotalStat(CreatureStats.WISDOM), GetOpponent(Target).HasElement(Element) ? 1.5 : 1, Target.GetElementEffectiveness(Element)));
-                if (Target.IsNotInArena()) {
+                //Animations.AddRange(Target.GiveDamage(Element, Catagory, BaseAmount, GetOpponent(Target).GetTotalStat(CreatureStats.STRENGTH), GetOpponent(Target).GetTotalStat(CreatureStats.INTELLIGENCE), Target.GetTotalStat(CreatureStats.ENDURANCE), Target.GetTotalStat(CreatureStats.WISDOM), GetOpponent(Target).HasElement(Element) ? 1.5 : 1, Target.GetElementEffectiveness(Element)));
+                Animations.AddRange(Target.GiveDamage(Element, Catagory, BaseAmount, Target));
+				if (Target.IsNotInArena()) {
                     AmountOfAttacks = (byte)(i + 1);
                     break;
                 }

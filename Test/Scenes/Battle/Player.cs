@@ -29,7 +29,8 @@ namespace Alpaka.Scenes.Battle {
 
 		private Dictionary<CreatureStats, byte> Statboosts = new Dictionary<CreatureStats, byte>();
 
-		public bool[] ElementBoosts = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
+		public bool[] ElementBuffs = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
+		public bool[] ElementDebuffs = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
 
 		public byte[] SwitchedStats = new byte[8];
 		public bool HasNewElement = false;
@@ -154,17 +155,18 @@ namespace Alpaka.Scenes.Battle {
 			return ElementBonus;
 		}
 
-		private double GetElementBoost(CreatureElement Element) {
-			if (ElementBoosts[(byte)Element] == true) return 1.5;          
+		public double GetElementBuffs(CreatureElement Element) {
+			if (ElementBuffs[(byte)Element] == true) return 1.5;
+			if (ElementDebuffs[(byte)Element] == true) return 0.67;
 			return 1.0;
 		}
 
-		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, int AttackerStrength, int AttackerIntelligence, int AttackedEndurance, int AttackedWisdom, double ElementBoost, double ElementEffectiveness) {
-
+		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, int AttackerStrength, int AttackerIntelligence, int AttackedEndurance, int AttackedWisdom, double ElementProficiency, double ElementEffectiveness) {
+			//TODO: REMOVE THIS
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
 			int Damage = 0;
-			double Bonuses = ElementEffectiveness * ElementBoost * GetElementBoost(Element);
+			double Bonuses = ElementEffectiveness * ElementProficiency * GetElementBuffs(Element);
 
 			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
 				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((AttackerStrength * BaseActionPower * Bonuses / AttackedEndurance) +2.0);
@@ -179,7 +181,42 @@ namespace Alpaka.Scenes.Battle {
 				nh,
 				-1*Damage,
 				ElementEffectiveness,
-				ElementBoost}, "#DAMAGE GIVEN#"));
+				ElementProficiency}, "#DAMAGE GIVEN#"));
+
+
+				ActiveCreature.Health -= Damage;
+
+				if (ActiveCreature.Health <= 0) {
+					ActiveCreature.Health = 0;
+					ActiveCreature.killed = true;
+				}
+			} else {
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, ActiveCreature.Nickname + " was unaffected by the damage!"));
+			}
+			return Animations;
+		}
+
+		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, Player Target) {
+
+			List<SceneAnimation> Animations = new List<SceneAnimation>();
+
+			int Damage = 0;
+			double Bonuses = Target.GetElementEffectiveness(Element) * (HasElement(Element) ? 1.5 : 1) * GetElementBuffs(Element);
+
+			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
+				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((GetTotalStat(CreatureStats.STRENGTH) * BaseActionPower * Bonuses / Target.GetElementBuffs(Element)* Target.GetTotalStat(CreatureStats.ENDURANCE)) + 2.0);
+              	else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor((GetTotalStat(CreatureStats.INTELLIGENCE) * BaseActionPower * Bonuses / Target.GetElementBuffs(Element) *Target.GetTotalStat(CreatureStats.WISDOM)) + 2.0);
+
+				int nh = ActiveCreature.Health - Damage;
+				if (nh < 0) nh = 0;
+
+				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.HEALTH_BAR, new double[] {
+				playerNumber,
+				ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
+				nh,
+				-1*Damage,
+				Target.GetElementEffectiveness(Element) ,
+				HasElement(Element) ? 1.5 : 1}, "#DAMAGE GIVEN#"));
 
 
 				ActiveCreature.Health -= Damage;
@@ -264,10 +301,10 @@ namespace Alpaka.Scenes.Battle {
 
 		public SceneAnimation GiveElementBoost(CreatureElement Element, bool IsPositiveBoost) {
 			if (IsPositiveBoost) {
-				ElementBoosts[(byte)Element] = true;
+				ElementBuffs[(byte)Element] = true;
 				return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Element, 1 }, "#ELEMENT BOOST ANIMATION#");
 			}
-			ElementBoosts[(byte)Element] = false;
+			ElementBuffs[(byte)Element] = false;
 			return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Element, -1 }, "#ELEMENT BOOST ANIMATION#");
 		}
 
@@ -385,7 +422,7 @@ namespace Alpaka.Scenes.Battle {
 				Statboosts[Stat] = 5;
 			}
 
-			ElementBoosts = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
+			ElementBuffs = new bool[Enum.GetNames(typeof(CreatureElement)).Length];
 
 			SwitchedStats = new byte[8];
 			HasNewElement = false;

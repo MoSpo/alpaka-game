@@ -196,16 +196,16 @@ namespace Alpaka.Scenes.Battle {
 			return Animations;
 		}
 
-		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, Player Target) {
+		public List<SceneAnimation> GiveDamage(CreatureElement Element, ActionCategory Category, byte BaseActionPower, Player Attacker) {
 
 			List<SceneAnimation> Animations = new List<SceneAnimation>();
 
 			int Damage = 0;
-			double Bonuses = Target.GetElementEffectiveness(Element) * (HasElement(Element) ? 1.5 : 1) * GetElementBuffs(Element);
+			double Bonuses = GetElementEffectiveness(Element) * (Attacker.HasElement(Element) ? 1.5 : 1) * Attacker.GetElementBuffs(Element);
 
 			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
-				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((GetTotalStat(CreatureStats.STRENGTH) * BaseActionPower * Bonuses / Target.GetElementBuffs(Element)* Target.GetTotalStat(CreatureStats.ENDURANCE)) + 2.0);
-              	else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor((GetTotalStat(CreatureStats.INTELLIGENCE) * BaseActionPower * Bonuses / Target.GetElementBuffs(Element) *Target.GetTotalStat(CreatureStats.WISDOM)) + 2.0);
+				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor(((Attacker.GetTotalStat(CreatureStats.STRENGTH) * (double)BaseActionPower * Bonuses) / (GetElementBuffs(Element)* GetTotalStat(CreatureStats.ENDURANCE))) + 2.0);
+              	else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor(((Attacker.GetTotalStat(CreatureStats.INTELLIGENCE) * (double)BaseActionPower * Bonuses) / (GetElementBuffs(Element) *GetTotalStat(CreatureStats.WISDOM))) + 2.0);
 
 				int nh = ActiveCreature.Health - Damage;
 				if (nh < 0) nh = 0;
@@ -215,8 +215,8 @@ namespace Alpaka.Scenes.Battle {
 				ActiveCreature.GetTotalStat(CreatureStats.HEALTH),
 				nh,
 				-1*Damage,
-				Target.GetElementEffectiveness(Element) ,
-				HasElement(Element) ? 1.5 : 1}, "#DAMAGE GIVEN#"));
+				GetElementEffectiveness(Element) ,
+                Attacker.HasElement(Element) ? 1.5 : 1}, "#DAMAGE GIVEN#"));
 
 
 				ActiveCreature.Health -= Damage;

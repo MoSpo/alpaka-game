@@ -197,10 +197,10 @@ namespace Alpaka {
                     }
                     break;
                     case SceneAnimation.SceneAnimationType.ADD_EFFECT:
-                    effects.Add((int)an.Values[0], an.Message);
+                    effects.Add((int)an.Values[0], an.Message, (int)an.Values[1]);
                     break;
                     case SceneAnimation.SceneAnimationType.REMOVE_EFFECT:
-                    effects.Remove((int)an.Values[0], an.Message);
+                    effects.Remove((int)an.Values[0], (int)an.Values[1]);
                     break;
                     case SceneAnimation.SceneAnimationType.USER_DEATH_SELECT:
                     IsUserDeathTurn = true;

@@ -38,7 +38,6 @@ namespace Alpaka {
 			};
 
             for (int i = 0; i < effects.Length; i++) {
-                //effects[i].amt = (i % 3) == 0 ? 1 : 0;
                 effects[i].setPosition(poses[i]);
                 if (effects[i].y > 350) effects[i].InFocus = false;
             }
@@ -50,24 +49,31 @@ namespace Alpaka {
 			foreach (ArenaEffect eff in effects) eff.Update(dt);
 		}
 
-		public void Add(int pos, string name) {
+		public void Add(int pos, string name, int id) {
 			ArenaEffect eff = effects[pos];
 			eff.text[eff.amt] = name;
-			eff.amt++;
+            eff.id[eff.amt] = id;
+            eff.amt++;
 		}
 
-		public void Remove(int pos, string name) {
+		public void Remove(int pos, int id) {
 			ArenaEffect eff = effects[pos];
 			for (int i = 0; i < 3; i++) {
-				if (i == eff.amt-1) {
-					eff.amt--;
-					return;
+
+                if (eff.amt == 0) return;
+
+				if (eff.id[i] == id) {
+                    for (int j = i; j < 2; j++) {
+                        eff.text[j] = eff.text[j + 1];
+                        eff.id[j] = eff.id[j + 1];
+                    }
+                    eff.amt--;
+                    return;
 				}
-				if (eff.text[i].Equals(name)) {
-					eff.text[i] = eff.text[i + 1];
-					eff.text[i + 1] = name;
-				}
-			}
+                if (i == eff.amt - 1) {
+                    return;
+                }
+            }
 		}
 
 		public void Rotate(double dt) {

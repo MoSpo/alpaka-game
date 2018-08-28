@@ -16,8 +16,9 @@ namespace Alpaka {
 		public double y;
 
 		public string[] text = { "EFFECT1", "EFFECT2", "EFFECT3" };
+        public int[] id = { 0,0,0 };
 
-		public SpriteFont font;
+        public SpriteFont font;
 
 		public int amt = 0;
 

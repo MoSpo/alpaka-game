@@ -694,18 +694,21 @@ namespace Alpaka.Scenes.Battle {
 
         public List<SceneAnimation> InterpretEffect(BattleEffect Effect, EffectScript EffectScripts, Player User, Player Trigger, byte TriggerPosition) {
 
+            bool u_nia = User.IsNotInArena();
+            bool o_nia = GetOpponent(User).IsNotInArena();
+
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
             Interpreter.SetEffect(Effect);
             Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
             Player Target = User;
-            if (Target.IsNotInArena()) {
+            if (!u_nia && Target.IsNotInArena()) {
                 Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
             }
 
             Target = GetOpponent(User);
-            if (Target.IsNotInArena()) {
+            if (!o_nia && Target.IsNotInArena()) {
                 Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
             }
 

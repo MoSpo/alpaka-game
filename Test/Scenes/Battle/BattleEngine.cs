@@ -245,13 +245,13 @@ namespace Alpaka.Scenes.Battle {
                         Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_NEW_TILE_PLACED, null));
                         foreach (EffectScript Script in Effect.Scripts) {
                             if (Script.Trigger == EffectTrigger.ON_STAND_ENTER) {
-                                if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].EffectInPosition(Effect.Name)) {
+                                if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
                                     if (Effect.EffectAnimation != null) {
                                         Animations.Add(Effect.EffectAnimation);
                                     }
                                     Animations.AddRange(InterpretEffect(Effect, Script, Effect.User, Player1, Effect.CurrentPlacement));
 
-                                } else if (Effect.CurrentPlacement == Player2.Placement && !AllEffects[Player2.Placement].EffectInPosition(Effect.Name)) {
+                                } else if (Effect.CurrentPlacement == Player2.Placement && !AllEffects[Player2.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
                                     if (Effect.EffectAnimation != null) {
                                         Animations.Add(Effect.EffectAnimation);
                                     }
@@ -318,13 +318,13 @@ namespace Alpaka.Scenes.Battle {
                     }
 
                     if (Script.Trigger == EffectTrigger.ON_STAND_EXIT) {
-                        if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].EffectInPosition(Effect.Name)) {
+                        if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
                             if (Effect.EffectAnimation != null) {
                                 Animations.Add(Effect.EffectAnimation);
                             }
                             Animations.AddRange(InterpretEffect(Effect, Script, Effect.User, Player1, Effect.CurrentPlacement));
 
-                        } else if (Effect.CurrentPlacement == Player2.Placement && !AllEffects[Player2.Placement].EffectInPosition(Effect.Name)) {
+                        } else if (Effect.CurrentPlacement == Player2.Placement && !AllEffects[Player2.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
                             if (Effect.EffectAnimation != null) {
                                 Animations.Add(Effect.EffectAnimation);
                             }
@@ -346,13 +346,13 @@ namespace Alpaka.Scenes.Battle {
                     }
 
                     if (Script.Trigger == EffectTrigger.ON_STAND_EXIT) {
-                        if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].EffectInPosition(Effect.Name)) {
+                        if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
                             if (Effect.EffectAnimation != null) {
                                 Animations.Add(Effect.EffectAnimation);
                             }
                             Animations.AddRange(InterpretEffect(Effect, Script, Effect.User, Player1, Effect.CurrentPlacement));
 
-                        } else if (Effect.CurrentPlacement == Player2.Placement && !AllEffects[Player2.Placement].EffectInPosition(Effect.Name)) {
+                        } else if (Effect.CurrentPlacement == Player2.Placement && !AllEffects[Player2.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
                             if (Effect.EffectAnimation != null) {
                                 Animations.Add(Effect.EffectAnimation);
                             }
@@ -629,7 +629,7 @@ namespace Alpaka.Scenes.Battle {
 
             foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
                 foreach (BattleEffect Effect in Effects) {
-                    if (Effect.CurrentPlacement == NewPosition && !AllEffects[OldPosition].EffectInPosition(Effect.Name)) {
+                    if (Effect.CurrentPlacement == NewPosition && !AllEffects[OldPosition].HasEffectGroup(Effect.GetEffectGroup())) {
                         if (Effect.EffectAnimation != null) {
                             Animations.Add(Effect.EffectAnimation);
                         }

@@ -39,10 +39,10 @@ namespace Alpaka.Scenes.Battle {
         }
 
 
-		public bool EffectInPosition(string name) {
+		public bool HasEffectGroup(int id) {
 			for (byte i = 0; i < 3; i++) {
 				if (effects[i] != null) {
-					if (effects[i].Name.Equals(name)) {
+					if (effects[i].GetEffectGroup() == id) {
 						return true;
 					}
 				}

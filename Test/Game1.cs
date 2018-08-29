@@ -36,7 +36,7 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
-        double GameSpeed = 0.5;
+        double GameSpeed = 0.8;
         int TurnNumber = 1;
         public bool chosen = false;
 
@@ -145,8 +145,10 @@ namespace Alpaka {
                     case SceneAnimation.SceneAnimationType.HEALTH_BAR:
                     if (an.Values[0] == 1) {
                         leftbar.setHealth((int)an.Values[2]);
+                        user.SetNumbers((int)an.Values[3], an.Values[4], an.Values[5]);
                     } else {
                         rightbar.setHealth((int)an.Values[2]);
+                        opponent.SetNumbers((int)an.Values[3], an.Values[4], an.Values[5]);
                     }
                     nextAnim = false;
                     break;

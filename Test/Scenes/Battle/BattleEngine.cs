@@ -488,6 +488,18 @@ namespace Alpaka.Scenes.Battle {
                 );
                 Target.ActiveCreature.killed = true;
             }
+
+            if (Target.playerNumber == 0) {
+                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
+                if (AllEffects[9].effects[1] != null) RemoveEffect(AllEffects[9].effects[1], true);
+                if (AllEffects[9].effects[2] != null) RemoveEffect(AllEffects[9].effects[2], true);
+            }
+            if (Target.playerNumber == 1) {
+                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
+                if (AllEffects[10].effects[1] != null) RemoveEffect(AllEffects[10].effects[1], true);
+                if (AllEffects[10].effects[2] != null) RemoveEffect(AllEffects[10].effects[2], true);
+            }
+
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH_OUT, new double[] {
                 Target.playerNumber,
                 IsKilled ? 1 : 0

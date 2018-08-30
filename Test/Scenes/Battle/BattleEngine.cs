@@ -261,11 +261,11 @@ namespace Alpaka.Scenes.Battle {
                         }
                         if (Effect.User == Player1) {
                             AllEffects[(Placement + ArenaOrientation) % 8].AddEffect(Effect);
-                            Animations.AddRange(RunTilePlacedOnTopEffect(Effect.CurrentPlacement));
+                            Animations.AddRange(RunTilePlacedOnTopEffect(Effect.CurrentPlacement, User));
 
                         } else {
                             AllEffects[(Placement + ArenaOrientation + 4) % 8].AddEffect(Effect);
-                            Animations.AddRange(RunTilePlacedOnTopEffect(Effect.CurrentPlacement));
+                            Animations.AddRange(RunTilePlacedOnTopEffect(Effect.CurrentPlacement, User));
                         }
 
                     } else if (Placement == 8) {
@@ -410,6 +410,17 @@ namespace Alpaka.Scenes.Battle {
                 RunTriggerTypeEffect(EffectTrigger.ON_YOUR_SWITCH, Target)
             );
 
+            if (Target.playerNumber == 0) {
+                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
+                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
+                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
+            }
+            if (Target.playerNumber == 1) {
+                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
+                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
+                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
+            }
+
             Target.ActiveCreature = Target.Team[Target.SelectedCreature];
             Target.Reset();
             Target.JustSwitchedIn = true;
@@ -491,13 +502,13 @@ namespace Alpaka.Scenes.Battle {
 
             if (Target.playerNumber == 0) {
                 if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-                if (AllEffects[9].effects[1] != null) RemoveEffect(AllEffects[9].effects[1], true);
-                if (AllEffects[9].effects[2] != null) RemoveEffect(AllEffects[9].effects[2], true);
+                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
+                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
             }
             if (Target.playerNumber == 1) {
                 if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-                if (AllEffects[10].effects[1] != null) RemoveEffect(AllEffects[10].effects[1], true);
-                if (AllEffects[10].effects[2] != null) RemoveEffect(AllEffects[10].effects[2], true);
+                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
+                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
             }
 
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH_OUT, new double[] {
@@ -613,9 +624,12 @@ namespace Alpaka.Scenes.Battle {
             return Animations;
         }
 
-        public List<SceneAnimation> RunTilePlacedOnTopEffect(byte Position) {
+        public List<SceneAnimation> RunTilePlacedOnTopEffect(byte Position, Player Placer) {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
+
+            bool u_nia = Placer.IsNotInArena();
+            bool o_nia = GetOpponent(Placer).IsNotInArena();
 
             foreach (List<BattleEffect> Effects in SortedEffects[EffectTrigger.ON_NEW_TILE_HERE].Values) {
                 foreach (BattleEffect Effect in Effects) {
@@ -631,6 +645,9 @@ namespace Alpaka.Scenes.Battle {
             foreach (BattleEffect Effect in DeadEffects) {
                 Animations.AddRange(RemoveEffect(Effect, true));
             }
+
+            Animations.AddRange(CheckIfRemoved(Placer, GetOpponent(Placer), u_nia, o_nia));
+
             return Animations;
         }
 
@@ -638,6 +655,9 @@ namespace Alpaka.Scenes.Battle {
         public List<SceneAnimation> RunRotationChangeEffect(EffectTrigger Trigger, Player Target, byte NewPosition, byte OldPosition) {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
+
+            bool u_nia = Target.IsNotInArena();
+            bool o_nia = GetOpponent(Target).IsNotInArena();
 
             foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
                 foreach (BattleEffect Effect in Effects) {
@@ -653,12 +673,17 @@ namespace Alpaka.Scenes.Battle {
                 Animations.AddRange(RemoveEffect(Effect, true));
             }
 
+            Animations.AddRange(CheckIfRemoved(Target, GetOpponent(Target), u_nia, o_nia));
+
             return Animations;
         }
 
         public List<SceneAnimation> RunCreatureChangeEffect(EffectTrigger Trigger, Player Target) {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
+
+            bool u_nia = Target.IsNotInArena();
+            bool o_nia = GetOpponent(Target).IsNotInArena();
 
             if (!Target.IsNotInArena()) {
                 foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
@@ -675,14 +700,22 @@ namespace Alpaka.Scenes.Battle {
                     Animations.AddRange(RemoveEffect(Effect, true));
                 }
             }
+
+            Animations.AddRange(CheckIfRemoved(Target, GetOpponent(Target), u_nia, o_nia));
+
             return Animations;
         }
 
 
         public List<SceneAnimation> RunTriggerTypeEffect(EffectTrigger Trigger, Player TargetUser) {
             //If TargetUser is parsed it will only run if they are not killed and own the effect
+            //TODO: PLEASE UNDERSTAND THIS SO THAT DEATH IN THIS IS DETERMINISTIC
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
+
+            bool u_nia = Player1.IsNotInArena();
+            bool o_nia = GetOpponent(Player1).IsNotInArena();
+
 
             if (TargetUser == null || !TargetUser.IsNotInArena()) {
                 foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
@@ -701,28 +734,34 @@ namespace Alpaka.Scenes.Battle {
                 }
 
             }
+
+            Animations.AddRange(CheckIfRemoved(Player1, GetOpponent(Player1), u_nia, o_nia));
+
             return Animations;
         }
 
-        public List<SceneAnimation> InterpretEffect(BattleEffect Effect, EffectScript EffectScripts, Player User, Player Trigger, byte TriggerPosition) {
-
-            bool u_nia = User.IsNotInArena();
-            bool o_nia = GetOpponent(User).IsNotInArena();
-
+        private List<SceneAnimation> CheckIfRemoved(Player User, Player Opponent, bool u_nia, bool o_nia) {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
-            Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
-            Interpreter.SetEffect(Effect);
-            Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
             Player Target = User;
             if (!u_nia && Target.IsNotInArena()) {
                 Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
             }
 
-            Target = GetOpponent(User);
+            Target = Opponent;
             if (!o_nia && Target.IsNotInArena()) {
                 Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
             }
+
+            return Animations;
+        }
+
+        public List<SceneAnimation> InterpretEffect(BattleEffect Effect, EffectScript EffectScripts, Player User, Player Trigger, byte TriggerPosition) {
+
+            List<SceneAnimation> Animations = new List<SceneAnimation>();
+            Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
+            Interpreter.SetEffect(Effect);
+            Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
             return Animations; //TODO: GET ANIMATIONS FROM SCRIPT
         }

@@ -36,7 +36,7 @@ namespace Alpaka {
         List<SceneAnimation> anim;
         int animPointer = 0;
 
-        double GameSpeed = 0.8;
+        double GameSpeed = 0.7;
         int TurnNumber = 1;
         public bool chosen = false;
 
@@ -176,6 +176,7 @@ namespace Alpaka {
                     case SceneAnimation.SceneAnimationType.ARENA:
                     arena.rot = (int)an.Values[0];
                     effects.rot = (int)an.Values[0];
+                    menu.keepRot = true;
                     menu.rot = (int)an.Values[0];
                     nextAnim = false;
                     break;
@@ -200,9 +201,11 @@ namespace Alpaka {
                     break;
                     case SceneAnimation.SceneAnimationType.ADD_EFFECT:
                     effects.Add((int)an.Values[0], an.Message, (int)an.Values[1]);
+                    menu.AddEffect((int)an.Values[0]);
                     break;
                     case SceneAnimation.SceneAnimationType.REMOVE_EFFECT:
                     effects.Remove((int)an.Values[0], (int)an.Values[1]);
+                    menu.RemoveEffect((int)an.Values[0]);
                     break;
                     case SceneAnimation.SceneAnimationType.USER_DEATH_SELECT:
                     IsUserDeathTurn = true;

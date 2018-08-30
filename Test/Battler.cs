@@ -79,7 +79,8 @@ namespace Alpaka {
 
             if (num < 0) {
                 num *= -1;
-                minus.sourcey = type * 64;
+                //minus.sourcey = type * 64;
+                minus.sourcey = 0;
             } else {
                 minus.sourcey = 0;
             }
@@ -160,6 +161,7 @@ namespace Alpaka {
         public void Draw(SpriteBatch spriteBatch, int x) {
 
             int y = 112;
+            battler.Draw(x + xoff, y + yoff, spriteBatch);
 
             if (numbersAmount > 0) {
                 if (UseTimer) {
@@ -175,16 +177,16 @@ namespace Alpaka {
 
                         blend(brackets[1], Bezier((timer - 0.04 * numbersAmount) / 0.5), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
 
-                        minus.Draw(x - 40, y - (int)(10 * Bezier((timer / 0.5))), spriteBatch);
+                        minus.Draw(x + 30 - 30 * numbersAmount, y + 30 - (int)(10 * Bezier((timer / 0.5))), spriteBatch);
 
-                        brackets[0].Draw(x - 40 + 64, y - (int)(10 * Bezier(((timer - 0.04) / 0.5))), spriteBatch);
+                        brackets[0].Draw(x + 30 - 30 * numbersAmount + 64, y + 30 - (int)(10 * Bezier(((timer - 0.04) / 0.5))), spriteBatch);
 
-                        numbers[0].Draw(x - 40 + 96, y - (int)(10 * Bezier(((timer - 0.04) / 0.5))), spriteBatch);
-                        numbers[1].Draw(x - 40 + 160, y - (int)(10 * Bezier(((timer - 0.04 * 2) / 0.5))), spriteBatch);
-                        numbers[2].Draw(x - 40 + 224, y - (int)(10 * Bezier(((timer - 0.04 * 3) / 0.5))), spriteBatch);
-                        numbers[3].Draw(x - 40 + 288, y - (int)(10 * Bezier(((timer - 0.04 * 4) / 0.5))), spriteBatch);
+                        numbers[0].Draw(x + 30 - 30 * numbersAmount + 96, y + 30 - (int)(10 * Bezier(((timer - 0.04) / 0.5))), spriteBatch);
+                        numbers[1].Draw(x + 30 - 30 * numbersAmount + 160, y + 30 - (int)(10 * Bezier(((timer - 0.04 * 2) / 0.5))), spriteBatch);
+                        numbers[2].Draw(x + 30 - 30 * numbersAmount + 224, y + 30 - (int)(10 * Bezier(((timer - 0.04 * 3) / 0.5))), spriteBatch);
+                        numbers[3].Draw(x + 30 - 30 * numbersAmount + 288, y + 30 - (int)(10 * Bezier(((timer - 0.04 * 4) / 0.5))), spriteBatch);
 
-                        brackets[1].Draw(x -40 + 96 + 64 * numbersAmount, y - (int)(10 * Bezier(((timer - 0.04 * numbersAmount) / 0.5))), spriteBatch);
+                        brackets[1].Draw(x +30 - 30*numbersAmount + 96 + 64 * numbersAmount, y + 30 - (int)(10 * Bezier(((timer - 0.04 * numbersAmount) / 0.5))), spriteBatch);
                     } else {
                         minus.Draw(spriteBatch);
 
@@ -199,8 +201,6 @@ namespace Alpaka {
                     numbersAmount = 0;
                 }
             }
-
-            battler.Draw(x + xoff, y + yoff, spriteBatch);
         }
     }
 }

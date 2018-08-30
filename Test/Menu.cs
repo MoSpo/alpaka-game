@@ -17,10 +17,14 @@ namespace Alpaka {
         Texture2D smallactions;
         Texture2D unusableactions;
         Texture2D disc;
-		Texture2D arrows;
+        Texture2D[] discTextures;
+        Texture2D arrows;
 		Texture2D cross;
 
         Thing[] middle;
+
+        DiscThing[] discParts;
+
         ActionThing[] actions;
 
         public Game1 g;
@@ -45,6 +49,8 @@ namespace Alpaka {
         bool creatureChoose = false;
 
         public int rot;
+        private int currentRot;
+        public bool keepRot = false;
         byte spriteRot = 0;
 
 
@@ -72,6 +78,27 @@ namespace Alpaka {
             Texture2D chooser = Content.Load<Texture2D>("chooser");
             Texture2D pointers = Content.Load<Texture2D>("pointers");
 
+            discTextures = new Texture2D[] {
+                Content.Load<Texture2D>("discparts/disc0"),
+                Content.Load<Texture2D>("discparts/disc1"),
+                Content.Load<Texture2D>("discparts/disc2"),
+                Content.Load<Texture2D>("discparts/disc3"),
+                Content.Load<Texture2D>("discparts/disc4"),
+                Content.Load<Texture2D>("discparts/disc5"),
+                Content.Load<Texture2D>("discparts/disc6"),
+                Content.Load<Texture2D>("discparts/disc7"),
+            };
+
+            discParts = new DiscThing[] {
+                new DiscThing(discTextures[0], 0, 0, 222, 74),
+                new DiscThing(discTextures[1], 0, 0, 222, 74),
+                new DiscThing(discTextures[2], 0, 0, 222, 74),
+                new DiscThing(discTextures[3], 0, 0, 222, 74),
+                new DiscThing(discTextures[4], 0, 0, 222, 74),
+                new DiscThing(discTextures[5], 0, 0, 222, 74),
+                new DiscThing(discTextures[6], 0, 0, 222, 74),
+                new DiscThing(discTextures[7], 0, 0, 222, 74),
+            };
 
             middle = new Thing[] {
                 new Thing(shell, 0, 0, 224, 192),
@@ -206,16 +233,19 @@ namespace Alpaka {
 						for (int i = 13; i < 17; i++) {
 							if (middle[i].x + middle[i].width - 2 >= x && middle[i].x + 2 <= x) {
 								middle[17].sourcey = 74 * (i - 12);
-							} else {
+                                if (i == 13 && rot == 0) rot--;
+                                if (i == 16 && rot == 0) rot++;
+                            } else {
 								u++;
-							}
-						}
+                            }
+                        }
 						if(u >=4) middle[17].sourcey = 0;
 						u = 0;
 					}
 				}
 			}
         }
+
 
         public void Rotate(double dt) {
             if (rot != 0) {
@@ -225,9 +255,21 @@ namespace Alpaka {
                     rotateTimer = 0;
                     if (rot > 0) {
                         rot--;
+                        if (keepRot) {
+                            currentRot--;
+                            if (currentRot < 0) currentRot = 7;
+                            RotateEffects(false);
+                            keepRot = false;
+                        }
 
                     } else if (rot < 0) {
                         rot++;
+                        if (keepRot) {
+                            currentRot++;
+                            if (currentRot > 7) currentRot = 0;
+                            RotateEffects(true);
+                            keepRot = false;
+                        }
                     }
                     spriteRot = 0;
                 }
@@ -242,6 +284,28 @@ namespace Alpaka {
 
         }
 
+        public void AddEffect(int pos) {
+            discParts[(8-pos) % 8].IncreaseAmount();
+        }
+        public void RemoveEffect(int pos) {
+            discParts[(8-pos) % 8].DecreaseAmount();
+        }
+
+        private void RotateEffects(bool IsRight) {
+            if(!IsRight) {
+                Texture2D t = discParts[0].texture;
+                for (int i = 0; i < 7;  i++) {
+                    discParts[i].texture = discParts[i + 1].texture;
+                }
+                discParts[7].texture = t;
+            } else {
+                Texture2D t = discParts[7].texture;
+                for (int i = 7; i > 0; i--) {
+                    discParts[i].texture = discParts[i - 1].texture;
+                }
+                discParts[0].texture = t;
+            }
+        }
 
         public void blend(Thing t, double ti, Color startColor, Color endColor) {
             t.color.R = (byte)(startColor.R + (endColor.R - startColor.R) * ti);
@@ -265,6 +329,10 @@ namespace Alpaka {
                         middle[0].Draw(248, 505 - (int)((505 - 368) * Bezier(timer / 0.35)), spriteBatch);
                         middle[1].Draw(248, 475 - (int)((475 - 475) * Bezier(timer / 0.35)), spriteBatch);
                         middle[2].Draw(249, 464 - (int)((464 - 328) * Bezier(timer / 0.35)), spriteBatch);
+
+                        foreach(DiscThing d in discParts) {
+                            d.Draw(249, 464 - (int)((464 - 328) * Bezier(timer / 0.35)), spriteBatch);
+                        }
 
                         blend(middle[3], Bezier((timer - 0.2) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
                         blend(middle[4], Bezier((timer - 0.15) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
@@ -297,6 +365,10 @@ namespace Alpaka {
                         middle[1].Draw(248, 475, spriteBatch);
                         middle[2].Draw(249, 328, spriteBatch);
 
+                        foreach (DiscThing d in discParts) {
+                            d.Draw(249, 328, spriteBatch);
+                        }
+
                         middle[3].Draw(80, 357, spriteBatch);
                         middle[4].Draw(100, 416, spriteBatch);
                         middle[5].Draw(120, 475, spriteBatch);
@@ -321,6 +393,13 @@ namespace Alpaka {
                         middle[0].Draw(248, 368, spriteBatch);
                         middle[1].Draw(248, (int)(475 - 80 + 80 * Bezier(timer / 0.2)), spriteBatch);
                         middle[2].Draw(249, 328, spriteBatch);
+
+                        middle[2].sourcey = 0;
+
+                        foreach (DiscThing d in discParts) {
+                            d.sourcey = 0;
+                            d.Draw(249, 328, spriteBatch);
+                        }
 
                         blend(middle[3], Bezier((timer - 0.2) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
                         blend(middle[4], Bezier((timer - 0.15) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
@@ -359,6 +438,10 @@ namespace Alpaka {
                     middle[1].Draw(248, 475, spriteBatch);
                     middle[2].Draw(249, 328, spriteBatch);
 
+                    foreach (DiscThing d in discParts) {
+                        d.Draw(249, 328, spriteBatch);
+                    }
+
                     middle[3].Draw(80, 357, spriteBatch);
                     middle[4].Draw(100, 416, spriteBatch);
                     middle[5].Draw(120, 475, spriteBatch);
@@ -385,6 +468,10 @@ namespace Alpaka {
                     middle[1].Draw(248, 475, spriteBatch);
                     middle[2].Draw(249, 464, spriteBatch);
 
+                    foreach (DiscThing d in discParts) {
+                        d.Draw(249, 464, spriteBatch);
+                    }
+
                     middle[11].Draw(0, 540 - (int)(122 * Bezier(timer / 0.2)), spriteBatch);
                     blend(middle[12], Bezier(timer / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
                     middle[12].Draw(317, 510 - (int)(122 * Bezier(timer / 0.2)), spriteBatch);
@@ -398,6 +485,10 @@ namespace Alpaka {
                         middle[0].Draw(248, 368, spriteBatch);
                         middle[1].Draw(248, (int)(475 - 80 * Bezier(timer / 0.2)), spriteBatch);
                         middle[2].Draw(249, 328, spriteBatch);
+
+                        foreach (DiscThing d in discParts) {
+                            d.Draw(249, 328, spriteBatch);
+                        }
 
                         blend(middle[3], Bezier(1 - ((timer - 0.2) / 0.2)), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
                         blend(middle[4], Bezier(1 - ((timer - 0.15) / 0.2)), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
@@ -433,6 +524,10 @@ namespace Alpaka {
                         middle[0].Draw(248, 368, spriteBatch);
                         middle[1].Draw(248, (int)(475 - 80 * Bezier(timer / 0.2)), spriteBatch);
                         middle[2].Draw(249, 328, spriteBatch);
+
+                        foreach (DiscThing d in discParts) {
+                            d.Draw(249, 328, spriteBatch);
+                        }
 
                         blend(middle[3], Bezier(1 - ((timer - 0.2) / 0.2)), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
                         blend(middle[4], Bezier(1 - ((timer - 0.15) / 0.2)), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
@@ -471,6 +566,14 @@ namespace Alpaka {
                         middle[0].Draw(248, 368 + (int)(137 * Bezier(timer / 0.2)), spriteBatch);
                         middle[1].Draw(248, 475 - 80 + (int)(80 * Bezier(timer / 0.2)), spriteBatch);
                         middle[2].Draw(249, 328 + (int)(136 * Bezier(timer / 0.2)), spriteBatch);
+
+                        middle[2].sourcey = 0;
+
+                        foreach (DiscThing d in discParts) {
+                            d.sourcey = 0;
+                            d.Draw(249, 328 + (int)(136 * Bezier(timer / 0.2)), spriteBatch);
+                        }
+
                         if (timer > 1 * 0.2) {
                             timer = 0;
                             currentMode = MenuMode.MESSAGE;
@@ -480,6 +583,10 @@ namespace Alpaka {
                         middle[0].Draw(248, 505, spriteBatch);
                         middle[1].Draw(248, 475, spriteBatch);
                         middle[2].Draw(249, 464, spriteBatch);
+
+                        foreach (DiscThing d in discParts) {
+                            d.Draw(249, 464, spriteBatch);
+                        }
 
                         middle[11].Draw(0, 540 - (int)(122 * Bezier(1 - (timer / 0.2))), spriteBatch);
                         blend(middle[12], Bezier(1 - (timer / 0.2)), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
@@ -500,10 +607,20 @@ namespace Alpaka {
                     middle[2].sourcey = 74 * spriteRot;
                     middle[2].Draw(249, 464, spriteBatch);
 
+                    foreach (DiscThing d in discParts) {
+                        d.sourcey = 74 * spriteRot;
+                        d.Draw(249, 464, spriteBatch);
+                    }
+
                 } else if (currentMode == MenuMode.MESSAGE) {
                     middle[0].Draw(248, 505, spriteBatch);
                     middle[1].Draw(248, 475, spriteBatch);
                     middle[2].Draw(249, 464, spriteBatch);
+
+                    foreach (DiscThing d in discParts) {
+                        d.Draw(249, 464, spriteBatch);
+                    }
+
                     g.chosen = true;
                     currentMode = MenuMode.CLOSED;
 
@@ -523,7 +640,12 @@ namespace Alpaka {
 					for (int i = 0; i < 11; i++) {
                         middle[i].Draw(spriteBatch);
                     }
-					spriteBatch.DrawString(g.font, g.getAction(0), new Vector2(100, 367), Color.Fuchsia);
+
+                    foreach (DiscThing d in discParts) {
+                        d.Draw(spriteBatch);
+                    }
+
+                    spriteBatch.DrawString(g.font, g.getAction(0), new Vector2(100, 367), Color.Fuchsia);
 					spriteBatch.DrawString(g.font, g.getAction(1), new Vector2(120, 426), Color.Fuchsia);
 					spriteBatch.DrawString(g.font, g.getAction(2), new Vector2(140, 485), Color.Fuchsia);
 					spriteBatch.DrawString(g.font, g.getAction(3), new Vector2(504, 367), Color.Fuchsia);
@@ -546,6 +668,10 @@ namespace Alpaka {
                         middle[i].Draw(spriteBatch);
                     }
 
+                    foreach (DiscThing d in discParts) {
+                        d.Draw(spriteBatch);
+                    }
+
                     for (int i = 18; i < 24; i++) {
                         if (!g.getCanUseTeam((byte)(i - 18))) {
                             middle[i].Draw(120 * (i - 18), 418, spriteBatch);
@@ -564,6 +690,10 @@ namespace Alpaka {
                     middle[1].Draw(248, 475, spriteBatch);
                     middle[2].Draw(249, 464, spriteBatch);
 
+                    foreach (DiscThing d in discParts) {
+                        d.Draw(249, 464, spriteBatch);
+                    }
+
                     middle[11].Draw(spriteBatch);
                     middle[12].Draw(spriteBatch);
 
@@ -581,9 +711,17 @@ namespace Alpaka {
 					spriteBatch.DrawString(g.font, g.getTeam(5), new Vector2(610, 500), Color.Black);
 
                 } else if (currentMode == MenuMode.MOVEMENT) {
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < 2; i++) {
                         middle[i].Draw(spriteBatch);
                     }
+                    middle[2].sourcey = 74 * spriteRot;
+                    middle[2].Draw(spriteBatch);
+
+                    foreach (DiscThing d in discParts) {
+                        d.sourcey = 74 * spriteRot;
+                        d.Draw(spriteBatch);
+                    }
+
                     middle[13].Draw(248, 475 - 80, spriteBatch);
                     middle[14].Draw(248 + 47, 475 - 80, spriteBatch);
                     middle[15].Draw(248 + 111, 475 - 80, spriteBatch);
@@ -648,6 +786,27 @@ namespace Alpaka {
         }
 
 
+    }
+
+    public class DiscThing : Thing {
+
+        private int amt;
+
+        public DiscThing(Texture2D texture, int sourcex, int sourcey, int width, int height) : base(texture, sourcex, sourcey, width, height) {
+            amt = 0;
+        }
+        public void IncreaseAmount() {
+            if(amt < 3) {
+                amt++;
+                color = new Color(255 - 5 * amt * amt, 255/(amt+1), 255 *(3-amt)/3, 255);
+            }
+        }
+        public void DecreaseAmount() {
+            if (amt > 0) {
+                amt--;
+                color = new Color(255 - 5 * amt* amt, 255 / (amt + 1), 255 * (3 - amt) / 3, 255);
+            }
+        }
     }
 
     public class ActionThing : Thing {

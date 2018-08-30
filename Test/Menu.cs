@@ -246,10 +246,19 @@ namespace Alpaka {
 			}
         }
 
+        private bool changeRotation;
 
         public void Rotate(double dt) {
             if (rot != 0) {
                 rotateTimer += dt;
+                if (changeRotation && rot > 0) {
+                    RotateEffects(false);
+                    changeRotation = false;
+                } else if (!changeRotation && rot < 0) {
+                    RotateEffects(true);
+                    changeRotation = true;
+                }
+
                 if (rotateTimer >= 1) {
 
                     rotateTimer = 0;
@@ -264,6 +273,8 @@ namespace Alpaka {
 
                     } else if (rot < 0) {
                         rot++;
+                        if (rot == 0) RotateEffects(false); changeRotation = false;
+
                         if (keepRot) {
                             currentRot++;
                             if (currentRot > 7) currentRot = 0;

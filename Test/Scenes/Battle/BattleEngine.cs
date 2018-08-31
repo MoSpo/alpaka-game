@@ -410,17 +410,6 @@ namespace Alpaka.Scenes.Battle {
                 RunTriggerTypeEffect(EffectTrigger.ON_YOUR_SWITCH, Target, false)
             );
 
-            if (Target.playerNumber == 0) {
-                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-            }
-            if (Target.playerNumber == 1) {
-                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-            }
-
             Target.ActiveCreature = Target.Team[Target.SelectedCreature];
             Target.Reset();
             Target.JustSwitchedIn = true;
@@ -444,6 +433,8 @@ namespace Alpaka.Scenes.Battle {
             Animations.AddRange(
                 RunTriggerTypeEffect(EffectTrigger.ON_OPPONENT_SWITCH, GetOpponent(Target), false)
             );
+
+            Target.RecentlySwitched = true;
 
             return Animations;
         }
@@ -500,16 +491,7 @@ namespace Alpaka.Scenes.Battle {
                 Target.ActiveCreature.killed = true;
             }
 
-            if (Target.playerNumber == 0) {
-                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-                if (AllEffects[9].effects[0] != null) RemoveEffect(AllEffects[9].effects[0], true);
-            }
-            if (Target.playerNumber == 1) {
-                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-                if (AllEffects[10].effects[0] != null) RemoveEffect(AllEffects[10].effects[0], true);
-            }
+            Animations.AddRange(RemovePersonalEffects(Target.playerNumber));
 
             Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.SWITCH_OUT, new double[] {
                 Target.playerNumber,
@@ -740,17 +722,33 @@ namespace Alpaka.Scenes.Battle {
             return Animations;
         }
 
+        private List<SceneAnimation> RemovePersonalEffects(byte PlayerNumber) {
+            List<SceneAnimation> Animations = new List<SceneAnimation>();
+
+            if (AllEffects[8 + PlayerNumber].effects[0] != null) Animations.AddRange(RemoveEffect(AllEffects[8 + PlayerNumber].effects[0], true));
+            if (AllEffects[8 + PlayerNumber].effects[0] != null) Animations.AddRange(RemoveEffect(AllEffects[8 + PlayerNumber].effects[0], true));
+            if (AllEffects[8 + PlayerNumber].effects[0] != null) Animations.AddRange(RemoveEffect(AllEffects[8 + PlayerNumber].effects[0], true));
+
+            return Animations;
+        }
+
         private List<SceneAnimation> CheckIfRemoved(Player User, Player Opponent, bool u_nia, bool o_nia) {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
 
             Player Target = User;
             if (!u_nia && Target.IsNotInArena()) {
                 Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
+            } else if(Target.RecentlySwitched) {
+                Animations.AddRange(RemovePersonalEffects(Target.playerNumber));
+                Target.RecentlySwitched = false;
             }
 
             Target = Opponent;
             if (!o_nia && Target.IsNotInArena()) {
                 Animations.AddRange(RemoveFromArena(Target, !Target.forceSwitched));
+            } else if (Target.RecentlySwitched) {
+                Animations.AddRange(RemovePersonalEffects(Target.playerNumber));
+                Target.RecentlySwitched = false;
             }
 
             return Animations;

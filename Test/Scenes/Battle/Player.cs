@@ -19,8 +19,9 @@ namespace Alpaka.Scenes.Battle {
 
 		public byte SelectedCreature;
 		public bool JustSwitchedIn;
+        public bool RecentlySwitched;
 
-		public float actionCombo = 1;
+        public float actionCombo = 1;
 
 		public byte amountOfAttacks = 1;
 
@@ -320,8 +321,9 @@ namespace Alpaka.Scenes.Battle {
 					if (AttackGainOnStatBoost.Evaluate() && Stat != CreatureStats.STRENGTH && Stat != CreatureStats.INTELLIGENCE) {
 						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Strength of " + ActiveCreature.Nickname + " increased!"));
 						Animations.AddRange(GiveStatBoost(CreatureStats.STRENGTH, true));
-					}
-				}
+                        Animations.AddRange(GiveStatBoost(CreatureStats.STRENGTH, true));
+                    }
+                }
 			} else {
 				if (Statboosts[Stat] > 0) {
 					Statboosts[Stat]--;

@@ -50,17 +50,19 @@ namespace Alpaka {
 
         public RightBar(ContentManager Content, Game1 g) {
 			bar = Content.Load<Texture2D>("creaturebarflipped");
-			body = new Thing(bar, 196, 100, 140, 180);
+            statuses = Content.Load<Texture2D>("status");
+
+            body = new Thing(bar, 196, 100, 140, 180);
 			blank = new Thing(bar, 0, 50, 336, 50);
 			hbar = new Thing(bar, 0, 0, 336, 25);
 			mbar = new Thing(bar, 0, 25, 336, 25);
 			statbars = new RightStatBar[] {
-				new RightStatBar(bar),
-				new RightStatBar(bar),
-				new RightStatBar(bar),
-				new RightStatBar(bar),
-				new RightStatBar(bar),
-				new RightStatBar(bar)
+				new RightStatBar(bar, statuses),
+				new RightStatBar(bar, statuses),
+				new RightStatBar(bar, statuses),
+				new RightStatBar(bar, statuses),
+				new RightStatBar(bar, statuses),
+				new RightStatBar(bar, statuses)
 			};
 
             elements = Content.Load<Texture2D>("elements");
@@ -82,7 +84,6 @@ namespace Alpaka {
 
             st = 0;
 
-            statuses = Content.Load<Texture2D>("status");
             status = new Thing(statuses, 0, 0, 32, 32);
 
             totalHealth = 100;
@@ -99,13 +100,26 @@ namespace Alpaka {
 			if (useTimer) {
 				timer += dt;
 			}
-		}
+            foreach (RightStatBar r in statbars) {
+                r.Update(dt);
+            }
+        }
+
+        public void AddBoost(int stat, int boost) {
+            bool isBoost = boost == 1;
+            if (isBoost) statbars[stat].IncreasePoints(true);
+            else statbars[stat].IncreasePoints(false);
+        }
 
         public void ResetBuffs() {
             foreach (ElementThing e in elementBuffs) {
                 if (e.GetAmount() == 0) e.IncreaseAmount(); e.element = 0;
                 if (e.GetAmount() == 2) e.DecreaseAmount(); e.element = 0;
             }
+        }
+
+        public void ResetBoosts() {
+            foreach (RightStatBar s in statbars) s.Reset();
         }
 
         public void AddBuff(int element, int buff) {
@@ -175,6 +189,10 @@ namespace Alpaka {
             el1.Draw(304 -136 + x, 34 + y, spriteBatch);
             el2.Draw(304 -172 + x, 34 + y, spriteBatch);
             el3.Draw(304 -208 + x, 34 + y, spriteBatch);
+
+            for (int i = 0; i < 6; i++) {
+                statbars[i].Draw(x + 299, y + 74 + i * 17, spriteBatch);
+            }
 
             body.Draw(x + 196, y + 50, spriteBatch);
 
@@ -247,109 +265,133 @@ namespace Alpaka {
 
     }
 
-	public class RightStatBar {
-		Texture2D bar;
-		Thing stats;
-		Thing[] flares;
+    public class RightStatBar {
+        Thing stats;
+        Thing[] flares;
 
-		byte points;
-		byte oldpoints;
+        byte points;
+        byte oldpoints;
 
-		double timer;
-		bool useTimer;
+        double timer;
+        bool useTimer;
 
 
-		public RightStatBar(Texture2D bar) {
-			this.bar = bar;
-			stats = new Thing(bar, 160, 250, 56, 32);
-			flares = new Thing[] {
-				new Thing(bar, 160, 250, 56, 32),
-				new Thing(bar, 160, 250, 56, 32),
-				new Thing(bar, 160, 250, 56, 32),
-				new Thing(bar, 160, 250, 56, 32),
-				new Thing(bar, 160, 250, 56, 32)
-			};
-			points = 5;
-			oldpoints = 5;
-			timer = 0;
-			useTimer = false;
-		}
+        public RightStatBar(Texture2D bar, Texture2D status) {
 
-		public void Update(double dt) {
-			if (useTimer) {
-				timer += dt;
-			}
-		}
+            stats = new Thing(bar, 83, 252, 16, 18);
+            flares = new Thing[] {
+                new Thing(status, 1, 129, 14, 14),
+                new Thing(status, 1, 129, 14, 14),
+                new Thing(status, 1, 129, 14, 14),
+                new Thing(status, 1, 129, 14, 14),
+                new Thing(status, 1, 129, 14, 14)
+            };
+            points = 5;
+            oldpoints = 5;
+            timer = 0;
+            useTimer = false;
+        }
 
-		public void IncreasePoints(bool increase) {
-			if (points < 10 && points > 0) {
-				if (increase) {
-					points += 1;
-					useTimer = true;
-				} else {
-					points -= 1;
-					useTimer = true;
-				}
-			}
-		}
+        public void Update(double dt) {
+            if (useTimer) {
+                timer += dt;
+            }
+        }
 
-		public void blend(Thing t, double ti, Color startColor, Color endColor) {
-			t.color.R = (byte)(startColor.R + (endColor.R - startColor.R) * ti);
-			t.color.B = (byte)(startColor.B + (endColor.B - startColor.B) * ti);
-			t.color.G = (byte)(startColor.G + (endColor.G - startColor.G) * ti);
-			t.color.A = (byte)(startColor.A + (endColor.A - startColor.A) * ti);
-		}
+        private void SetColour(bool IsPositive) {
+            foreach (Thing t in flares) {
+                if (IsPositive) t.sourcex = 1;
+                else t.sourcex = 17;
+            }
+        }
 
-		public void Draw(SpriteBatch spriteBatch, int x, int y) {
-			if (useTimer) {
+        public void Reset() {
+            points = 5;
+            oldpoints = 5;
+        }
 
-				int p = points - 5;
-				if (p < 0) p *= -1;
+        public void IncreasePoints(bool increase) {
+            if (points < 10 && points > 0) {
+                if (increase) {
+                    points += 1;
+                    if (points > 5) SetColour(true);
+                    useTimer = true;
+                } else {
+                    points -= 1;
+                    if (points < 5) SetColour(false);
+                    useTimer = true;
+                }
+            }
+        }
 
-				int q = oldpoints - 5;
-				if (q < 0) q *= -1;
-				if (p > q) {
-					stats.Draw(x + (int)(p * Bezier(timer / 0.2)), y, spriteBatch);
-					if (p < 5) {
-						flares[p].sourcex = 0;
-					} else {
-						flares[p].sourcex = 0;
-					}
-					blend(flares[p], Bezier((timer - 0.2) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
+        public void blend(Thing t, double ti, Color startColor, Color endColor) {
+            t.color.R = (byte)(startColor.R + (endColor.R - startColor.R) * ti);
+            t.color.B = (byte)(startColor.B + (endColor.B - startColor.B) * ti);
+            t.color.G = (byte)(startColor.G + (endColor.G - startColor.G) * ti);
+            t.color.A = (byte)(startColor.A + (endColor.A - startColor.A) * ti);
+        }
+        public void Draw(int x, int y, SpriteBatch spriteBatch) {
+            if (useTimer) {
 
-					for (int i = 0; i < p; i++) {
-						flares[i].Draw(x, y, spriteBatch);
-					}
-				} else {
+                int p = points - 5;
+                if (p < 0) p *= -1;
 
-				}
+                int q = oldpoints - 5;
+                if (q < 0) q *= -1;
 
-				if (timer > 1) {
-					timer = 0;
-					oldpoints = points;
-					useTimer = false;
-				}
-			} else {
-				stats.Draw(x, y, spriteBatch);
-			}
-		}
+                int r = q;
+                if (p > q) r = p;
+                if (p != q) {
+                    if (timer < 0.4) {
+                        stats.width = 16 + (int)((r * 16) * Bezier(timer / 0.4));
+                        stats.Draw(x - (int)((r * 16) * Bezier(timer / 0.4)), y, spriteBatch);
+                        for (int i = 0; i < q; i++) {
+                            if ((i + 1) * 15 - (int)((r * 16) * Bezier(timer / 0.4)) < 16) flares[i].Draw(2+x + (i + 1) * 15 - (int)((r * 16) * Bezier(timer / 0.4)), y + 2, spriteBatch);
+                        }
+                    } else if (timer < 0.6) {
+                        stats.Draw(spriteBatch);
 
-		private double Bezier(double t) {
-			if (t < 0) t = 0;
-			if (t > 1) t = 1;
+                        if (p > q) blend(flares[p - 1], Bezier((timer - 0.4) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
+                        else if (p < q) blend(flares[q - 1], Bezier((timer - 0.4) / 0.2), new Color(255, 255, 255, 255), new Color(0, 0, 0, 0));
+                        for (int i = 0; i < r; i++) {
+                            flares[i].Draw(2+x + (i + 1) * 15 - r * 16, y + 2, spriteBatch);
+                        }
+                    } else {
+                        stats.width = 16 + r * 16 - (int)((r * 16) * Bezier((timer - 0.6) / 0.4));
+                        stats.Draw(x - r * 16 + (int)((r * 16) * Bezier((timer - 0.6) / 0.4)), y, spriteBatch);
+                        for (int i = 0; i < p; i++) {
+                            if ((i + 1) * 15 - r * 16 + (int)((r * 16) * Bezier((timer - 0.6) / 0.4)) < 16) flares[i].Draw(2+x + (i + 1) * 15 - r * 16 + (int)((r * 16) * Bezier((timer - 0.6) / 0.4)), y + 2, spriteBatch);
+                        }
+                    }
+                }
 
-			double u = 1 - t;
-			double tt = t * t;
-			double uu = u * u;
-			double uuu = uu * u;
-			double ttt = tt * t;
+                if (timer > 1) {
+                    timer = 0;
+                    oldpoints = points;
+                    useTimer = false;
+                }
+            } else {
+                stats.Draw(x, y, spriteBatch);
+            }
+        }
 
-			double p = uuu * 0; //first term
-			p += 3 * uu * t * 0.1; //second term
-			p += 3 * u * tt * 1.0; //third term
-			p += ttt * 1.0; //fourth term
+        private double Bezier(double t) {
+            if (t < 0) t = 0;
+            if (t > 1) t = 1;
 
-			return p;
-		}
-	}
+            double u = 1 - t;
+            double tt = t * t;
+            double uu = u * u;
+            double uuu = uu * u;
+            double ttt = tt * t;
+
+            double p = uuu * 0; //first term
+            p += 3 * uu * t * 0.1; //second term
+            p += 3 * u * tt * 1.0; //third term
+            p += ttt * 1.0; //fourth term
+
+            return p;
+        }
+
+    }
 }

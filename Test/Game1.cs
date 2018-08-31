@@ -198,6 +198,13 @@ namespace Alpaka {
                         rightbar.AddBuff((int)an.Values[1], (int)an.Values[2]);
                     }
                     break;
+                    case SceneAnimation.SceneAnimationType.STAT_BOOST:
+                    if (an.Values[0] == 1) {
+                        leftbar.AddBoost((int)an.Values[1]-2, (int)an.Values[2]);
+                    } else {
+                        rightbar.AddBoost((int)an.Values[1]-2, (int)an.Values[2]);
+                    }
+                    break;
                     case SceneAnimation.SceneAnimationType.CONDITION:
                     if (an.Values[0] == 1) {
                         leftbar.st = (byte)(an.Values[1] + 1);
@@ -238,6 +245,7 @@ namespace Alpaka {
                         user.changeID((int)an.Values[1]);
                         leftbar.name = an.Message;
                         leftbar.ResetBuffs();
+                        leftbar.ResetBoosts();
                     } else {
                         rightbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
                         rightbar.health = (int)an.Values[2];
@@ -248,6 +256,7 @@ namespace Alpaka {
                         opponent.changeID((int)an.Values[1]);
                         rightbar.name = an.Message;
                         rightbar.ResetBuffs();
+                        rightbar.ResetBoosts();
                     }
 
                     break;

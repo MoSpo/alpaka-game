@@ -11,11 +11,15 @@ namespace Alpaka.Scenes.Battle {
 		public List<SceneAnimation> Animations;
 		public List<List<SceneAnimation>> AnimationStack;
 
-		public abstract List<SceneAnimation> ExecuteEffect(EffectScript Script);
+        public List<InterpreterFrame> Frames;
+
+        public abstract List<SceneAnimation> ExecuteEffect(EffectScript Script);
 
 		public abstract void SetTargets(Player User, Player Opponent, Player Trigger, byte TriggerPosition);
 
 		public abstract void SetEffect(BattleEffect Effect);
+
+        public abstract void SetNewFrame(BattleEffect Effect, Player User, Player Opponent, Player Trigger, byte TriggerPosition);
 
         public abstract void SetElement(CreatureElement Element);
 
@@ -24,48 +28,112 @@ namespace Alpaka.Scenes.Battle {
 		public abstract void SetBaseAttacks(int BasePhysical, int BaseMystical);
     }
 
+    class InterpreterFrame {
+
+        public EffectHardExecute e;
+
+        public List<SceneAnimation> Animations;
+        public Player User;
+        public Player Opponent;
+        public Player Trigger;
+        public byte TriggerPosition;
+        public byte PlayersEffected;
+        public BattleEffect CurrentEffect;
+
+        public int BasePhysical;
+        public int BaseMystical;
+
+        public CreatureElement Element;
+
+        public InterpreterFrame(EffectHardExecute e, BattleEffect Effect, Player User, Player Opponent, Player Trigger, byte TriggerPosition) {
+            this.e = e;
+            Animations = new List<SceneAnimation>();
+            this.User = User;
+            this.Opponent = Opponent;
+            this.Trigger = Trigger;
+            this.TriggerPosition = TriggerPosition;
+            CurrentEffect = Effect;
+            Element = Effect.Element;
+            BasePhysical = Effect.BasePhysical;
+            BaseMystical = Effect.BaseMystical;
+        }
+
+        public void UseFrame() {
+            e.Animations = Animations;
+            e.User = User;
+            e.Opponent = Opponent;
+            e.Trigger = Trigger;
+            e.TriggerPosition = TriggerPosition;
+            e.CurrentEffect = CurrentEffect;
+            e.Element = Element;
+            e.BasePhysical = BasePhysical;
+            e.BaseMystical = BaseMystical;
+        }
+
+    }
+
     class EffectHardExecute : EffectExecute {
 
 		BattleEngine Battle;
-		Player User;
-		Player Opponent;
-		Player Trigger;
-		byte TriggerPosition;
-		byte PlayersEffected;
-		BattleEffect CurrentEffect;
+        InterpreterFrame CurrentFrame;
+        public Player User;
+        public Player Opponent;
+        public Player Trigger;
+        public byte TriggerPosition;
+        public byte PlayersEffected;
+        public BattleEffect CurrentEffect;
 
 		public int BasePhysical;
 		public int BaseMystical;
 
 		CreatureElement PrevElement;
-		CreatureElement Element;
+        public CreatureElement Element;
 
 		OP_[] OP_Decode;
 
 		public override List<SceneAnimation> ExecuteEffect(EffectScript Script) {
 
-			Animations = new List<SceneAnimation>();
-			AnimationStack.Add(Animations);
+            //Animations = new List<SceneAnimation>();
+            //AnimationStack.Add(Animations);
 
-			if (!(Element == CreatureElement.EARTH && Opponent.NotEffectedByEarth.Evaluate())) {
+            CurrentFrame = Frames.Last();
+            CurrentFrame.UseFrame();
+
+            if (!(Element == CreatureElement.EARTH && Opponent.NotEffectedByEarth.Evaluate())) {
 
 				List<byte> Memory = Script.Script;
 				for (int i = 0; i < Memory.Count; i++) {
 					OP_Decode[Memory[i] >> 4]((byte)(Memory[i] & 0x0F))();
 				}
 			}
-			AnimationStack.Remove(Animations);
+            /*AnimationStack.Remove(Animations);
 			List<SceneAnimation> Finished = Animations;
 			if (AnimationStack.Count > 0) {
 				Animations = AnimationStack.Last();
 			} else {
 				AnimationStack.Clear();
 				Animations = null;
+			}*/
+
+            Frames.Remove(CurrentFrame);
+			List<SceneAnimation> Finished = Animations;
+			if (Frames.Count > 0) {
+                CurrentFrame = Frames.Last();
+                CurrentFrame.UseFrame();
+            } else {
+                Frames.Clear();
+                CurrentFrame = null;
 			}
-			return Finished;
+
+            return Finished;
 		}
 
-		public override void SetTargets(Player User, Player Opponent, Player Trigger, byte TriggerPosition) {
+        public override void SetNewFrame(BattleEffect Effect, Player User, Player Opponent, Player Trigger, byte TriggerPosition) {
+            InterpreterFrame Frame = new InterpreterFrame(this, Effect, User, Opponent, Trigger, TriggerPosition);
+            Frames.Add(Frame);
+        }
+
+        public override void SetTargets(Player User, Player Opponent, Player Trigger, byte TriggerPosition) {
 			this.User = User;
 			this.Opponent = Opponent;
 			this.Trigger = Trigger;
@@ -102,8 +170,8 @@ namespace Alpaka.Scenes.Battle {
 
 		public EffectHardExecute(BattleEngine Battle) {
 			this.Battle = Battle;
-			AnimationStack = new List<List<SceneAnimation>>();
-
+            //AnimationStack = new List<List<SceneAnimation>>();
+            Frames = new List<InterpreterFrame>();
 			OP_[] fun = {OP_0_, OP_1_, OP_2_, OP_3_};
 
 			OP_Decode = fun;
@@ -385,7 +453,7 @@ namespace Alpaka.Scenes.Battle {
 		void OP_2F() {
 
 		}
-	}
+    }
 	/*
 	class EffectInterpreter : EffectExecute {
 

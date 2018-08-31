@@ -722,12 +722,23 @@ namespace Alpaka.Scenes.Battle {
             return Animations;
         }
 
-        private List<SceneAnimation> RemovePersonalEffects(byte PlayerNumber) {
-            List<SceneAnimation> Animations = new List<SceneAnimation>();
 
-            if (AllEffects[8 + PlayerNumber].effects[0] != null) Animations.AddRange(RemoveEffect(AllEffects[8 + PlayerNumber].effects[0], true));
-            if (AllEffects[8 + PlayerNumber].effects[0] != null) Animations.AddRange(RemoveEffect(AllEffects[8 + PlayerNumber].effects[0], true));
-            if (AllEffects[8 + PlayerNumber].effects[0] != null) Animations.AddRange(RemoveEffect(AllEffects[8 + PlayerNumber].effects[0], true));
+        public void RemovePersonalEffect(BattleEffect Effect) {
+
+            AllEffects[Effect.CurrentPlacement].RemoveEffect(Effect);
+            foreach (EffectScript Script in Effect.Scripts) {
+
+                    SortedEffects[Script.Trigger][Script.Speed].Remove(Effect);
+
+            }
+        }
+
+        private List<SceneAnimation> RemovePersonalEffects(byte PlayerNumber) {
+            List<SceneAnimation> Animations = new List<SceneAnimation>();//NOT NEEDED
+
+            if (AllEffects[8 + PlayerNumber].effects[0] != null) RemovePersonalEffect(AllEffects[8 + PlayerNumber].effects[0]);
+            if (AllEffects[8 + PlayerNumber].effects[0] != null) RemovePersonalEffect(AllEffects[8 + PlayerNumber].effects[0]);
+            if (AllEffects[8 + PlayerNumber].effects[0] != null) RemovePersonalEffect(AllEffects[8 + PlayerNumber].effects[0]);
 
             return Animations;
         }
@@ -757,8 +768,9 @@ namespace Alpaka.Scenes.Battle {
         public List<SceneAnimation> InterpretEffect(BattleEffect Effect, EffectScript EffectScripts, Player User, Player Trigger, byte TriggerPosition) {
 
             List<SceneAnimation> Animations = new List<SceneAnimation>();
-            Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
-            Interpreter.SetEffect(Effect);
+            Interpreter.SetNewFrame(Effect, User, GetOpponent(User), Trigger, TriggerPosition);
+            //Interpreter.SetTargets(User, GetOpponent(User), Trigger, TriggerPosition);
+            //Interpreter.SetEffect(Effect);
             Animations.AddRange(Interpreter.ExecuteEffect(EffectScripts));
 
             return Animations; //TODO: GET ANIMATIONS FROM SCRIPT

@@ -360,10 +360,12 @@ namespace Alpaka {
 				if (increase) {
 					points += 1;
                     if (points > 5) SetColour(true);
+                    timer = 0;
                         useTimer = true;
 				} else {
 					points -= 1;
                     if(points < 5) SetColour(false);
+                    timer = 0;
                     useTimer = true;
 				}
 			}
@@ -395,25 +397,25 @@ namespace Alpaka {
                         for (int i = 0; i < q; i++) {
                             if (-(i + 1) * 15 + (int)((r * 16) * Bezier(timer / 0.4)) > -16) flares[i].Draw(x - (i + 1) * 15 + (int)((r * 16) * Bezier(timer / 0.4)), y + 2, spriteBatch);
                         }
-                    } else if (timer < 0.6) {
+                    } else if (timer < 1.6) {
                         stats.Draw(spriteBatch);
 
-                        if (p > q) blend(flares[p - 1], Bezier((timer - 0.4) / 0.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
-                        else if (p < q) blend(flares[q - 1], Bezier((timer - 0.4) / 0.2), new Color(255, 255, 255, 255), new Color(0, 0, 0, 0));
+                        if (p > q) blend(flares[p - 1], Bezier((timer - 0.4) / 1.2), new Color(0, 0, 0, 0), new Color(255, 255, 255, 255));
+                        else if (p < q) blend(flares[q - 1], Bezier((timer - 0.4) / 1.2), new Color(255, 255, 255, 255), new Color(0, 0, 0, 0));
                             for (int i = 0; i < r; i++) {
                                 flares[i].Draw(x - (i + 1) * 15 + r * 16, y + 2, spriteBatch);
                             }
                     } else {
-                        stats.sourcex = 161 + 76 - r * 16 + (int)((r * 16) * Bezier((timer - 0.6) / 0.4));
-                        stats.width = 16 + r * 16 - (int)((r * 16) * Bezier((timer - 0.6) / 0.4));
+                        stats.sourcex = 161 + 76 - r * 16 + (int)((r * 16) * Bezier((timer - 1.6) / 0.4));
+                        stats.width = 16 + r * 16 - (int)((r * 16) * Bezier((timer - 1.6) / 0.4));
                         stats.Draw(x, y, spriteBatch);
                         for (int i = 0; i < p; i++) {
-                            if (-(i + 1) * 15 + r * 16 - (int)((r * 16) * Bezier((timer - 0.6) / 0.4)) > -16) flares[i].Draw(x - (i + 1) * 15 + r * 16 - (int)((r * 16) * Bezier((timer - 0.6) / 0.4)), y + 2, spriteBatch);
+                            if (-(i + 1) * 15 + r * 16 - (int)((r * 16) * Bezier((timer - 1.6) / 0.4)) > -16) flares[i].Draw(x - (i + 1) * 15 + r * 16 - (int)((r * 16) * Bezier((timer - 1.6) / 0.4)), y + 2, spriteBatch);
                         }
                     }
                 }
 
-                if (timer > 1) {
+                if (timer > 2) {
 					timer = 0;
 					oldpoints = points;
 					useTimer = false;

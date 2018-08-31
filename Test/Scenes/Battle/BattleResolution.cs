@@ -31,7 +31,7 @@ namespace Alpaka.Scenes.Battle {
 
 			if (RotationDelta != 0) {
 
-                    Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_MOVEMENT, null));
+                    Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_MOVEMENT, User, true));
 
                     if (RotationDelta > 0) {
                         Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " moves right..."));
@@ -45,7 +45,7 @@ namespace Alpaka.Scenes.Battle {
                 } else {
                     Animations.AddRange(Battle.DeltaRotate(RotationDelta));
 
-                    Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_MOVEMENT, null));
+                    Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_MOVEMENT, User, true));
                 }
 			} else {
 				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, User.ActiveCreature.Nickname + " stays still..."));
@@ -72,7 +72,7 @@ namespace Alpaka.Scenes.Battle {
 
 			if (User.CanUseActionThisTurn.Evaluate()) {
 
-				Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_ACTION, User));
+				Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_ACTION, User, false));
 
 				if (Opponent.CanBeAttacked.Evaluate() || !(Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL)) {
 					if (Action.Mana > 0) {
@@ -93,14 +93,14 @@ namespace Alpaka.Scenes.Battle {
 				if ((Action.Catagory == ActionCategory.MYSTICAL || Action.Catagory == ActionCategory.PHYSICAL)) { //TODO: ADD ADAPTIVES AND DEFENSIVES
 
 					if (Opponent.CanBeAttacked.Evaluate()) {
-						Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_ATTACKING, User));
+						Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.BEFORE_ATTACKING, User, false));
 
 						//Do Attack
 						Animations.AddRange(Battle.Damage(Opponent, Action.Element, Action.Catagory, Action.Power, User.amountOfAttacks, Action.Animation, User.TriggersAttackFlags.Evaluate())); //BEOFRE_ATTACKED migrated into here
 
 						User.amountOfAttacks = 1; //Needed for if any following effects inflict damage
 
-						Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_ATTACKING, User));
+						Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_ATTACKING, User, false));
 					} else {
 						Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Opponent.ActiveCreature.Nickname + " cannot be attacked!"));
 					}
@@ -112,7 +112,7 @@ namespace Alpaka.Scenes.Battle {
 					User.amountOfAttacks = 1;
 				}
 
-				Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_ACTION, User));
+				Animations.AddRange(Battle.RunTriggerTypeEffect(EffectTrigger.AFTER_ACTION, User, false));
 
 			} else {
 				Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "But the Action failed!"));

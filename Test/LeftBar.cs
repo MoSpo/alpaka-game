@@ -46,6 +46,7 @@ namespace Alpaka {
         Thing el2;
         Thing el3;
 
+        ElementThing[] elementBuffs;
 
         Game1 g;
 
@@ -70,6 +71,17 @@ namespace Alpaka {
             el2 = new Thing(elements, 0, 32 * ele2, 32, 32);
             el3 = new Thing(elements, 0, 32 * ele3, 32, 32);
 
+            Texture2D buffs = Content.Load<Texture2D>("buffs");
+
+            elementBuffs = new ElementThing[6] {
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16)
+            };
+
             st = 0;
 
             statuses = Content.Load<Texture2D>("status");
@@ -90,6 +102,41 @@ namespace Alpaka {
 				timer += dt;
 			}
 		}
+
+        public void ResetBuffs() {
+            foreach (ElementThing e in elementBuffs) {
+                if (e.GetAmount() == 0) e.IncreaseAmount(); e.element = 0;
+                if (e.GetAmount() == 2) e.DecreaseAmount(); e.element = 0;
+                }
+            }
+
+            public void AddBuff(int element, int buff) {
+
+            bool isBuff = buff == 1;
+
+            foreach (ElementThing e in elementBuffs) {
+                if (e.element == element) {
+                    if (isBuff) {
+                        if (e.GetAmount() == 0) e.IncreaseAmount(); e.element = 0;
+                    } else {
+                        if (e.GetAmount() == 2) e.DecreaseAmount(); e.element = 0;
+                    }
+                    return;
+                }
+            }
+
+            foreach (ElementThing e in elementBuffs) {
+                if (e.GetAmount() == 1) {
+                    if (isBuff) {
+                        e.IncreaseAmount();
+                    } else {
+                        e.DecreaseAmount();
+                    }
+                    e.element = element;
+                    return;
+                }
+            }
+        }
 
 		public void setHealth(int sh) {
 			health = sh;
@@ -132,7 +179,14 @@ namespace Alpaka {
             el3.Draw(208 + x, 34 + y, spriteBatch);
 
             body.Draw(x, y + 50, spriteBatch);
-			blank.Draw(x, y, spriteBatch);
+
+            int ei = 0;
+            foreach (ElementThing e in elementBuffs) {
+                e.Draw(x + 5, y + 73 + 16 * ei, spriteBatch);
+                if (e.GetAmount() != 1) ei++;
+            }
+
+            blank.Draw(x, y, spriteBatch);
 			if (useTimer) {
 				if (isHealth) {
 					h = (int)((oldhealth + (health - oldhealth) * timer) * 250/totalHealth);
@@ -185,7 +239,42 @@ namespace Alpaka {
 
     }
 
-	public class LeftStatBar {
+    public class ElementThing : Thing {
+
+        public int element;
+
+        private int amt;
+        private Texture2D texture2;
+
+        public ElementThing(Texture2D texture, Texture2D texture2, int sourcex, int sourcey, int width, int height) : base(texture, sourcex, sourcey, width, height) {
+            amt = 1;
+            this.texture2 = texture2;
+        }
+
+        public int GetAmount() {
+            return amt;
+        }
+        public void IncreaseAmount() {
+            if (amt < 3) {
+                amt++;
+            }
+        }
+        public void DecreaseAmount() {
+            if (amt > 0) {
+                amt--;
+            }
+        }
+        public override void Draw(int x, int y, SpriteBatch spriteBatch) {
+            this.x = x;
+            this.y = y;
+            if (amt != 1) {
+                spriteBatch.Draw(texture2, new Rectangle(x, y, width, height), new Rectangle(0, 8 * amt, width, height), color);
+                spriteBatch.Draw(texture, new Rectangle(x, y, width, height), new Rectangle(8 * amt, 16 + 32 * element, width, height), color);
+            }
+        }
+    }
+
+    public class LeftStatBar {
 		Texture2D bar;
 		Thing stats;
 		Thing[] flares;
@@ -289,5 +378,6 @@ namespace Alpaka {
 
 			return p;
 		}
-	}
+
+    }
 }

@@ -242,7 +242,7 @@ namespace Alpaka.Scenes.Battle {
                     }
                     if (Placement < 8) {
                         Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_EFFECT, new double[] { Effect.CurrentPlacement, Effect.GetEffectGroup() }, Effect.Name));
-                        Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_NEW_TILE_PLACED, null));
+                        Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_NEW_TILE_PLACED, User, true));
                         foreach (EffectScript Script in Effect.Scripts) {
                             if (Script.Trigger == EffectTrigger.ON_STAND_ENTER) {
                                 if (Effect.CurrentPlacement == Player1.Placement && !AllEffects[Player1.Placement].HasEffectGroup(Effect.GetEffectGroup())) {
@@ -288,7 +288,7 @@ namespace Alpaka.Scenes.Battle {
                         }
                     }
 
-                    Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_OTHER_EFFECT_ENTER, null));
+                    Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_OTHER_EFFECT_ENTER, User, true));
 
                     foreach (EffectScript Script in Effect.Scripts) {
                         List<BattleEffect> Effects;
@@ -336,7 +336,7 @@ namespace Alpaka.Scenes.Battle {
 
                     if (Effect.CurrentPlacement < 8) {
                         Interpreter.SetPrevElement(Effect.Element); //TODO: HIGHLY LIKELY A BETTER WAY OF DOING ALL THIS
-                        Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_OTHER_EFFECT_TIMEOUT, null));
+                        Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_OTHER_EFFECT_TIMEOUT, Effect.User, true));
                     }
 
                 } else {
@@ -364,7 +364,7 @@ namespace Alpaka.Scenes.Battle {
 
                     if (Effect.CurrentPlacement < 8) {
                         Interpreter.SetPrevElement(Effect.Element);
-                        Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_OTHER_EFFECT_EXIT, null));
+                        Animations.AddRange(RunTriggerTypeEffect(EffectTrigger.ON_OTHER_EFFECT_EXIT, Effect.User, true));
                     }
                 }
             }
@@ -407,7 +407,7 @@ namespace Alpaka.Scenes.Battle {
             List<SceneAnimation> Animations = new List<SceneAnimation>();
 
             Animations.AddRange(
-                RunTriggerTypeEffect(EffectTrigger.ON_YOUR_SWITCH, Target)
+                RunTriggerTypeEffect(EffectTrigger.ON_YOUR_SWITCH, Target, false)
             );
 
             if (Target.playerNumber == 0) {
@@ -442,7 +442,7 @@ namespace Alpaka.Scenes.Battle {
             Target.JustSwitchedIn = false;
 
             Animations.AddRange(
-                RunTriggerTypeEffect(EffectTrigger.ON_OPPONENT_SWITCH, GetOpponent(Target))
+                RunTriggerTypeEffect(EffectTrigger.ON_OPPONENT_SWITCH, GetOpponent(Target), false)
             );
 
             return Animations;
@@ -454,7 +454,7 @@ namespace Alpaka.Scenes.Battle {
 
             if (TriggersAttackFlags) {
                 Animations.AddRange(
-                    RunTriggerTypeEffect(EffectTrigger.BEFORE_ATTACKED, Target)
+                    RunTriggerTypeEffect(EffectTrigger.BEFORE_ATTACKED, Target, false)
                 );
             }
 
@@ -483,7 +483,7 @@ namespace Alpaka.Scenes.Battle {
             } else if (!Target.IsNotInArena()) {
                 if (TriggersAttackFlags) {
                     Animations.AddRange(
-                        RunTriggerTypeEffect(EffectTrigger.AFTER_ATTACKED, Target)
+                        RunTriggerTypeEffect(EffectTrigger.AFTER_ATTACKED, Target, false)
                     );
                 }
             }
@@ -495,7 +495,7 @@ namespace Alpaka.Scenes.Battle {
             if (IsKilled) {
                 Target.ActiveCreature.killed = false;
                 Animations.AddRange(
-                    RunTriggerTypeEffect(EffectTrigger.ON_YOUR_DEATH, Target)
+                    RunTriggerTypeEffect(EffectTrigger.ON_YOUR_DEATH, Target, false)
                 );
                 Target.ActiveCreature.killed = true;
             }
@@ -520,7 +520,7 @@ namespace Alpaka.Scenes.Battle {
                 Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " collapses!"));
 
                 Animations.AddRange(
-                    RunTriggerTypeEffect(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target))
+                    RunTriggerTypeEffect(EffectTrigger.ON_OPPONENT_DEATH, GetOpponent(Target), false)
                 );
             } else {
                 Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, Target.ActiveCreature.Nickname + " has been forced out of the arena!"));
@@ -707,20 +707,20 @@ namespace Alpaka.Scenes.Battle {
         }
 
 
-        public List<SceneAnimation> RunTriggerTypeEffect(EffectTrigger Trigger, Player TargetUser) {
+        public List<SceneAnimation> RunTriggerTypeEffect(EffectTrigger Trigger, Player TargetUser, bool RunIfKilled) {
             //If TargetUser is parsed it will only run if they are not killed and own the effect
             //TODO: PLEASE UNDERSTAND THIS SO THAT DEATH IN THIS IS DETERMINISTIC
             List<SceneAnimation> Animations = new List<SceneAnimation>();
             List<BattleEffect> DeadEffects = new List<BattleEffect>();
 
-            bool u_nia = Player1.IsNotInArena();
-            bool o_nia = GetOpponent(Player1).IsNotInArena();
+            bool u_nia = TargetUser.IsNotInArena();
+            bool o_nia = GetOpponent(TargetUser).IsNotInArena();
 
 
-            if (TargetUser == null || !TargetUser.IsNotInArena()) {
+            if (RunIfKilled || !TargetUser.IsNotInArena()) {
                 foreach (List<BattleEffect> Effects in SortedEffects[Trigger].Values) {
                     foreach (BattleEffect Effect in Effects) {
-                        if (Effect.User == TargetUser || TargetUser == null) {
+                        if (RunIfKilled || Effect.User == TargetUser) {
                             if (Effect.EffectAnimation != null) {
                                 Animations.Add(Effect.EffectAnimation);
                             }
@@ -735,7 +735,7 @@ namespace Alpaka.Scenes.Battle {
 
             }
 
-            Animations.AddRange(CheckIfRemoved(Player1, GetOpponent(Player1), u_nia, o_nia));
+            Animations.AddRange(CheckIfRemoved(TargetUser, GetOpponent(TargetUser), u_nia, o_nia));
 
             return Animations;
         }

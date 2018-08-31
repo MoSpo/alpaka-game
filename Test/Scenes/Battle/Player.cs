@@ -169,8 +169,8 @@ namespace Alpaka.Scenes.Battle {
 			double Bonuses = ElementEffectiveness * ElementProficiency * GetElementBuffs(Element);
 
 			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
-				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((AttackerStrength * BaseActionPower * Bonuses / AttackedEndurance) +2.0);
-				else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor((AttackerIntelligence * BaseActionPower * Bonuses / AttackedWisdom) + 2.0);
+				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor((AttackerStrength * BaseActionPower * Bonuses / AttackedEndurance) *2.1);
+				else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor((AttackerIntelligence * BaseActionPower * Bonuses / AttackedWisdom) * 2.1);
 
 				int nh = ActiveCreature.Health - Damage;
 				if (nh < 0) nh = 0;
@@ -204,8 +204,8 @@ namespace Alpaka.Scenes.Battle {
 			double Bonuses = GetElementEffectiveness(Element) * (Attacker.HasElement(Element) ? 1.5 : 1) * Attacker.GetElementBuffs(Element);
 
 			if (Bonuses > 0 && !(Element == CreatureElement.EARTH && NotEffectedByEarth.Evaluate())) {
-				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor(((Attacker.GetTotalStat(CreatureStats.STRENGTH) * (double)BaseActionPower * Bonuses) / (GetElementBuffs(Element)* GetTotalStat(CreatureStats.ENDURANCE))) + 2.0);
-              	else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor(((Attacker.GetTotalStat(CreatureStats.INTELLIGENCE) * (double)BaseActionPower * Bonuses) / (GetElementBuffs(Element) *GetTotalStat(CreatureStats.WISDOM))) + 2.0);
+				if (Category == ActionCategory.PHYSICAL) Damage = (int)Math.Floor(((Attacker.GetTotalStat(CreatureStats.STRENGTH) * (double)BaseActionPower * Bonuses) / (GetElementBuffs(Element)* GetTotalStat(CreatureStats.ENDURANCE))) * 2.1);
+              	else if (Category == ActionCategory.MYSTICAL) Damage = (int)Math.Floor(((Attacker.GetTotalStat(CreatureStats.INTELLIGENCE) * (double)BaseActionPower * Bonuses) / (GetElementBuffs(Element) *GetTotalStat(CreatureStats.WISDOM))) * 2.1);
 
 				int nh = ActiveCreature.Health - Damage;
 				if (nh < 0) nh = 0;
@@ -299,13 +299,13 @@ namespace Alpaka.Scenes.Battle {
 			return new SceneAnimation(SceneAnimation.SceneAnimationType.CONDITION, new double[] { playerNumber, Condition }, "#CONDITION ANIMATION#");
 		}
 
-		public SceneAnimation GiveElementBoost(CreatureElement Element, bool IsPositiveBoost) {
+		public SceneAnimation GiveElementBuff(CreatureElement Element, bool IsPositiveBoost) {
 			if (IsPositiveBoost) {
 				ElementBuffs[(byte)Element] = true;
-				return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Element, 1 }, "#ELEMENT BOOST ANIMATION#");
+				return new SceneAnimation(SceneAnimation.SceneAnimationType.ELEMENT_BOOST, new double[] { playerNumber, (double)Element, 1 }, "#ELEMENT BOOST ANIMATION#");
 			}
 			ElementBuffs[(byte)Element] = false;
-			return new SceneAnimation(SceneAnimation.SceneAnimationType.STAT_BOOST, new double[] { playerNumber, (double)Element, -1 }, "#ELEMENT BOOST ANIMATION#");
+			return new SceneAnimation(SceneAnimation.SceneAnimationType.ELEMENT_BOOST, new double[] { playerNumber, (double)Element, -1 }, "#ELEMENT BOOST ANIMATION#");
 		}
 
 		public List<SceneAnimation> GiveStatBoost(CreatureStats Stat, bool IsPositiveBoost) {

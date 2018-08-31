@@ -44,6 +44,8 @@ namespace Alpaka {
         Thing el2;
         Thing el3;
 
+        ElementThing[] elementBuffs;
+
         Game1 g;
 
         public RightBar(ContentManager Content, Game1 g) {
@@ -67,6 +69,17 @@ namespace Alpaka {
             el2 = new Thing(elements, 0, 32 * ele2, 32, 32);
             el3 = new Thing(elements, 0, 32 * ele3, 32, 32);
 
+            Texture2D buffs = Content.Load<Texture2D>("buffs");
+
+            elementBuffs = new ElementThing[6] {
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16),
+                new ElementThing(elements, buffs, 0, 0, 16, 16)
+            };
+
             st = 0;
 
             statuses = Content.Load<Texture2D>("status");
@@ -88,7 +101,42 @@ namespace Alpaka {
 			}
 		}
 
-		public void setHealth(int sh) {
+        public void ResetBuffs() {
+            foreach (ElementThing e in elementBuffs) {
+                if (e.GetAmount() == 0) e.IncreaseAmount(); e.element = 0;
+                if (e.GetAmount() == 2) e.DecreaseAmount(); e.element = 0;
+            }
+        }
+
+        public void AddBuff(int element, int buff) {
+
+            bool isBuff = buff == 1;
+
+            foreach (ElementThing e in elementBuffs) {
+                if (e.element == element) {
+                    if (isBuff) {
+                        if (e.GetAmount() == 0) e.IncreaseAmount(); e.element = 0;
+                    } else {
+                        if (e.GetAmount() == 2) e.DecreaseAmount(); e.element = 0;
+                    }
+                    return;
+                }
+            }
+
+            foreach (ElementThing e in elementBuffs) {
+                if (e.GetAmount() == 1) {
+                    if (isBuff) {
+                        e.IncreaseAmount();
+                    } else {
+                        e.DecreaseAmount();
+                    }
+                    e.element = element;
+                    return;
+                }
+            }
+        }
+
+        public void setHealth(int sh) {
 			health = sh;
 			useTimer = true;
 			isHealth = true;
@@ -129,7 +177,14 @@ namespace Alpaka {
             el3.Draw(304 -208 + x, 34 + y, spriteBatch);
 
             body.Draw(x + 196, y + 50, spriteBatch);
-			blank.Draw(x, y, spriteBatch);
+
+            int ei = 0;
+            foreach (ElementThing e in elementBuffs) {
+                e.Draw(x + 315, y + 73 + 16 * ei, spriteBatch);
+                if (e.GetAmount() != 1) ei++;
+            }
+
+            blank.Draw(x, y, spriteBatch);
 			if (useTimer) {
 				if (isHealth) {
 					h =  250 - (int)((oldhealth + (health - oldhealth) * timer) * 250 / totalHealth);

@@ -190,7 +190,13 @@ namespace Alpaka {
                     } else {
                         opponent.changeID(0);
                     }
-
+                    break;
+                    case SceneAnimation.SceneAnimationType.ELEMENT_BOOST:
+                    if (an.Values[0] == 1) {
+                        leftbar.AddBuff((int)an.Values[1], (int)an.Values[2]);
+                    } else {
+                        rightbar.AddBuff((int)an.Values[1], (int)an.Values[2]);
+                    }
                     break;
                     case SceneAnimation.SceneAnimationType.CONDITION:
                     if (an.Values[0] == 1) {
@@ -231,6 +237,7 @@ namespace Alpaka {
                         leftbar.oldkin = (int)an.Values[4];
                         user.changeID((int)an.Values[1]);
                         leftbar.name = an.Message;
+                        leftbar.ResetBuffs();
                     } else {
                         rightbar.setElements((byte)an.Values[5], (byte)an.Values[6], (byte)an.Values[7]);
                         rightbar.health = (int)an.Values[2];
@@ -240,6 +247,7 @@ namespace Alpaka {
                         rightbar.oldkin = (int)an.Values[4];
                         opponent.changeID((int)an.Values[1]);
                         rightbar.name = an.Message;
+                        rightbar.ResetBuffs();
                     }
 
                     break;
@@ -387,7 +395,7 @@ namespace Alpaka {
 
                             IsUserDeathTurn = false;
                             List<SceneAnimation> a = engine.Poll();
-                            anim.AddRange(a);
+                            if (a != null) anim.AddRange(a);
                         } else if (IsOpponentDeathTurn) {
                             engine.Player1.SelectAction(0);
                             engine.Player1.SelectMovement(MovementCategory.DO_NOTHING);
@@ -398,7 +406,7 @@ namespace Alpaka {
 
                             IsOpponentDeathTurn = false;
                             List<SceneAnimation> a = engine.Poll();
-                            anim.AddRange(a);
+                            if (a != null) anim.AddRange(a);
                         } else {
                             engine.Player1.SelectAction((byte)(menu.chosenAction - 1));
                             engine.Player1.SelectMovement((MovementCategory)menu.chosenMovement);
@@ -410,7 +418,7 @@ namespace Alpaka {
                             TurnNumber++;
                             for (int i = 0; i < 10; i++) {
                                 List<SceneAnimation> a = engine.Poll();
-                                anim.AddRange(a);
+                                if(a != null) anim.AddRange(a);
                             }
                         }
                         PrintAnim();

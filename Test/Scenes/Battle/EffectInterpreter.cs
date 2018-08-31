@@ -241,7 +241,7 @@ namespace Alpaka.Scenes.Battle {
 
         }
         void WINDTUNNEL() {
-			Animations.Add(Trigger.GiveElementBoost(CreatureElement.WIND, true));
+			Animations.Add(Trigger.GiveElementBuff(CreatureElement.WIND, true));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " became more proficient with Wind Actions!"));
 			Animations.AddRange(Trigger.GiveStatBoost(CreatureStats.PACE, true));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " increased!"));
@@ -281,7 +281,7 @@ namespace Alpaka.Scenes.Battle {
         }
 
         void WINDTUNNEL2() {
-			Animations.Add(Trigger.GiveElementBoost(CreatureElement.WIND, false));
+			Animations.Add(Trigger.GiveElementBuff(CreatureElement.WIND, false));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " became less proficient with Wind Actions!"));
 			Animations.AddRange(Trigger.GiveStatBoost(CreatureStats.PACE, false));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, "The Pace of " + OpponentText(Trigger) + Trigger.ActiveCreature.Nickname + " decreased!"));
@@ -332,11 +332,11 @@ namespace Alpaka.Scenes.Battle {
 
 		}
 		void OP_22() {
-			Animations.Add(Opponent.GiveElementBoost(CreatureElement.FIRE, false));
+			Animations.Add(Opponent.GiveElementBuff(CreatureElement.FIRE, false));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(Opponent) + Opponent.ActiveCreature.Nickname + " became less proficient with Fire Actions!"));
 		}
 		void OP_23() {
-			Animations.Add(User.GiveElementBoost(CreatureElement.NUCLEAR, true));
+			Animations.Add(User.GiveElementBuff(CreatureElement.NUCLEAR, true));
 			Animations.Add(new SceneAnimation(SceneAnimation.SceneAnimationType.ADD_MESSAGE, null, OpponentText(User) + User.ActiveCreature.Nickname + " became more proficient with Nuclear Actions!"));
 		}
 		void OP_24() {
